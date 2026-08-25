@@ -20,6 +20,22 @@ RSpec.describe EndpointSecurity::Codegen::IR do
     )
   end
 
+  it "scopes both message and msg version comments to their records" do
+    source = <<~HEADER
+      typedef struct {
+        int value; /* field available only if message version >= 2 */
+      } es_first_t;
+      typedef struct {
+        int value; // Available in msg versions >= 8.
+      } es_second_t;
+    HEADER
+
+    expect(described_class.scan_field_versions([source])).to eq(
+      %w[es_first_t value] => 2,
+      %w[es_second_t value] => 8
+    )
+  end
+
   it "exposes every SDK event and marks reserved placeholders" do
     expect(ES::EventType.all.size).to eq(ES::EventType::LAST)
     expect(ES::EventType.auth?(:auth_exec)).to be(true)

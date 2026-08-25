@@ -76,7 +76,7 @@ module EndpointSecurity
             next if field["name"].start_with?("reserved")
 
             type = field.dig("type", "desugaredQualType") || field.dig("type", "qualType")
-            minimum_version = versions.fetch([name, field["name"]], versions.fetch(field["name"], 1))
+            minimum_version = versions.fetch([name, field["name"]], 1)
             Field.new(field["name"], type, minimum_version)
           end
           next if fields.empty?
@@ -87,9 +87,18 @@ module EndpointSecurity
 
       def self.scan_field_versions(sources)
         sources.each_with_object({}) do |source, versions|
+          fields = nil
           source.each_line do |line|
-            match = line.match(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:;|\[[^\]]+\];)[^\n]*message version >= (\d+)/)
-            versions[match[1]] = Integer(match[2]) if match
+            fields = {} if fields.nil? && line.match?(/\btypedef\s+struct(?:\s+[a-zA-Z_]\w*)?\s*\{/)
+            if fields && (match = line.match(
+              /\b([a-zA-Z_]\w*)\s*(?:\[[^\]]*\])?\s*;[^\n]*(?:message|msg)\s+versions?\s*>=\s*(\d+)/i
+            ))
+              fields[match[1]] = Integer(match[2])
+            end
+            next unless fields && (record = line[/^\s*}\s*(es_[a-zA-Z0-9_]+_t)\s*;/, 1])
+
+            fields.each { |name, version| versions[[record, name]] = version }
+            fields = nil
           end
         end
       end
