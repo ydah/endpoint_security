@@ -2,12 +2,15 @@
 
 require "endpoint_security"
 
-blocked_prefix = ARGV.fetch(0, "/tmp/")
+blocked_team_id, blocked_signing_id = ARGV
+abort "usage: ruby execblock.rb TEAM_ID SIGNING_ID" unless blocked_team_id && blocked_signing_id
+
 ES::Client.open(auth_default: :allow) do |client|
   client.subscribe(:auth_exec)
   client.on(:auth_exec) do |message|
     target = message.event.target
-    target.executable.path.start_with?(blocked_prefix) ? message.deny!(cache: false) : message.allow!(cache: false)
+    blocked = target.team_id == blocked_team_id && target.signing_id == blocked_signing_id
+    blocked ? message.deny!(cache: false) : message.allow!(cache: false)
   end
   client.run
 end
