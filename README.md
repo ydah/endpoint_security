@@ -45,17 +45,19 @@ end
 ## Authorize events
 
 ```ruby
-ES::Client.open(auth_default: :allow) do |client|
+ES::Client.open(auth_default: :allow, warn_on_truncated_path: true) do |client|
   client.subscribe(:auth_exec)
   client.on(:auth_exec) do |message|
-    path = message.event.target.executable.path
-    path.start_with?("/tmp/") ? message.deny!(cache: false) : message.allow!(cache: false)
+    target = message.event.target
+    target.platform_binary? ? message.allow!(cache: true) : message.deny!(cache: false)
   end
   client.run
 end
 ```
 
 The native watchdog sends `auth_default` if Ruby misses the deadline. `allow!`, `deny!`, and the watchdog share one atomic state, so a message is never answered twice. Keep network, file, and subprocess I/O out of an AUTH handler; use `retain!` and another thread when slow work is unavoidable.
+
+Do not authorize from a path string alone: paths can be truncated or replaced between observation and use. Prefer `cdhash`, `signing_id`, `team_id`, and platform-signing metadata; treat `path_truncated?` as unsafe for path-based decisions.
 
 ## Muting and recording
 
