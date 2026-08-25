@@ -35,6 +35,7 @@ static _Atomic uint32_t last_response;
 static _Atomic bool inverted[3];
 static _Atomic int next_new_client_result;
 static _Atomic int next_respond_result;
+static _Atomic int next_delete_result;
 static _Atomic size_t clients;
 static _Atomic bool delete_on_creator_thread;
 
@@ -74,7 +75,7 @@ es_delete_client(es_client_t *client)
     Block_release(client->handler);
     atomic_fetch_sub_explicit(&clients, 1, memory_order_relaxed);
     free(client);
-    return ES_RETURN_SUCCESS;
+    return atomic_exchange_explicit(&next_delete_result, ES_RETURN_SUCCESS, memory_order_relaxed);
 }
 
 es_return_t
@@ -414,12 +415,19 @@ esmock_set_respond_result(es_respond_result_t result)
 }
 
 void
+esmock_set_delete_result(es_return_t result)
+{
+    atomic_store_explicit(&next_delete_result, result, memory_order_relaxed);
+}
+
+void
 esmock_reset(void)
 {
     atomic_store_explicit(&responses, 0, memory_order_relaxed);
     atomic_store_explicit(&last_response, 0, memory_order_relaxed);
     atomic_store_explicit(&next_new_client_result, ES_NEW_CLIENT_RESULT_SUCCESS, memory_order_relaxed);
     atomic_store_explicit(&next_respond_result, ES_RESPOND_RESULT_SUCCESS, memory_order_relaxed);
+    atomic_store_explicit(&next_delete_result, ES_RETURN_SUCCESS, memory_order_relaxed);
     atomic_store_explicit(&clients, 0, memory_order_relaxed);
     atomic_store_explicit(&delete_on_creator_thread, true, memory_order_relaxed);
     for (size_t index = 0; index < 3; index++) {

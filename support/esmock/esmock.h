@@ -15,6 +15,7 @@ size_t esmock_client_count(void);
 bool esmock_delete_on_creator_thread(void);
 void esmock_set_new_client_result(es_new_client_result_t result);
 void esmock_set_respond_result(es_respond_result_t result);
+void esmock_set_delete_result(es_return_t result);
 void esmock_reset(void);
 
 #endif

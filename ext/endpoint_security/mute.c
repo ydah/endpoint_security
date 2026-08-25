@@ -82,12 +82,13 @@ static VALUE
 mute_path(VALUE self, VALUE action, VALUE path, VALUE type_value, VALUE values)
 {
     esrb_client_t *client = mute_client(self);
-    size_t count;
-    es_event_type_t *events = event_values(values, &count);
+    ID action_id = SYM2ID(action);
     es_mute_path_type_t type = (es_mute_path_type_t)NUM2INT(type_value);
     const char *path_string = StringValueCStr(path);
+    size_t count;
+    es_event_type_t *events = event_values(values, &count);
     es_return_t result;
-    if (SYM2ID(action) == rb_intern("mute")) {
+    if (action_id == rb_intern("mute")) {
         result = count == 0 ? es_mute_path(client->client, path_string, type)
                             : es_mute_path_events(client->client, path_string, type, events, count);
     } else {

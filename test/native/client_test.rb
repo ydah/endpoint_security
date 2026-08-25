@@ -205,6 +205,16 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "reports native client deletion failures" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    ES::Mock.delete_result = 1
+
+    client.close
+    expect(client.stats[:delete_errors]).to eq(1)
+  ensure
+    client&.close
+  end
+
   it "releases retained AUTH messages safely while the watchdog races" do
     client = described_class.new(queue_depth: 8)
     retained = Queue.new
@@ -256,6 +266,14 @@ RSpec.describe ES::Client do
     expect(client.muted_paths).to eq([])
     expect(client.muted_processes).to eq([])
     expect(client.clear_cache).to be(true)
+  ensure
+    client&.close
+  end
+
+  it "rejects paths containing null bytes before allocating event storage" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+
+    expect { client.mute_path_events("/tmp\0bad", :notify_exec) }.to raise_error(ArgumentError, /null byte/)
   ensure
     client&.close
   end
@@ -360,6 +378,15 @@ RSpec.describe ES::Client do
     expect { message.process.cs_validation_category }.to raise_error(ES::FieldUnavailableError)
   ensure
     message&.__auto_release!
+    client&.close
+  end
+
+  it "releases native subscription storage when conversion raises" do
+    client = described_class.new(queue_depth: 8, mute_self: false, subscribe: :notify_exec)
+    allow(ES::EventType).to receive(:symbol).and_raise("conversion failed")
+
+    expect { client.subscriptions }.to raise_error(RuntimeError, "conversion failed")
+  ensure
     client&.close
   end
 

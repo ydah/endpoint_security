@@ -53,6 +53,7 @@ typedef struct {
     _Atomic uint64_t delivered;
     _Atomic uint64_t timeouts;
     _Atomic uint64_t response_errors;
+    _Atomic uint64_t delete_errors;
     _Atomic uint64_t errors;
     _Atomic uint64_t seq_gaps;
     _Atomic uint64_t leaked_messages;

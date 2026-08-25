@@ -5,6 +5,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <mach/mach_time.h>
 #include <math.h>
 #include <sched.h>
@@ -61,7 +62,9 @@ client_native_main(void *argument)
         pthread_cond_wait(&client->watchdog.condition, &client->watchdog.mutex);
     }
     pthread_mutex_unlock(&client->watchdog.mutex);
-    es_delete_client(client->client);
+    if (es_delete_client(client->client) != ES_RETURN_SUCCESS) {
+        atomic_fetch_add_explicit(&client->delete_errors, 1, memory_order_relaxed);
+    }
     return NULL;
 }
 
@@ -422,6 +425,7 @@ client_initialize(int argc, VALUE *argv, VALUE self)
     atomic_init(&client->delivered, 0);
     atomic_init(&client->timeouts, 0);
     atomic_init(&client->response_errors, 0);
+    atomic_init(&client->delete_errors, 0);
     atomic_init(&client->errors, 0);
     atomic_init(&client->seq_gaps, 0);
     atomic_init(&client->leaked_messages, 0);
@@ -572,22 +576,45 @@ client_unsubscribe(VALUE self, VALUE values)
     return Qtrue;
 }
 
+typedef struct {
+    es_event_type_t *values;
+    size_t count;
+} esrb_subscriptions_t;
+
+static VALUE
+copy_subscriptions(VALUE context_value)
+{
+    esrb_subscriptions_t *context = (esrb_subscriptions_t *)(uintptr_t)context_value;
+    VALUE values = rb_ary_new_capa((long)context->count);
+    VALUE event_type = rb_path2class("EndpointSecurity::EventType");
+    for (size_t index = 0; index < context->count; index++) {
+        rb_ary_push(values, rb_funcall(event_type, rb_intern("symbol"), 1, INT2NUM(context->values[index])));
+    }
+    return values;
+}
+
+static VALUE
+release_subscriptions(VALUE context_value)
+{
+    esrb_subscriptions_t *context = (esrb_subscriptions_t *)(uintptr_t)context_value;
+    free(context->values);
+    return Qnil;
+}
+
 static VALUE
 client_subscriptions(VALUE self)
 {
     esrb_client_t *client = get_open_client(self);
-    size_t count = 0;
-    es_event_type_t *subscriptions = NULL;
-    if (es_subscriptions(client->client, &count, &subscriptions) != ES_RETURN_SUCCESS) {
+    esrb_subscriptions_t context = {0};
+    if (es_subscriptions(client->client, &context.count, &context.values) != ES_RETURN_SUCCESS) {
         rb_raise(rb_path2class("EndpointSecurity::SubscriptionError"), "es_subscriptions failed");
     }
-    VALUE values = rb_ary_new_capa((long)count);
-    VALUE event_type = rb_path2class("EndpointSecurity::EventType");
-    for (size_t index = 0; index < count; index++) {
-        rb_ary_push(values, rb_funcall(event_type, rb_intern("symbol"), 1, INT2NUM(subscriptions[index])));
+    if (context.count > LONG_MAX) {
+        free(context.values);
+        rb_raise(rb_eRangeError, "subscription count is too large");
     }
-    free(subscriptions);
-    return values;
+    return rb_ensure(copy_subscriptions, (VALUE)(uintptr_t)&context,
+        release_subscriptions, (VALUE)(uintptr_t)&context);
 }
 
 static VALUE
@@ -600,6 +627,7 @@ client_stats(VALUE self)
     SET_STAT("dropped", atomic_load_explicit(&client->dropped, memory_order_relaxed));
     SET_STAT("timeouts", atomic_load_explicit(&client->timeouts, memory_order_relaxed));
     SET_STAT("response_errors", atomic_load_explicit(&client->response_errors, memory_order_relaxed));
+    SET_STAT("delete_errors", atomic_load_explicit(&client->delete_errors, memory_order_relaxed));
     SET_STAT("errors", atomic_load_explicit(&client->errors, memory_order_relaxed));
     SET_STAT("queue_depth_max", atomic_load_explicit(&client->queue.depth_max, memory_order_relaxed));
     SET_STAT("queue_depth", esrb_queue_depth(&client->queue));
@@ -720,6 +748,14 @@ mock_set_respond_result(VALUE module, VALUE result)
     esmock_set_respond_result((es_respond_result_t)NUM2INT(result));
     return result;
 }
+
+static VALUE
+mock_set_delete_result(VALUE module, VALUE result)
+{
+    (void)module;
+    esmock_set_delete_result((es_return_t)NUM2INT(result));
+    return result;
+}
 #endif
 
 void
@@ -748,6 +784,7 @@ esrb_init_client(VALUE endpoint_security)
     rb_define_singleton_method(mock, "delete_on_creator_thread?", mock_delete_on_creator_thread, 0);
     rb_define_singleton_method(mock, "new_client_result=", mock_set_new_client_result, 1);
     rb_define_singleton_method(mock, "respond_result=", mock_set_respond_result, 1);
+    rb_define_singleton_method(mock, "delete_result=", mock_set_delete_result, 1);
     rb_define_singleton_method(mock, "reset", mock_reset, 0);
 #endif
 }
