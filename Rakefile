@@ -56,6 +56,20 @@ task "test:eslogger" do
   end
 end
 
+task "test:api_surface" do
+  sdk = `xcrun --show-sdk-path`.strip
+  header = File.read(File.join(sdk, "usr/include/EndpointSecurity/ESClient.h")).gsub(%r{/\*.*?\*/}m, "")
+  declarations = header.split(";").filter_map do |statement|
+    name = statement.scan(/\b(es_[a-z0-9_]+)\s*\(/).last&.first
+    [name, statement.include?("API_DEPRECATED")] if name
+  end
+  native = Dir["ext/endpoint_security/*.c"].map { |path| File.read(path) }.join
+  missing = declarations.reject(&:last).map(&:first).reject { |name| native.match?(/\b#{Regexp.escape(name)}\s*\(/) }
+  deprecated = declarations.select(&:last).map(&:first).select { |name| native.match?(/\b#{Regexp.escape(name)}\s*\(/) }
+  raise "unbound Endpoint Security functions: #{missing.join(", ")}" unless missing.empty?
+  raise "deprecated Endpoint Security functions used: #{deprecated.join(", ")}" unless deprecated.empty?
+end
+
 namespace :test do
   task native: ["compile:mock", "test:native:spec"]
   task :drift do
@@ -71,6 +85,7 @@ namespace :test do
     raise "generated files drifted: #{changed.join(", ")}" unless changed.empty?
 
     Rake::Task["test:eslogger"].invoke
+    Rake::Task["test:api_surface"].invoke
   end
   task :sanitize do
     sdk = `xcrun --show-sdk-path`.strip
