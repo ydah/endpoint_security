@@ -3,7 +3,7 @@
 require "endpoint_security"
 
 def rss_bytes
-  Integer(IO.popen(["/bin/ps", "-o", "rss=", "-p", Process.pid], &:read).strip) * 1024
+  Integer(IO.popen(["/bin/ps", "-o", "rss=", "-p", Process.pid.to_s], &:read).strip) * 1024
 end
 
 deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + (Integer(ENV.fetch("HOURS", "24")) * 3600)
