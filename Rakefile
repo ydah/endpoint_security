@@ -34,16 +34,11 @@ task "compile:mock" do
      "-Werror", "-mmacosx-version-min=13.0", "-isysroot", sdk, "-I#{sdk}/usr/include",
      "-install_name", "@rpath/libesmock.dylib",
      "support/esmock/esmock.c", "-o", "build/libesmock.dylib"
-  ENV["ES_MOCK"] = "1"
-  Rake::Task[:compile].reenable
-  Rake::Task[:compile].invoke
+  sh({ "ES_MOCK" => "1" }, RbConfig.ruby, "-S", "rake", "clobber", "compile")
 end
 
 task "compile:real" do
-  ENV.delete("ES_MOCK")
-  Rake::Task[:clobber].invoke
-  Rake::Task[:compile].reenable
-  Rake::Task[:compile].invoke
+  sh({ "ES_MOCK" => nil }, RbConfig.ruby, "-S", "rake", "clobber", "compile")
 end
 
 namespace :test do
