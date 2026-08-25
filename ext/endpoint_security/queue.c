@@ -29,6 +29,7 @@ esrb_queue_init(esrb_queue_t *queue, size_t capacity)
         atomic_init(&queue->slots[index].occupied, false);
         atomic_init(&queue->slots[index].answer_state, ESRB_ANSWER_NOT_AUTH);
         atomic_init(&queue->slots[index].readers, 0);
+        queue->slots[index].watchdog_index = SIZE_MAX;
     }
     return true;
 }

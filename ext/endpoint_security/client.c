@@ -73,6 +73,7 @@ client_close_native(esrb_client_t *client)
         sched_yield();
     }
     if (atomic_exchange_explicit(&client->watchdog_running, false, memory_order_acq_rel)) {
+        pthread_cond_broadcast(&client->watchdog.condition);
         pthread_join(client->watchdog_thread, NULL);
     }
     client_answer_occupied(client);
@@ -88,7 +89,8 @@ static void
 client_free(void *pointer)
 {
     esrb_client_t *client = pointer;
-    if (client->owner_pid == 0 || client->owner_pid == getpid()) {
+    bool owned_here = client->owner_pid == 0 || client->owner_pid == getpid();
+    if (owned_here) {
         client_close_native(client);
     } else {
         client->client = NULL;
@@ -96,6 +98,11 @@ client_free(void *pointer)
         atomic_store_explicit(&client->closed, true, memory_order_release);
     }
     esrb_queue_destroy(&client->queue);
+    if (owned_here) {
+        esrb_watchdog_destroy(&client->watchdog);
+    } else {
+        esrb_watchdog_abandon(&client->watchdog);
+    }
     if (client->wakeup_fd[0] >= 0) {
         close(client->wakeup_fd[0]);
     }
@@ -109,7 +116,9 @@ static size_t
 client_size(const void *pointer)
 {
     esrb_client_t const *client = pointer;
-    return client == NULL ? 0 : sizeof(*client) + client->queue.capacity * sizeof(esrb_slot_t);
+    return client == NULL ? 0
+                          : sizeof(*client) + client->queue.capacity *
+                                (sizeof(esrb_slot_t) + sizeof(esrb_watchdog_request_t) + sizeof(esrb_watchdog_entry_t));
 }
 
 const rb_data_type_t esrb_client_type = {
@@ -265,6 +274,9 @@ handle_message(esrb_client_t *client, es_client_t *native_client, const es_messa
     atomic_store_explicit(&slot->answer_state,
         message->action_type == ES_ACTION_TYPE_AUTH ? ESRB_ANSWER_PENDING : ESRB_ANSWER_NOT_AUTH, memory_order_relaxed);
     atomic_store_explicit(&slot->occupied, true, memory_order_release);
+    if (message->action_type == ES_ACTION_TYPE_AUTH && !esrb_watchdog_arm(&client->watchdog, slot)) {
+        client_answer_slot(client, slot);
+    }
     esrb_queue_publish(&client->queue, slot);
     esrb_notify(client);
     atomic_fetch_sub_explicit(&client->active_callbacks, 1, memory_order_release);
@@ -324,7 +336,12 @@ client_initialize(int argc, VALUE *argv, VALUE self)
     if (!esrb_queue_init(&client->queue, queue_depth)) {
         rb_raise(rb_eArgError, "queue_depth must be a power of two and at least 2");
     }
+    if (!esrb_watchdog_init(&client->watchdog, queue_depth)) {
+        esrb_queue_destroy(&client->queue);
+        rb_raise(rb_eNoMemError, "failed to allocate Endpoint Security watchdog");
+    }
     if (pipe(client->wakeup_fd) != 0) {
+        esrb_watchdog_destroy(&client->watchdog);
         esrb_queue_destroy(&client->queue);
         rb_sys_fail("pipe");
     }
@@ -335,6 +352,7 @@ client_initialize(int argc, VALUE *argv, VALUE self)
         close(client->wakeup_fd[1]);
         client->wakeup_fd[0] = -1;
         client->wakeup_fd[1] = -1;
+        esrb_watchdog_destroy(&client->watchdog);
         esrb_queue_destroy(&client->queue);
         errno = error;
         rb_sys_fail("fcntl");
@@ -368,6 +386,7 @@ client_initialize(int argc, VALUE *argv, VALUE self)
         close(client->wakeup_fd[1]);
         client->wakeup_fd[0] = -1;
         client->wakeup_fd[1] = -1;
+        esrb_watchdog_destroy(&client->watchdog);
         esrb_queue_destroy(&client->queue);
         atomic_store_explicit(&client->closed, true, memory_order_release);
         raise_new_client_error(result);

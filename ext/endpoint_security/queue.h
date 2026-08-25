@@ -22,6 +22,7 @@ typedef struct {
     uint64_t fire_at;
     _Atomic uint32_t answer_state;
     _Atomic uint32_t readers;
+    size_t watchdog_index;
 } esrb_slot_t;
 
 typedef struct {
