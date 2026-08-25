@@ -41,9 +41,26 @@ task "compile:real" do
   sh({ "ES_MOCK" => nil }, RbConfig.ruby, "-S", "rake", "clobber", "compile")
 end
 
+task "test:eslogger" do
+  require_relative "lib/endpoint_security/generated/event_types"
+
+  output, status = Open3.capture2e("/usr/bin/eslogger", "--list-events")
+  raise "eslogger --list-events failed: #{output}" unless status.success?
+
+  actual = output.lines.map { |line| line.strip.to_sym }.reject { |event| event.to_s.empty? }.sort
+  expected = EndpointSecurity::EventType.all_notify.map { |event| event.to_s.delete_prefix("notify_").to_sym }.sort
+  missing = expected - actual
+  extra = actual - expected
+  return if missing.empty? && extra.empty?
+
+  raise "eslogger drifted (missing: #{missing.join(", ")}; extra: #{extra.join(", ")})"
+end
+
 namespace :test do
   task native: ["compile:mock", "test:native:spec"]
   task :drift do
+    require_relative "lib/endpoint_security/generated/event_types"
+
     generated_roots = "{codegen/overlay,codegen/snapshots," \
                       "ext/endpoint_security/generated,lib/endpoint_security/generated}"
     files = Dir["#{generated_roots}/**/*"].select { |path| File.file?(path) }
@@ -52,6 +69,8 @@ namespace :test do
     after_files = Dir["#{generated_roots}/**/*"].select { |path| File.file?(path) }
     changed = (files | after_files).reject { |path| before[path] == (File.binread(path) if File.exist?(path)) }
     raise "generated files drifted: #{changed.join(", ")}" unless changed.empty?
+
+    Rake::Task["test:eslogger"].invoke
   end
   task :sanitize do
     sdk = `xcrun --show-sdk-path`.strip
