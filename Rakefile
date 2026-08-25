@@ -108,6 +108,18 @@ namespace :test do
          "ext/endpoint_security/queue.c", "support/esmock/esmock.c", "-o", watchdog_output
       sh watchdog_output
     end
+
+    Rake::Task["compile:mock"].invoke
+    sanitizer_flags = "-fsanitize=undefined"
+    build_environment = { "ES_MOCK" => "1", "CFLAGS" => sanitizer_flags, "LDFLAGS" => sanitizer_flags }
+    begin
+      sh build_environment, RbConfig.ruby, "-S", "rake", "clobber", "compile"
+      sh({ "UBSAN_OPTIONS" => "halt_on_error=1" },
+         RbConfig.ruby, "-S", "rspec", "-Itest", *Dir["test/native/**/*_test.rb"])
+    ensure
+      sh({ "ES_MOCK" => "1", "CFLAGS" => ENV.fetch("CFLAGS", nil), "LDFLAGS" => ENV.fetch("LDFLAGS", nil) },
+         RbConfig.ruby, "-S", "rake", "clobber", "compile")
+    end
   end
   task integration: ["compile:real", "test:integration:spec"]
 end
