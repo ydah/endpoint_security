@@ -42,7 +42,7 @@ module EndpointSecurity
           next unless field
 
           indirect = field.type.include?("*") ? "true" : "false"
-          %(    {#{event.value}, offsetof(es_events_t, #{member}), "#{schema}", #{indirect}})
+          %(    {#{event.value}, offsetof(es_events_t, #{member}), "#{schema}", sizeof(#{schema}), #{indirect}})
         end.join(",\n")
 
         <<~C
