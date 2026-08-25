@@ -4152,5 +4152,1674 @@
         "minimum_version": 1
       }
     ]
+  },
+  "enumerations": {
+    "es_action_type_t": [
+      {
+        "name": "ES_ACTION_TYPE_AUTH",
+        "symbol": "auth",
+        "value": 0
+      },
+      {
+        "name": "ES_ACTION_TYPE_NOTIFY",
+        "symbol": "notify",
+        "value": 1
+      }
+    ],
+    "es_set_or_clear_t": [
+      {
+        "name": "ES_SET",
+        "symbol": "set",
+        "value": 0
+      },
+      {
+        "name": "ES_CLEAR",
+        "symbol": "clear",
+        "value": 1
+      }
+    ],
+    "es_proc_check_type_t": [
+      {
+        "name": "ES_PROC_CHECK_TYPE_LISTPIDS",
+        "symbol": "listpids",
+        "value": 1
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_PIDINFO",
+        "symbol": "pidinfo",
+        "value": 2
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_PIDFDINFO",
+        "symbol": "pidfdinfo",
+        "value": 3
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_KERNMSGBUF",
+        "symbol": "kernmsgbuf",
+        "value": 4
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_SETCONTROL",
+        "symbol": "setcontrol",
+        "value": 5
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_PIDFILEPORTINFO",
+        "symbol": "pidfileportinfo",
+        "value": 6
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_TERMINATE",
+        "symbol": "terminate",
+        "value": 7
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_DIRTYCONTROL",
+        "symbol": "dirtycontrol",
+        "value": 8
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_PIDRUSAGE",
+        "symbol": "pidrusage",
+        "value": 9
+      },
+      {
+        "name": "ES_PROC_CHECK_TYPE_UDATA_INFO",
+        "symbol": "udata_info",
+        "value": 14
+      }
+    ],
+    "es_xpc_domain_type_t": [
+      {
+        "name": "ES_XPC_DOMAIN_TYPE_SYSTEM",
+        "symbol": "system",
+        "value": 1
+      },
+      {
+        "name": "ES_XPC_DOMAIN_TYPE_USER",
+        "symbol": "user",
+        "value": 2
+      },
+      {
+        "name": "ES_XPC_DOMAIN_TYPE_USER_LOGIN",
+        "symbol": "user_login",
+        "value": 3
+      },
+      {
+        "name": "ES_XPC_DOMAIN_TYPE_SESSION",
+        "symbol": "session",
+        "value": 4
+      },
+      {
+        "name": "ES_XPC_DOMAIN_TYPE_PID",
+        "symbol": "pid",
+        "value": 5
+      },
+      {
+        "name": "ES_XPC_DOMAIN_TYPE_MANAGER",
+        "symbol": "manager",
+        "value": 6
+      },
+      {
+        "name": "ES_XPC_DOMAIN_TYPE_PORT",
+        "symbol": "port",
+        "value": 7
+      },
+      {
+        "name": "ES_XPC_DOMAIN_TYPE_GUI",
+        "symbol": "gui",
+        "value": 8
+      }
+    ],
+    "es_authentication_type_t": [
+      {
+        "name": "ES_AUTHENTICATION_TYPE_OD",
+        "symbol": "od",
+        "value": 0
+      },
+      {
+        "name": "ES_AUTHENTICATION_TYPE_TOUCHID",
+        "symbol": "touchid",
+        "value": 1
+      },
+      {
+        "name": "ES_AUTHENTICATION_TYPE_TOKEN",
+        "symbol": "token",
+        "value": 2
+      },
+      {
+        "name": "ES_AUTHENTICATION_TYPE_AUTO_UNLOCK",
+        "symbol": "auto_unlock",
+        "value": 3
+      },
+      {
+        "name": "ES_AUTHENTICATION_TYPE_LAST",
+        "symbol": "last",
+        "value": 4
+      }
+    ],
+    "es_sudo_plugin_type_t": [
+      {
+        "name": "ES_SUDO_PLUGIN_TYPE_UNKNOWN",
+        "symbol": "unknown",
+        "value": 0
+      },
+      {
+        "name": "ES_SUDO_PLUGIN_TYPE_FRONT_END",
+        "symbol": "front_end",
+        "value": 1
+      },
+      {
+        "name": "ES_SUDO_PLUGIN_TYPE_POLICY",
+        "symbol": "policy",
+        "value": 2
+      },
+      {
+        "name": "ES_SUDO_PLUGIN_TYPE_IO",
+        "symbol": "io",
+        "value": 3
+      },
+      {
+        "name": "ES_SUDO_PLUGIN_TYPE_AUDIT",
+        "symbol": "audit",
+        "value": 4
+      },
+      {
+        "name": "ES_SUDO_PLUGIN_TYPE_APPROVAL",
+        "symbol": "approval",
+        "value": 5
+      }
+    ],
+    "es_event_type_t": [
+      {
+        "name": "ES_EVENT_TYPE_AUTH_EXEC",
+        "symbol": "auth_exec",
+        "value": 0
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_OPEN",
+        "symbol": "auth_open",
+        "value": 1
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_KEXTLOAD",
+        "symbol": "auth_kextload",
+        "value": 2
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_MMAP",
+        "symbol": "auth_mmap",
+        "value": 3
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_MPROTECT",
+        "symbol": "auth_mprotect",
+        "value": 4
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_MOUNT",
+        "symbol": "auth_mount",
+        "value": 5
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_RENAME",
+        "symbol": "auth_rename",
+        "value": 6
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SIGNAL",
+        "symbol": "auth_signal",
+        "value": 7
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_UNLINK",
+        "symbol": "auth_unlink",
+        "value": 8
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_EXEC",
+        "symbol": "notify_exec",
+        "value": 9
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OPEN",
+        "symbol": "notify_open",
+        "value": 10
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_FORK",
+        "symbol": "notify_fork",
+        "value": 11
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_CLOSE",
+        "symbol": "notify_close",
+        "value": 12
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_CREATE",
+        "symbol": "notify_create",
+        "value": 13
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_EXCHANGEDATA",
+        "symbol": "notify_exchangedata",
+        "value": 14
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_EXIT",
+        "symbol": "notify_exit",
+        "value": 15
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_GET_TASK",
+        "symbol": "notify_get_task",
+        "value": 16
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_KEXTLOAD",
+        "symbol": "notify_kextload",
+        "value": 17
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_KEXTUNLOAD",
+        "symbol": "notify_kextunload",
+        "value": 18
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LINK",
+        "symbol": "notify_link",
+        "value": 19
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_MMAP",
+        "symbol": "notify_mmap",
+        "value": 20
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_MPROTECT",
+        "symbol": "notify_mprotect",
+        "value": 21
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_MOUNT",
+        "symbol": "notify_mount",
+        "value": 22
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_UNMOUNT",
+        "symbol": "notify_unmount",
+        "value": 23
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_IOKIT_OPEN",
+        "symbol": "notify_iokit_open",
+        "value": 24
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_RENAME",
+        "symbol": "notify_rename",
+        "value": 25
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETATTRLIST",
+        "symbol": "notify_setattrlist",
+        "value": 26
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETEXTATTR",
+        "symbol": "notify_setextattr",
+        "value": 27
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETFLAGS",
+        "symbol": "notify_setflags",
+        "value": 28
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETMODE",
+        "symbol": "notify_setmode",
+        "value": 29
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETOWNER",
+        "symbol": "notify_setowner",
+        "value": 30
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SIGNAL",
+        "symbol": "notify_signal",
+        "value": 31
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_UNLINK",
+        "symbol": "notify_unlink",
+        "value": 32
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_WRITE",
+        "symbol": "notify_write",
+        "value": 33
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_FILE_PROVIDER_MATERIALIZE",
+        "symbol": "auth_file_provider_materialize",
+        "value": 34
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_MATERIALIZE",
+        "symbol": "notify_file_provider_materialize",
+        "value": 35
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_FILE_PROVIDER_UPDATE",
+        "symbol": "auth_file_provider_update",
+        "value": 36
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_UPDATE",
+        "symbol": "notify_file_provider_update",
+        "value": 37
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_READLINK",
+        "symbol": "auth_readlink",
+        "value": 38
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_READLINK",
+        "symbol": "notify_readlink",
+        "value": 39
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_TRUNCATE",
+        "symbol": "auth_truncate",
+        "value": 40
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_TRUNCATE",
+        "symbol": "notify_truncate",
+        "value": 41
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_LINK",
+        "symbol": "auth_link",
+        "value": 42
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LOOKUP",
+        "symbol": "notify_lookup",
+        "value": 43
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_CREATE",
+        "symbol": "auth_create",
+        "value": 44
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SETATTRLIST",
+        "symbol": "auth_setattrlist",
+        "value": 45
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SETEXTATTR",
+        "symbol": "auth_setextattr",
+        "value": 46
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SETFLAGS",
+        "symbol": "auth_setflags",
+        "value": 47
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SETMODE",
+        "symbol": "auth_setmode",
+        "value": 48
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SETOWNER",
+        "symbol": "auth_setowner",
+        "value": 49
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_CHDIR",
+        "symbol": "auth_chdir",
+        "value": 50
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_CHDIR",
+        "symbol": "notify_chdir",
+        "value": 51
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_GETATTRLIST",
+        "symbol": "auth_getattrlist",
+        "value": 52
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_GETATTRLIST",
+        "symbol": "notify_getattrlist",
+        "value": 53
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_STAT",
+        "symbol": "notify_stat",
+        "value": 54
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_ACCESS",
+        "symbol": "notify_access",
+        "value": 55
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_CHROOT",
+        "symbol": "auth_chroot",
+        "value": 56
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_CHROOT",
+        "symbol": "notify_chroot",
+        "value": 57
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_UTIMES",
+        "symbol": "auth_utimes",
+        "value": 58
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_UTIMES",
+        "symbol": "notify_utimes",
+        "value": 59
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_CLONE",
+        "symbol": "auth_clone",
+        "value": 60
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_CLONE",
+        "symbol": "notify_clone",
+        "value": 61
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_FCNTL",
+        "symbol": "notify_fcntl",
+        "value": 62
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_GETEXTATTR",
+        "symbol": "auth_getextattr",
+        "value": 63
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_GETEXTATTR",
+        "symbol": "notify_getextattr",
+        "value": 64
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_LISTEXTATTR",
+        "symbol": "auth_listextattr",
+        "value": 65
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LISTEXTATTR",
+        "symbol": "notify_listextattr",
+        "value": 66
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_READDIR",
+        "symbol": "auth_readdir",
+        "value": 67
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_READDIR",
+        "symbol": "notify_readdir",
+        "value": 68
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_DELETEEXTATTR",
+        "symbol": "auth_deleteextattr",
+        "value": 69
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_DELETEEXTATTR",
+        "symbol": "notify_deleteextattr",
+        "value": 70
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_FSGETPATH",
+        "symbol": "auth_fsgetpath",
+        "value": 71
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_FSGETPATH",
+        "symbol": "notify_fsgetpath",
+        "value": 72
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_DUP",
+        "symbol": "notify_dup",
+        "value": 73
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SETTIME",
+        "symbol": "auth_settime",
+        "value": 74
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETTIME",
+        "symbol": "notify_settime",
+        "value": 75
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_UIPC_BIND",
+        "symbol": "notify_uipc_bind",
+        "value": 76
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_UIPC_BIND",
+        "symbol": "auth_uipc_bind",
+        "value": 77
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_UIPC_CONNECT",
+        "symbol": "notify_uipc_connect",
+        "value": 78
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_UIPC_CONNECT",
+        "symbol": "auth_uipc_connect",
+        "value": 79
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_EXCHANGEDATA",
+        "symbol": "auth_exchangedata",
+        "value": 80
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SETACL",
+        "symbol": "auth_setacl",
+        "value": 81
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETACL",
+        "symbol": "notify_setacl",
+        "value": 82
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_PTY_GRANT",
+        "symbol": "notify_pty_grant",
+        "value": 83
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_PTY_CLOSE",
+        "symbol": "notify_pty_close",
+        "value": 84
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_PROC_CHECK",
+        "symbol": "auth_proc_check",
+        "value": 85
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_PROC_CHECK",
+        "symbol": "notify_proc_check",
+        "value": 86
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_GET_TASK",
+        "symbol": "auth_get_task",
+        "value": 87
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_SEARCHFS",
+        "symbol": "auth_searchfs",
+        "value": 88
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SEARCHFS",
+        "symbol": "notify_searchfs",
+        "value": 89
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_FCNTL",
+        "symbol": "auth_fcntl",
+        "value": 90
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_IOKIT_OPEN",
+        "symbol": "auth_iokit_open",
+        "value": 91
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_PROC_SUSPEND_RESUME",
+        "symbol": "auth_proc_suspend_resume",
+        "value": 92
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_PROC_SUSPEND_RESUME",
+        "symbol": "notify_proc_suspend_resume",
+        "value": 93
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_CS_INVALIDATED",
+        "symbol": "notify_cs_invalidated",
+        "value": 94
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_GET_TASK_NAME",
+        "symbol": "notify_get_task_name",
+        "value": 95
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_TRACE",
+        "symbol": "notify_trace",
+        "value": 96
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_REMOTE_THREAD_CREATE",
+        "symbol": "notify_remote_thread_create",
+        "value": 97
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_REMOUNT",
+        "symbol": "auth_remount",
+        "value": 98
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_REMOUNT",
+        "symbol": "notify_remount",
+        "value": 99
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_GET_TASK_READ",
+        "symbol": "auth_get_task_read",
+        "value": 100
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_GET_TASK_READ",
+        "symbol": "notify_get_task_read",
+        "value": 101
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_GET_TASK_INSPECT",
+        "symbol": "notify_get_task_inspect",
+        "value": 102
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETUID",
+        "symbol": "notify_setuid",
+        "value": 103
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETGID",
+        "symbol": "notify_setgid",
+        "value": 104
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETEUID",
+        "symbol": "notify_seteuid",
+        "value": 105
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETEGID",
+        "symbol": "notify_setegid",
+        "value": 106
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETREUID",
+        "symbol": "notify_setreuid",
+        "value": 107
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SETREGID",
+        "symbol": "notify_setregid",
+        "value": 108
+      },
+      {
+        "name": "ES_EVENT_TYPE_AUTH_COPYFILE",
+        "symbol": "auth_copyfile",
+        "value": 109
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_COPYFILE",
+        "symbol": "notify_copyfile",
+        "value": 110
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_AUTHENTICATION",
+        "symbol": "notify_authentication",
+        "value": 111
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED",
+        "symbol": "notify_xp_malware_detected",
+        "value": 112
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_XP_MALWARE_REMEDIATED",
+        "symbol": "notify_xp_malware_remediated",
+        "value": 113
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGIN",
+        "symbol": "notify_lw_session_login",
+        "value": 114
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGOUT",
+        "symbol": "notify_lw_session_logout",
+        "value": 115
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOCK",
+        "symbol": "notify_lw_session_lock",
+        "value": 116
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LW_SESSION_UNLOCK",
+        "symbol": "notify_lw_session_unlock",
+        "value": 117
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SCREENSHARING_ATTACH",
+        "symbol": "notify_screensharing_attach",
+        "value": 118
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SCREENSHARING_DETACH",
+        "symbol": "notify_screensharing_detach",
+        "value": 119
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGIN",
+        "symbol": "notify_openssh_login",
+        "value": 120
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGOUT",
+        "symbol": "notify_openssh_logout",
+        "value": 121
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LOGIN_LOGIN",
+        "symbol": "notify_login_login",
+        "value": 122
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_LOGIN_LOGOUT",
+        "symbol": "notify_login_logout",
+        "value": 123
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD",
+        "symbol": "notify_btm_launch_item_add",
+        "value": 124
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE",
+        "symbol": "notify_btm_launch_item_remove",
+        "value": 125
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_PROFILE_ADD",
+        "symbol": "notify_profile_add",
+        "value": 126
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_PROFILE_REMOVE",
+        "symbol": "notify_profile_remove",
+        "value": 127
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SU",
+        "symbol": "notify_su",
+        "value": 128
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_PETITION",
+        "symbol": "notify_authorization_petition",
+        "value": 129
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_JUDGEMENT",
+        "symbol": "notify_authorization_judgement",
+        "value": 130
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_SUDO",
+        "symbol": "notify_sudo",
+        "value": 131
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD",
+        "symbol": "notify_od_group_add",
+        "value": 132
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE",
+        "symbol": "notify_od_group_remove",
+        "value": 133
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET",
+        "symbol": "notify_od_group_set",
+        "value": 134
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD",
+        "symbol": "notify_od_modify_password",
+        "value": 135
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER",
+        "symbol": "notify_od_disable_user",
+        "value": 136
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER",
+        "symbol": "notify_od_enable_user",
+        "value": 137
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD",
+        "symbol": "notify_od_attribute_value_add",
+        "value": 138
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE",
+        "symbol": "notify_od_attribute_value_remove",
+        "value": 139
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET",
+        "symbol": "notify_od_attribute_set",
+        "value": 140
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER",
+        "symbol": "notify_od_create_user",
+        "value": 141
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP",
+        "symbol": "notify_od_create_group",
+        "value": 142
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER",
+        "symbol": "notify_od_delete_user",
+        "value": 143
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP",
+        "symbol": "notify_od_delete_group",
+        "value": 144
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_XPC_CONNECT",
+        "symbol": "notify_xpc_connect",
+        "value": 145
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE",
+        "symbol": "notify_gatekeeper_user_override",
+        "value": 146
+      },
+      {
+        "name": "ES_EVENT_TYPE_NOTIFY_TCC_MODIFY",
+        "symbol": "notify_tcc_modify",
+        "value": 147
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_0",
+        "symbol": "reserved_0",
+        "value": 148
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_1",
+        "symbol": "reserved_1",
+        "value": 149
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_2",
+        "symbol": "reserved_2",
+        "value": 150
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_3",
+        "symbol": "reserved_3",
+        "value": 151
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_4",
+        "symbol": "reserved_4",
+        "value": 152
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_5",
+        "symbol": "reserved_5",
+        "value": 153
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_6",
+        "symbol": "reserved_6",
+        "value": 154
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_7",
+        "symbol": "reserved_7",
+        "value": 155
+      },
+      {
+        "name": "ES_EVENT_TYPE_RESERVED_8",
+        "symbol": "reserved_8",
+        "value": 156
+      },
+      {
+        "name": "ES_EVENT_TYPE_LAST",
+        "symbol": "last",
+        "value": 157
+      }
+    ],
+    "es_auth_result_t": [
+      {
+        "name": "ES_AUTH_RESULT_ALLOW",
+        "symbol": "allow",
+        "value": 0
+      },
+      {
+        "name": "ES_AUTH_RESULT_DENY",
+        "symbol": "deny",
+        "value": 1
+      }
+    ],
+    "es_result_type_t": [
+      {
+        "name": "ES_RESULT_TYPE_AUTH",
+        "symbol": "auth",
+        "value": 0
+      },
+      {
+        "name": "ES_RESULT_TYPE_FLAGS",
+        "symbol": "flags",
+        "value": 1
+      }
+    ],
+    "es_return_t": [
+      {
+        "name": "ES_RETURN_SUCCESS",
+        "symbol": "success",
+        "value": 0
+      },
+      {
+        "name": "ES_RETURN_ERROR",
+        "symbol": "error",
+        "value": 1
+      }
+    ],
+    "es_respond_result_t": [
+      {
+        "name": "ES_RESPOND_RESULT_SUCCESS",
+        "symbol": "success",
+        "value": 0
+      },
+      {
+        "name": "ES_RESPOND_RESULT_ERR_INVALID_ARGUMENT",
+        "symbol": "err_invalid_argument",
+        "value": 1
+      },
+      {
+        "name": "ES_RESPOND_RESULT_ERR_INTERNAL",
+        "symbol": "err_internal",
+        "value": 2
+      },
+      {
+        "name": "ES_RESPOND_RESULT_NOT_FOUND",
+        "symbol": "not_found",
+        "value": 3
+      },
+      {
+        "name": "ES_RESPOND_RESULT_ERR_DUPLICATE_RESPONSE",
+        "symbol": "err_duplicate_response",
+        "value": 4
+      },
+      {
+        "name": "ES_RESPOND_RESULT_ERR_EVENT_TYPE",
+        "symbol": "err_event_type",
+        "value": 5
+      }
+    ],
+    "es_new_client_result_t": [
+      {
+        "name": "ES_NEW_CLIENT_RESULT_SUCCESS",
+        "symbol": "success",
+        "value": 0
+      },
+      {
+        "name": "ES_NEW_CLIENT_RESULT_ERR_INVALID_ARGUMENT",
+        "symbol": "err_invalid_argument",
+        "value": 1
+      },
+      {
+        "name": "ES_NEW_CLIENT_RESULT_ERR_INTERNAL",
+        "symbol": "err_internal",
+        "value": 2
+      },
+      {
+        "name": "ES_NEW_CLIENT_RESULT_ERR_NOT_ENTITLED",
+        "symbol": "err_not_entitled",
+        "value": 3
+      },
+      {
+        "name": "ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED",
+        "symbol": "err_not_permitted",
+        "value": 4
+      },
+      {
+        "name": "ES_NEW_CLIENT_RESULT_ERR_NOT_PRIVILEGED",
+        "symbol": "err_not_privileged",
+        "value": 5
+      },
+      {
+        "name": "ES_NEW_CLIENT_RESULT_ERR_TOO_MANY_CLIENTS",
+        "symbol": "err_too_many_clients",
+        "value": 6
+      }
+    ],
+    "es_clear_cache_result_t": [
+      {
+        "name": "ES_CLEAR_CACHE_RESULT_SUCCESS",
+        "symbol": "success",
+        "value": 0
+      },
+      {
+        "name": "ES_CLEAR_CACHE_RESULT_ERR_INTERNAL",
+        "symbol": "err_internal",
+        "value": 1
+      },
+      {
+        "name": "ES_CLEAR_CACHE_RESULT_ERR_THROTTLE",
+        "symbol": "err_throttle",
+        "value": 2
+      }
+    ],
+    "es_mute_path_type_t": [
+      {
+        "name": "ES_MUTE_PATH_TYPE_PREFIX",
+        "symbol": "prefix",
+        "value": 0
+      },
+      {
+        "name": "ES_MUTE_PATH_TYPE_LITERAL",
+        "symbol": "literal",
+        "value": 1
+      },
+      {
+        "name": "ES_MUTE_PATH_TYPE_TARGET_PREFIX",
+        "symbol": "target_prefix",
+        "value": 2
+      },
+      {
+        "name": "ES_MUTE_PATH_TYPE_TARGET_LITERAL",
+        "symbol": "target_literal",
+        "value": 3
+      }
+    ],
+    "es_address_type_t": [
+      {
+        "name": "ES_ADDRESS_TYPE_NONE",
+        "symbol": "none",
+        "value": 0
+      },
+      {
+        "name": "ES_ADDRESS_TYPE_IPV4",
+        "symbol": "ipv4",
+        "value": 1
+      },
+      {
+        "name": "ES_ADDRESS_TYPE_IPV6",
+        "symbol": "ipv6",
+        "value": 2
+      },
+      {
+        "name": "ES_ADDRESS_TYPE_NAMED_SOCKET",
+        "symbol": "named_socket",
+        "value": 3
+      }
+    ],
+    "es_mute_inversion_type_t": [
+      {
+        "name": "ES_MUTE_INVERSION_TYPE_PROCESS",
+        "symbol": "process",
+        "value": 0
+      },
+      {
+        "name": "ES_MUTE_INVERSION_TYPE_PATH",
+        "symbol": "path",
+        "value": 1
+      },
+      {
+        "name": "ES_MUTE_INVERSION_TYPE_TARGET_PATH",
+        "symbol": "target_path",
+        "value": 2
+      },
+      {
+        "name": "ES_MUTE_INVERSION_TYPE_LAST",
+        "symbol": "last",
+        "value": 3
+      }
+    ],
+    "es_mute_inverted_return_t": [
+      {
+        "name": "ES_MUTE_INVERTED",
+        "symbol": "mute_inverted",
+        "value": 0
+      },
+      {
+        "name": "ES_MUTE_NOT_INVERTED",
+        "symbol": "mute_not_inverted",
+        "value": 1
+      },
+      {
+        "name": "ES_MUTE_INVERTED_ERROR",
+        "symbol": "mute_inverted_error",
+        "value": 2
+      }
+    ],
+    "es_authorization_rule_class_t": [
+      {
+        "name": "ES_AUTHORIZATION_RULE_CLASS_USER",
+        "symbol": "user",
+        "value": 0
+      },
+      {
+        "name": "ES_AUTHORIZATION_RULE_CLASS_RULE",
+        "symbol": "rule",
+        "value": 1
+      },
+      {
+        "name": "ES_AUTHORIZATION_RULE_CLASS_MECHANISM",
+        "symbol": "mechanism",
+        "value": 2
+      },
+      {
+        "name": "ES_AUTHORIZATION_RULE_CLASS_ALLOW",
+        "symbol": "allow",
+        "value": 3
+      },
+      {
+        "name": "ES_AUTHORIZATION_RULE_CLASS_DENY",
+        "symbol": "deny",
+        "value": 4
+      },
+      {
+        "name": "ES_AUTHORIZATION_RULE_CLASS_UNKNOWN",
+        "symbol": "unknown",
+        "value": 5
+      },
+      {
+        "name": "ES_AUTHORIZATION_RULE_CLASS_INVALID",
+        "symbol": "invalid",
+        "value": 6
+      }
+    ],
+    "es_od_member_type_t": [
+      {
+        "name": "ES_OD_MEMBER_TYPE_USER_NAME",
+        "symbol": "user_name",
+        "value": 0
+      },
+      {
+        "name": "ES_OD_MEMBER_TYPE_USER_UUID",
+        "symbol": "user_uuid",
+        "value": 1
+      },
+      {
+        "name": "ES_OD_MEMBER_TYPE_GROUP_UUID",
+        "symbol": "group_uuid",
+        "value": 2
+      }
+    ],
+    "es_od_account_type_t": [
+      {
+        "name": "ES_OD_ACCOUNT_TYPE_USER",
+        "symbol": "user",
+        "value": 0
+      },
+      {
+        "name": "ES_OD_ACCOUNT_TYPE_COMPUTER",
+        "symbol": "computer",
+        "value": 1
+      }
+    ],
+    "es_od_record_type_t": [
+      {
+        "name": "ES_OD_RECORD_TYPE_USER",
+        "symbol": "user",
+        "value": 0
+      },
+      {
+        "name": "ES_OD_RECORD_TYPE_GROUP",
+        "symbol": "group",
+        "value": 1
+      }
+    ],
+    "es_gatekeeper_user_override_file_type_t": [
+      {
+        "name": "ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_PATH",
+        "symbol": "path",
+        "value": 0
+      },
+      {
+        "name": "ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_FILE",
+        "symbol": "file",
+        "value": 1
+      }
+    ],
+    "es_tcc_event_type_t": [
+      {
+        "name": "ES_TCC_EVENT_TYPE_UNKNOWN",
+        "symbol": "unknown",
+        "value": 0
+      },
+      {
+        "name": "ES_TCC_EVENT_TYPE_CREATE",
+        "symbol": "create",
+        "value": 1
+      },
+      {
+        "name": "ES_TCC_EVENT_TYPE_MODIFY",
+        "symbol": "modify",
+        "value": 2
+      },
+      {
+        "name": "ES_TCC_EVENT_TYPE_DELETE",
+        "symbol": "delete",
+        "value": 3
+      }
+    ],
+    "es_tcc_authorization_right_t": [
+      {
+        "name": "ES_TCC_AUTHORIZATION_RIGHT_DENIED",
+        "symbol": "denied",
+        "value": 0
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_RIGHT_UNKNOWN",
+        "symbol": "unknown",
+        "value": 1
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_RIGHT_ALLOWED",
+        "symbol": "allowed",
+        "value": 2
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_RIGHT_LIMITED",
+        "symbol": "limited",
+        "value": 3
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_RIGHT_ADD_MODIFY_ADDED",
+        "symbol": "add_modify_added",
+        "value": 4
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_RIGHT_SESSION_PID",
+        "symbol": "session_pid",
+        "value": 5
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_RIGHT_LEARN_MORE",
+        "symbol": "learn_more",
+        "value": 6
+      }
+    ],
+    "es_tcc_authorization_reason_t": [
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_NONE",
+        "symbol": "none",
+        "value": 0
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_ERROR",
+        "symbol": "error",
+        "value": 1
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_USER_CONSENT",
+        "symbol": "user_consent",
+        "value": 2
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_USER_SET",
+        "symbol": "user_set",
+        "value": 3
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_SYSTEM_SET",
+        "symbol": "system_set",
+        "value": 4
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_SERVICE_POLICY",
+        "symbol": "service_policy",
+        "value": 5
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_MDM_POLICY",
+        "symbol": "mdm_policy",
+        "value": 6
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_SERVICE_OVERRIDE_POLICY",
+        "symbol": "service_override_policy",
+        "value": 7
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_MISSING_USAGE_STRING",
+        "symbol": "missing_usage_string",
+        "value": 8
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_PROMPT_TIMEOUT",
+        "symbol": "prompt_timeout",
+        "value": 9
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_PREFLIGHT_UNKNOWN",
+        "symbol": "preflight_unknown",
+        "value": 10
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_ENTITLED",
+        "symbol": "entitled",
+        "value": 11
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_APP_TYPE_POLICY",
+        "symbol": "app_type_policy",
+        "value": 12
+      },
+      {
+        "name": "ES_TCC_AUTHORIZATION_REASON_PROMPT_CANCEL",
+        "symbol": "prompt_cancel",
+        "value": 13
+      }
+    ],
+    "es_tcc_identity_type_t": [
+      {
+        "name": "ES_TCC_IDENTITY_TYPE_BUNDLE_ID",
+        "symbol": "bundle_id",
+        "value": 0
+      },
+      {
+        "name": "ES_TCC_IDENTITY_TYPE_EXECUTABLE_PATH",
+        "symbol": "executable_path",
+        "value": 1
+      },
+      {
+        "name": "ES_TCC_IDENTITY_TYPE_POLICY_ID",
+        "symbol": "policy_id",
+        "value": 2
+      },
+      {
+        "name": "ES_TCC_IDENTITY_TYPE_FILE_PROVIDER_DOMAIN_ID",
+        "symbol": "file_provider_domain_id",
+        "value": 3
+      }
+    ],
+    "es_cs_validation_category_t": [
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_INVALID",
+        "symbol": "invalid",
+        "value": 0
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_PLATFORM",
+        "symbol": "platform",
+        "value": 1
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_TESTFLIGHT",
+        "symbol": "testflight",
+        "value": 2
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_DEVELOPMENT",
+        "symbol": "development",
+        "value": 3
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_APP_STORE",
+        "symbol": "app_store",
+        "value": 4
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_ENTERPRISE",
+        "symbol": "enterprise",
+        "value": 5
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_DEVELOPER_ID",
+        "symbol": "developer_id",
+        "value": 6
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_LOCAL_SIGNING",
+        "symbol": "local_signing",
+        "value": 7
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_ROSETTA",
+        "symbol": "rosetta",
+        "value": 8
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_OOPJIT",
+        "symbol": "oopjit",
+        "value": 9
+      },
+      {
+        "name": "ES_CS_VALIDATION_CATEGORY_NONE",
+        "symbol": "none",
+        "value": 10
+      }
+    ],
+    "es_auto_unlock_type_t": [
+      {
+        "name": "ES_AUTO_UNLOCK_MACHINE_UNLOCK",
+        "symbol": "auto_unlock_machine_unlock",
+        "value": 1
+      },
+      {
+        "name": "ES_AUTO_UNLOCK_AUTH_PROMPT",
+        "symbol": "auto_unlock_auth_prompt",
+        "value": 2
+      }
+    ],
+    "es_btm_item_type_t": [
+      {
+        "name": "ES_BTM_ITEM_TYPE_USER_ITEM",
+        "symbol": "user_item",
+        "value": 0
+      },
+      {
+        "name": "ES_BTM_ITEM_TYPE_APP",
+        "symbol": "app",
+        "value": 1
+      },
+      {
+        "name": "ES_BTM_ITEM_TYPE_LOGIN_ITEM",
+        "symbol": "login_item",
+        "value": 2
+      },
+      {
+        "name": "ES_BTM_ITEM_TYPE_AGENT",
+        "symbol": "agent",
+        "value": 3
+      },
+      {
+        "name": "ES_BTM_ITEM_TYPE_DAEMON",
+        "symbol": "daemon",
+        "value": 4
+      }
+    ],
+    "es_destination_type_t": [
+      {
+        "name": "ES_DESTINATION_TYPE_EXISTING_FILE",
+        "symbol": "existing_file",
+        "value": 0
+      },
+      {
+        "name": "ES_DESTINATION_TYPE_NEW_PATH",
+        "symbol": "new_path",
+        "value": 1
+      }
+    ],
+    "es_get_task_type_t": [
+      {
+        "name": "ES_GET_TASK_TYPE_TASK_FOR_PID",
+        "symbol": "task_for_pid",
+        "value": 0
+      },
+      {
+        "name": "ES_GET_TASK_TYPE_EXPOSE_TASK",
+        "symbol": "expose_task",
+        "value": 1
+      },
+      {
+        "name": "ES_GET_TASK_TYPE_IDENTITY_TOKEN",
+        "symbol": "identity_token",
+        "value": 2
+      }
+    ],
+    "es_openssh_login_result_type_t": [
+      {
+        "name": "ES_OPENSSH_LOGIN_EXCEED_MAXTRIES",
+        "symbol": "openssh_login_exceed_maxtries",
+        "value": 0
+      },
+      {
+        "name": "ES_OPENSSH_LOGIN_ROOT_DENIED",
+        "symbol": "openssh_login_root_denied",
+        "value": 1
+      },
+      {
+        "name": "ES_OPENSSH_AUTH_SUCCESS",
+        "symbol": "openssh_auth_success",
+        "value": 2
+      },
+      {
+        "name": "ES_OPENSSH_AUTH_FAIL_NONE",
+        "symbol": "openssh_auth_fail_none",
+        "value": 3
+      },
+      {
+        "name": "ES_OPENSSH_AUTH_FAIL_PASSWD",
+        "symbol": "openssh_auth_fail_passwd",
+        "value": 4
+      },
+      {
+        "name": "ES_OPENSSH_AUTH_FAIL_KBDINT",
+        "symbol": "openssh_auth_fail_kbdint",
+        "value": 5
+      },
+      {
+        "name": "ES_OPENSSH_AUTH_FAIL_PUBKEY",
+        "symbol": "openssh_auth_fail_pubkey",
+        "value": 6
+      },
+      {
+        "name": "ES_OPENSSH_AUTH_FAIL_HOSTBASED",
+        "symbol": "openssh_auth_fail_hostbased",
+        "value": 7
+      },
+      {
+        "name": "ES_OPENSSH_AUTH_FAIL_GSSAPI",
+        "symbol": "openssh_auth_fail_gssapi",
+        "value": 8
+      },
+      {
+        "name": "ES_OPENSSH_INVALID_USER",
+        "symbol": "openssh_invalid_user",
+        "value": 9
+      }
+    ],
+    "es_mount_disposition_t": [
+      {
+        "name": "ES_MOUNT_DISPOSITION_EXTERNAL",
+        "symbol": "external",
+        "value": 0
+      },
+      {
+        "name": "ES_MOUNT_DISPOSITION_INTERNAL",
+        "symbol": "internal",
+        "value": 1
+      },
+      {
+        "name": "ES_MOUNT_DISPOSITION_NETWORK",
+        "symbol": "network",
+        "value": 2
+      },
+      {
+        "name": "ES_MOUNT_DISPOSITION_VIRTUAL",
+        "symbol": "virtual",
+        "value": 3
+      },
+      {
+        "name": "ES_MOUNT_DISPOSITION_NULLFS",
+        "symbol": "nullfs",
+        "value": 4
+      },
+      {
+        "name": "ES_MOUNT_DISPOSITION_UNKNOWN",
+        "symbol": "unknown",
+        "value": 5
+      }
+    ],
+    "es_proc_suspend_resume_type_t": [
+      {
+        "name": "ES_PROC_SUSPEND_RESUME_TYPE_SUSPEND",
+        "symbol": "suspend",
+        "value": 0
+      },
+      {
+        "name": "ES_PROC_SUSPEND_RESUME_TYPE_RESUME",
+        "symbol": "resume",
+        "value": 1
+      },
+      {
+        "name": "ES_PROC_SUSPEND_RESUME_TYPE_SHUTDOWN_SOCKETS",
+        "symbol": "shutdown_sockets",
+        "value": 3
+      }
+    ],
+    "es_profile_source_t": [
+      {
+        "name": "ES_PROFILE_SOURCE_MANAGED",
+        "symbol": "managed",
+        "value": 0
+      },
+      {
+        "name": "ES_PROFILE_SOURCE_INSTALL",
+        "symbol": "install",
+        "value": 1
+      }
+    ],
+    "es_touchid_mode_t": [
+      {
+        "name": "ES_TOUCHID_MODE_VERIFICATION",
+        "symbol": "verification",
+        "value": 0
+      },
+      {
+        "name": "ES_TOUCHID_MODE_IDENTIFICATION",
+        "symbol": "identification",
+        "value": 1
+      }
+    ]
   }
 }
