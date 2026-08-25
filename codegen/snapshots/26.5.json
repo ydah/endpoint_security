@@ -1,0 +1,1105 @@
+{
+  "sdk_version": "26.5",
+  "last": 157,
+  "events": [
+    {
+      "name": "ES_EVENT_TYPE_AUTH_EXEC",
+      "symbol": "auth_exec",
+      "value": 0,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_OPEN",
+      "symbol": "auth_open",
+      "value": 1,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_KEXTLOAD",
+      "symbol": "auth_kextload",
+      "value": 2,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_MMAP",
+      "symbol": "auth_mmap",
+      "value": 3,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_MPROTECT",
+      "symbol": "auth_mprotect",
+      "value": 4,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_MOUNT",
+      "symbol": "auth_mount",
+      "value": 5,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_RENAME",
+      "symbol": "auth_rename",
+      "value": 6,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SIGNAL",
+      "symbol": "auth_signal",
+      "value": 7,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_UNLINK",
+      "symbol": "auth_unlink",
+      "value": 8,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_EXEC",
+      "symbol": "notify_exec",
+      "value": 9,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OPEN",
+      "symbol": "notify_open",
+      "value": 10,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_FORK",
+      "symbol": "notify_fork",
+      "value": 11,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_CLOSE",
+      "symbol": "notify_close",
+      "value": 12,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_CREATE",
+      "symbol": "notify_create",
+      "value": 13,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_EXCHANGEDATA",
+      "symbol": "notify_exchangedata",
+      "value": 14,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_EXIT",
+      "symbol": "notify_exit",
+      "value": 15,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_GET_TASK",
+      "symbol": "notify_get_task",
+      "value": 16,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_KEXTLOAD",
+      "symbol": "notify_kextload",
+      "value": 17,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_KEXTUNLOAD",
+      "symbol": "notify_kextunload",
+      "value": 18,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LINK",
+      "symbol": "notify_link",
+      "value": 19,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_MMAP",
+      "symbol": "notify_mmap",
+      "value": 20,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_MPROTECT",
+      "symbol": "notify_mprotect",
+      "value": 21,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_MOUNT",
+      "symbol": "notify_mount",
+      "value": 22,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_UNMOUNT",
+      "symbol": "notify_unmount",
+      "value": 23,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_IOKIT_OPEN",
+      "symbol": "notify_iokit_open",
+      "value": 24,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_RENAME",
+      "symbol": "notify_rename",
+      "value": 25,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETATTRLIST",
+      "symbol": "notify_setattrlist",
+      "value": 26,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETEXTATTR",
+      "symbol": "notify_setextattr",
+      "value": 27,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETFLAGS",
+      "symbol": "notify_setflags",
+      "value": 28,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETMODE",
+      "symbol": "notify_setmode",
+      "value": 29,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETOWNER",
+      "symbol": "notify_setowner",
+      "value": 30,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SIGNAL",
+      "symbol": "notify_signal",
+      "value": 31,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_UNLINK",
+      "symbol": "notify_unlink",
+      "value": 32,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_WRITE",
+      "symbol": "notify_write",
+      "value": 33,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_FILE_PROVIDER_MATERIALIZE",
+      "symbol": "auth_file_provider_materialize",
+      "value": 34,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_MATERIALIZE",
+      "symbol": "notify_file_provider_materialize",
+      "value": 35,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_FILE_PROVIDER_UPDATE",
+      "symbol": "auth_file_provider_update",
+      "value": 36,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_UPDATE",
+      "symbol": "notify_file_provider_update",
+      "value": 37,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_READLINK",
+      "symbol": "auth_readlink",
+      "value": 38,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_READLINK",
+      "symbol": "notify_readlink",
+      "value": 39,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_TRUNCATE",
+      "symbol": "auth_truncate",
+      "value": 40,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_TRUNCATE",
+      "symbol": "notify_truncate",
+      "value": 41,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_LINK",
+      "symbol": "auth_link",
+      "value": 42,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LOOKUP",
+      "symbol": "notify_lookup",
+      "value": 43,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_CREATE",
+      "symbol": "auth_create",
+      "value": 44,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SETATTRLIST",
+      "symbol": "auth_setattrlist",
+      "value": 45,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SETEXTATTR",
+      "symbol": "auth_setextattr",
+      "value": 46,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SETFLAGS",
+      "symbol": "auth_setflags",
+      "value": 47,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SETMODE",
+      "symbol": "auth_setmode",
+      "value": 48,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SETOWNER",
+      "symbol": "auth_setowner",
+      "value": 49,
+      "minimum_os": "10.15",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_CHDIR",
+      "symbol": "auth_chdir",
+      "value": 50,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_CHDIR",
+      "symbol": "notify_chdir",
+      "value": 51,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_GETATTRLIST",
+      "symbol": "auth_getattrlist",
+      "value": 52,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_GETATTRLIST",
+      "symbol": "notify_getattrlist",
+      "value": 53,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_STAT",
+      "symbol": "notify_stat",
+      "value": 54,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_ACCESS",
+      "symbol": "notify_access",
+      "value": 55,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_CHROOT",
+      "symbol": "auth_chroot",
+      "value": 56,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_CHROOT",
+      "symbol": "notify_chroot",
+      "value": 57,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_UTIMES",
+      "symbol": "auth_utimes",
+      "value": 58,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_UTIMES",
+      "symbol": "notify_utimes",
+      "value": 59,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_CLONE",
+      "symbol": "auth_clone",
+      "value": 60,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_CLONE",
+      "symbol": "notify_clone",
+      "value": 61,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_FCNTL",
+      "symbol": "notify_fcntl",
+      "value": 62,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_GETEXTATTR",
+      "symbol": "auth_getextattr",
+      "value": 63,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_GETEXTATTR",
+      "symbol": "notify_getextattr",
+      "value": 64,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_LISTEXTATTR",
+      "symbol": "auth_listextattr",
+      "value": 65,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LISTEXTATTR",
+      "symbol": "notify_listextattr",
+      "value": 66,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_READDIR",
+      "symbol": "auth_readdir",
+      "value": 67,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_READDIR",
+      "symbol": "notify_readdir",
+      "value": 68,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_DELETEEXTATTR",
+      "symbol": "auth_deleteextattr",
+      "value": 69,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_DELETEEXTATTR",
+      "symbol": "notify_deleteextattr",
+      "value": 70,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_FSGETPATH",
+      "symbol": "auth_fsgetpath",
+      "value": 71,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_FSGETPATH",
+      "symbol": "notify_fsgetpath",
+      "value": 72,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_DUP",
+      "symbol": "notify_dup",
+      "value": 73,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SETTIME",
+      "symbol": "auth_settime",
+      "value": 74,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETTIME",
+      "symbol": "notify_settime",
+      "value": 75,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_UIPC_BIND",
+      "symbol": "notify_uipc_bind",
+      "value": 76,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_UIPC_BIND",
+      "symbol": "auth_uipc_bind",
+      "value": 77,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_UIPC_CONNECT",
+      "symbol": "notify_uipc_connect",
+      "value": 78,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_UIPC_CONNECT",
+      "symbol": "auth_uipc_connect",
+      "value": 79,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_EXCHANGEDATA",
+      "symbol": "auth_exchangedata",
+      "value": 80,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SETACL",
+      "symbol": "auth_setacl",
+      "value": 81,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETACL",
+      "symbol": "notify_setacl",
+      "value": 82,
+      "minimum_os": "10.15.1",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_PTY_GRANT",
+      "symbol": "notify_pty_grant",
+      "value": 83,
+      "minimum_os": "10.15.4",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_PTY_CLOSE",
+      "symbol": "notify_pty_close",
+      "value": 84,
+      "minimum_os": "10.15.4",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_PROC_CHECK",
+      "symbol": "auth_proc_check",
+      "value": 85,
+      "minimum_os": "10.15.4",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_PROC_CHECK",
+      "symbol": "notify_proc_check",
+      "value": 86,
+      "minimum_os": "10.15.4",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_GET_TASK",
+      "symbol": "auth_get_task",
+      "value": 87,
+      "minimum_os": "10.15.4",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_SEARCHFS",
+      "symbol": "auth_searchfs",
+      "value": 88,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SEARCHFS",
+      "symbol": "notify_searchfs",
+      "value": 89,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_FCNTL",
+      "symbol": "auth_fcntl",
+      "value": 90,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_IOKIT_OPEN",
+      "symbol": "auth_iokit_open",
+      "value": 91,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_PROC_SUSPEND_RESUME",
+      "symbol": "auth_proc_suspend_resume",
+      "value": 92,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_PROC_SUSPEND_RESUME",
+      "symbol": "notify_proc_suspend_resume",
+      "value": 93,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_CS_INVALIDATED",
+      "symbol": "notify_cs_invalidated",
+      "value": 94,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_GET_TASK_NAME",
+      "symbol": "notify_get_task_name",
+      "value": 95,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_TRACE",
+      "symbol": "notify_trace",
+      "value": 96,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_REMOTE_THREAD_CREATE",
+      "symbol": "notify_remote_thread_create",
+      "value": 97,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_REMOUNT",
+      "symbol": "auth_remount",
+      "value": 98,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_REMOUNT",
+      "symbol": "notify_remount",
+      "value": 99,
+      "minimum_os": "11.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_GET_TASK_READ",
+      "symbol": "auth_get_task_read",
+      "value": 100,
+      "minimum_os": "11.3",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_GET_TASK_READ",
+      "symbol": "notify_get_task_read",
+      "value": 101,
+      "minimum_os": "11.3",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_GET_TASK_INSPECT",
+      "symbol": "notify_get_task_inspect",
+      "value": 102,
+      "minimum_os": "11.3",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETUID",
+      "symbol": "notify_setuid",
+      "value": 103,
+      "minimum_os": "12.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETGID",
+      "symbol": "notify_setgid",
+      "value": 104,
+      "minimum_os": "12.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETEUID",
+      "symbol": "notify_seteuid",
+      "value": 105,
+      "minimum_os": "12.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETEGID",
+      "symbol": "notify_setegid",
+      "value": 106,
+      "minimum_os": "12.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETREUID",
+      "symbol": "notify_setreuid",
+      "value": 107,
+      "minimum_os": "12.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SETREGID",
+      "symbol": "notify_setregid",
+      "value": 108,
+      "minimum_os": "12.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_AUTH_COPYFILE",
+      "symbol": "auth_copyfile",
+      "value": 109,
+      "minimum_os": "12.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_COPYFILE",
+      "symbol": "notify_copyfile",
+      "value": 110,
+      "minimum_os": "12.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_AUTHENTICATION",
+      "symbol": "notify_authentication",
+      "value": 111,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED",
+      "symbol": "notify_xp_malware_detected",
+      "value": 112,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_XP_MALWARE_REMEDIATED",
+      "symbol": "notify_xp_malware_remediated",
+      "value": 113,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGIN",
+      "symbol": "notify_lw_session_login",
+      "value": 114,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGOUT",
+      "symbol": "notify_lw_session_logout",
+      "value": 115,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOCK",
+      "symbol": "notify_lw_session_lock",
+      "value": 116,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LW_SESSION_UNLOCK",
+      "symbol": "notify_lw_session_unlock",
+      "value": 117,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SCREENSHARING_ATTACH",
+      "symbol": "notify_screensharing_attach",
+      "value": 118,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SCREENSHARING_DETACH",
+      "symbol": "notify_screensharing_detach",
+      "value": 119,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGIN",
+      "symbol": "notify_openssh_login",
+      "value": 120,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGOUT",
+      "symbol": "notify_openssh_logout",
+      "value": 121,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LOGIN_LOGIN",
+      "symbol": "notify_login_login",
+      "value": 122,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_LOGIN_LOGOUT",
+      "symbol": "notify_login_logout",
+      "value": 123,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD",
+      "symbol": "notify_btm_launch_item_add",
+      "value": 124,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE",
+      "symbol": "notify_btm_launch_item_remove",
+      "value": 125,
+      "minimum_os": "13.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_PROFILE_ADD",
+      "symbol": "notify_profile_add",
+      "value": 126,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_PROFILE_REMOVE",
+      "symbol": "notify_profile_remove",
+      "value": 127,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SU",
+      "symbol": "notify_su",
+      "value": 128,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_PETITION",
+      "symbol": "notify_authorization_petition",
+      "value": 129,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_JUDGEMENT",
+      "symbol": "notify_authorization_judgement",
+      "value": 130,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_SUDO",
+      "symbol": "notify_sudo",
+      "value": 131,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD",
+      "symbol": "notify_od_group_add",
+      "value": 132,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE",
+      "symbol": "notify_od_group_remove",
+      "value": 133,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET",
+      "symbol": "notify_od_group_set",
+      "value": 134,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD",
+      "symbol": "notify_od_modify_password",
+      "value": 135,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER",
+      "symbol": "notify_od_disable_user",
+      "value": 136,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER",
+      "symbol": "notify_od_enable_user",
+      "value": 137,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD",
+      "symbol": "notify_od_attribute_value_add",
+      "value": 138,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE",
+      "symbol": "notify_od_attribute_value_remove",
+      "value": 139,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET",
+      "symbol": "notify_od_attribute_set",
+      "value": 140,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER",
+      "symbol": "notify_od_create_user",
+      "value": 141,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP",
+      "symbol": "notify_od_create_group",
+      "value": 142,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER",
+      "symbol": "notify_od_delete_user",
+      "value": 143,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP",
+      "symbol": "notify_od_delete_group",
+      "value": 144,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_XPC_CONNECT",
+      "symbol": "notify_xpc_connect",
+      "value": 145,
+      "minimum_os": "14.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE",
+      "symbol": "notify_gatekeeper_user_override",
+      "value": 146,
+      "minimum_os": "15.0",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_NOTIFY_TCC_MODIFY",
+      "symbol": "notify_tcc_modify",
+      "value": 147,
+      "minimum_os": "15.4",
+      "reserved": false
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_0",
+      "symbol": "reserved_0",
+      "value": 148,
+      "minimum_os": "26.3",
+      "reserved": true
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_1",
+      "symbol": "reserved_1",
+      "value": 149,
+      "minimum_os": "26.3",
+      "reserved": true
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_2",
+      "symbol": "reserved_2",
+      "value": 150,
+      "minimum_os": "26.3",
+      "reserved": true
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_3",
+      "symbol": "reserved_3",
+      "value": 151,
+      "minimum_os": "26.4.0",
+      "reserved": true
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_4",
+      "symbol": "reserved_4",
+      "value": 152,
+      "minimum_os": "26.4.0",
+      "reserved": true
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_5",
+      "symbol": "reserved_5",
+      "value": 153,
+      "minimum_os": "26.4.0",
+      "reserved": true
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_6",
+      "symbol": "reserved_6",
+      "value": 154,
+      "minimum_os": "26.4.0",
+      "reserved": true
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_7",
+      "symbol": "reserved_7",
+      "value": 155,
+      "minimum_os": "26.5",
+      "reserved": true
+    },
+    {
+      "name": "ES_EVENT_TYPE_RESERVED_8",
+      "symbol": "reserved_8",
+      "value": 156,
+      "minimum_os": "26.5",
+      "reserved": true
+    }
+  ]
+}
