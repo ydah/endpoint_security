@@ -4,6 +4,8 @@ module EndpointSecurity
   module Codegen
     Event = Data.define(:name, :symbol, :value, :minimum_os, :reserved)
     EventTypes = Data.define(:events, :last)
+    Field = Data.define(:name, :type, :minimum_version)
+    Record = Data.define(:name, :fields)
 
     class IR
       AVAILABILITY = /available beginning in macOS ([0-9]+(?:\.[0-9]+){1,2})/i
@@ -61,6 +63,61 @@ module EndpointSecurity
       end
 
       private_class_method :explicit_value
+
+      def self.records(ast:, version_sources:)
+        versions = scan_field_versions(version_sources)
+        ast.typedef_records.filter_map do |name, node|
+          direct = node.fetch("inner", []).select { |child| child["kind"] == "FieldDecl" && child["name"] }
+          indirect_fields = node.fetch("inner", []).select { |child| child["kind"] == "IndirectFieldDecl" }
+          indirect = indirect_fields.filter_map do |child|
+            recursive_field(node, child["name"])
+          end
+          fields = (direct + indirect).uniq { |field| field["name"] }.filter_map do |field|
+            next if field["name"].start_with?("reserved")
+
+            type = field.dig("type", "desugaredQualType") || field.dig("type", "qualType")
+            minimum_version = versions.fetch([name, field["name"]], versions.fetch(field["name"], 1))
+            Field.new(field["name"], type, minimum_version)
+          end
+          next if fields.empty?
+
+          Record.new(name, fields.freeze)
+        end.freeze
+      end
+
+      def self.scan_field_versions(sources)
+        sources.each_with_object({}) do |source, versions|
+          source.each_line do |line|
+            match = line.match(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:;|\[[^\]]+\];)[^\n]*message version >= (\d+)/)
+            versions[match[1]] = Integer(match[2]) if match
+          end
+        end
+      end
+
+      def self.recursive_field(node, name)
+        pending = node.fetch("inner", []).dup
+        until pending.empty?
+          child = pending.shift
+          return child if child["kind"] == "FieldDecl" && child["name"] == name
+
+          pending.concat(child.fetch("inner", []))
+        end
+        nil
+      end
+
+      private_class_method :recursive_field
+
+      def self.cacheable_events(source, events)
+        cacheable_structs = source.to_enum(:scan, /}\s*(es_event_[a-zA-Z0-9_]+_t);/).filter_map do
+          match = Regexp.last_match
+          comment_start = source.rindex("/**", match.begin(0))
+          match[1] if comment_start && source[comment_start...match.begin(0)].include?("Cache key for this event type")
+        end
+        suffixes = cacheable_structs.map { |name| name.delete_prefix("es_event_").delete_suffix("_t") }
+        events.events.select do |event|
+          suffixes.include?(event.symbol.to_s.sub(/\A(?:auth|notify)_/, ""))
+        end.map(&:symbol)
+      end
     end
   end
 end

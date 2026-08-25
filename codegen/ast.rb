@@ -26,6 +26,18 @@ module EndpointSecurity
         end || raise(CodegenError, "enum containing #{constant} was not found")
       end
 
+      def typedef_records
+        nodes = walk.to_a
+        by_id = nodes.to_h { |node| [node["id"], node] }
+        nodes.filter_map do |node|
+          next unless node["kind"] == "TypedefDecl" && node["name"]&.start_with?("es_")
+
+          record_id = node.dig("inner", 0, "ownedTagDecl", "id")
+          record = by_id[record_id]
+          [node["name"], record] if record&.fetch("completeDefinition", false)
+        end.to_h
+      end
+
       private
 
       def walk

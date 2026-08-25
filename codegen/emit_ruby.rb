@@ -3,14 +3,16 @@
 module EndpointSecurity
   module Codegen
     class EmitRuby
-      def initialize(event_types_ir)
+      def initialize(event_types_ir, cacheable: [])
         @ir = event_types_ir
+        @cacheable = cacheable
       end
 
       def event_types
         constants = @ir.events.map { |event| "    #{event.symbol.upcase} = :#{event.symbol}" }.join("\n")
         pairs = @ir.events.map { |event| "      #{event.symbol}: #{event.value}" }.join(",\n")
         reserved = @ir.events.select(&:reserved).map { |event| ":#{event.symbol}" }.join(", ")
+        cacheable = @cacheable.map { |event| ":#{event}" }.join(", ")
 
         <<~RUBY
           # frozen_string_literal: true
@@ -29,6 +31,7 @@ module EndpointSecurity
               ALL_AUTH = ALL.select { |event| event.to_s.start_with?("auth_") }.freeze
               ALL_NOTIFY = ALL.select { |event| event.to_s.start_with?("notify_") }.freeze
               RESERVED = [#{reserved}].freeze
+              CACHEABLE = [#{cacheable}].freeze
 
               module_function
 
@@ -38,6 +41,7 @@ module EndpointSecurity
               def auth?(event) = event.to_s.start_with?("auth_")
               def notify?(event) = event.to_s.start_with?("notify_")
               def reserved?(event) = RESERVED.include?(event.to_sym)
+              def cacheable?(event) = CACHEABLE.include?(event.to_sym)
               def flags_response?(event) = event.to_sym == :auth_open
               def value(event) = SYMBOL_TO_VALUE.fetch(event.to_sym)
               def symbol(value) = VALUE_TO_SYMBOL.fetch(value, value)

@@ -8,6 +8,7 @@ require_relative "../lib/endpoint_security/errors"
 require_relative "ast"
 require_relative "ir"
 require_relative "emit_ruby"
+require_relative "emit_c"
 
 module EndpointSecurity
   module Codegen
@@ -20,10 +21,17 @@ module EndpointSecurity
         header = File.join(sdk, "usr/include/EndpointSecurity/ESTypes.h")
         source = File.read(header)
         ir = IR.event_types(ast: AST.load(header: header, sdk: sdk), source: source)
-        emitter = EmitRuby.new(ir)
+        umbrella = File.join(sdk, "usr/include/EndpointSecurity/EndpointSecurity.h")
+        schema_ast = AST.load(header: umbrella, sdk: sdk)
+        message_sources = %w[ESMessage.h ESMessageCore.h].map do |name|
+          File.read(File.join(sdk, "usr/include/EndpointSecurity", name))
+        end
+        records = IR.records(ast: schema_ast, version_sources: message_sources)
+        emitter = EmitRuby.new(ir, cacheable: IR.cacheable_events(message_sources.first, ir))
 
         write("lib/endpoint_security/generated/event_types.rb", emitter.event_types)
         write("lib/endpoint_security/generated/availability.rb", emitter.availability)
+        write("ext/endpoint_security/generated/es_schema.c", EmitC.new(records, ir).schema)
         availability = ir.events.to_h { |event| [event.symbol.to_s, event.minimum_os] }
         write("codegen/overlay/availability.yml", YAML.dump(availability))
         write("codegen/snapshots/#{version}.json", JSON.pretty_generate(snapshot(version, ir)) << "\n")
