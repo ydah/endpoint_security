@@ -14,6 +14,8 @@ The gem keeps Apple's callback thread away from the Ruby VM: callbacks retain an
 
 The entitlement belongs to the host executable, not to this gem. Apple must grant it for production use.
 
+For production, request `com.apple.developer.endpoint-security.client` for your Apple Developer team, sign a dedicated host executable with the approved entitlement, then grant that executable Full Disk Access. The helper under [Signing](#development) only performs the signing step; it cannot grant or bypass Apple's approval.
+
 ## Installation
 
 ```ruby
@@ -102,6 +104,8 @@ Do not disable SIP on a general-purpose machine. This project never changes SIP,
 - Fork after client creation is unsupported and raises `ES::ForkedClientError`.
 - Undocumented `RESERVED_*` events expose their enum and `raw_event_bytes`, but no guessed structure.
 - Real integration tests require Apple-granted entitlement, root, signing, and TCC; CI uses `libesmock`.
+
+Public releases follow Semantic Versioning. Before 1.0, minor releases may contain breaking API changes; from 1.0 onward, breaking changes require a major release.
 
 ## License
 
