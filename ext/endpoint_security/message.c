@@ -266,6 +266,9 @@ message_respond(int argc, VALUE *argv, VALUE self)
     VALUE cache_value = rb_hash_aref(options, ID2SYM(rb_intern("cache")));
     bool cache = NIL_P(cache_value) || RTEST(cache_value);
     esrb_message_t *message = get_message(self);
+    if (message->slot->message->event_type != ES_EVENT_TYPE_AUTH_OPEN) {
+        rb_raise(rb_path2class("EndpointSecurity::MessageError"), "flags responses are only valid for AUTH_OPEN");
+    }
     return esrb_respond_slot(message->client, message->slot, ES_AUTH_RESULT_ALLOW, NUM2UINT(flags), cache) ? Qtrue : Qfalse;
 }
 

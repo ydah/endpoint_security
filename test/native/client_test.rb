@@ -50,6 +50,23 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "uses flags responses only for AUTH_OPEN" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_open), auth: true)
+    open_message = client.send(:__drain, 1).first
+    expect(open_message.respond(flags: 0xa, cache: false)).to be(true)
+    expect(ES::Mock.last_response).to eq(0xa)
+    open_message.__auto_release!
+
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_exec), auth: true)
+    exec_message = client.send(:__drain, 1).first
+    expect { exec_message.respond(flags: 0xa) }.to raise_error(ES::MessageError, /AUTH_OPEN/)
+  ensure
+    open_message&.__auto_release!
+    exec_message&.__auto_release!
+    client&.close
+  end
+
   it "uses the watchdog before a slow handler reaches its deadline" do
     client = described_class.new(queue_depth: 8, auth_default: :deny)
     client.on(:auth_exec) { sleep(0.05) }
