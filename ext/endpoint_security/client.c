@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <mach/mach_time.h>
 #include <math.h>
+#include <sched.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,20 +22,38 @@
 static VALUE c_client;
 
 static void
+client_answer_slot(esrb_client_t *client, esrb_slot_t *slot)
+{
+    uint32_t expected = ESRB_ANSWER_PENDING;
+    if (!atomic_compare_exchange_strong_explicit(
+            &slot->answer_state, &expected, ESRB_ANSWER_ANSWERED, memory_order_acq_rel, memory_order_acquire)) {
+        return;
+    }
+    if (slot->message->event_type == ES_EVENT_TYPE_AUTH_OPEN) {
+        es_respond_flags_result(slot->client, slot->message,
+            client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
+    } else {
+        es_respond_auth_result(slot->client, slot->message, client->default_auth, client->default_cache);
+    }
+}
+
+static void
+client_answer_occupied(esrb_client_t *client)
+{
+    for (size_t index = 0; index < client->queue.capacity; index++) {
+        esrb_slot_t *slot = &client->queue.slots[index];
+        if (atomic_load_explicit(&slot->occupied, memory_order_acquire)) {
+            client_answer_slot(client, slot);
+        }
+    }
+}
+
+static void
 client_drain_and_release(esrb_client_t *client)
 {
     esrb_slot_t *slot;
     while ((slot = esrb_queue_dequeue(&client->queue)) != NULL) {
-        uint32_t expected = ESRB_ANSWER_PENDING;
-        if (atomic_compare_exchange_strong_explicit(
-                &slot->answer_state, &expected, ESRB_ANSWER_ANSWERED, memory_order_acq_rel, memory_order_acquire)) {
-            if (slot->message->event_type == ES_EVENT_TYPE_AUTH_OPEN) {
-                es_respond_flags_result(slot->client, slot->message,
-                    client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
-            } else {
-                es_respond_auth_result(slot->client, slot->message, client->default_auth, client->default_cache);
-            }
-        }
+        client_answer_slot(client, slot);
         es_release_message(slot->message);
         esrb_queue_release(&client->queue, slot);
     }
@@ -47,14 +66,21 @@ client_close_native(esrb_client_t *client)
         return;
     }
 
+    if (client->client != NULL) {
+        es_unsubscribe_all(client->client);
+    }
+    while (atomic_load_explicit(&client->active_callbacks, memory_order_acquire) != 0) {
+        sched_yield();
+    }
     if (atomic_exchange_explicit(&client->watchdog_running, false, memory_order_acq_rel)) {
         pthread_join(client->watchdog_thread, NULL);
     }
+    client_answer_occupied(client);
+    client_drain_and_release(client);
     if (client->client != NULL) {
         es_delete_client(client->client);
         client->client = NULL;
     }
-    client_drain_and_release(client);
     esrb_notify(client);
 }
 
@@ -202,6 +228,19 @@ record_sequence_gaps(esrb_client_t *client, const es_message_t *message)
 static void
 handle_message(esrb_client_t *client, es_client_t *native_client, const es_message_t *message)
 {
+    atomic_fetch_add_explicit(&client->active_callbacks, 1, memory_order_acquire);
+    if (atomic_load_explicit(&client->closed, memory_order_acquire)) {
+        if (message->action_type == ES_ACTION_TYPE_AUTH) {
+            if (message->event_type == ES_EVENT_TYPE_AUTH_OPEN) {
+                es_respond_flags_result(native_client, message,
+                    client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
+            } else {
+                es_respond_auth_result(native_client, message, client->default_auth, client->default_cache);
+            }
+        }
+        atomic_fetch_sub_explicit(&client->active_callbacks, 1, memory_order_release);
+        return;
+    }
     record_sequence_gaps(client, message);
     es_retain_message(message);
     esrb_slot_t *slot = esrb_queue_enqueue(&client->queue);
@@ -216,6 +255,7 @@ handle_message(esrb_client_t *client, es_client_t *native_client, const es_messa
         }
         atomic_fetch_add_explicit(&client->dropped, 1, memory_order_relaxed);
         es_release_message(message);
+        atomic_fetch_sub_explicit(&client->active_callbacks, 1, memory_order_release);
         return;
     }
 
@@ -227,6 +267,7 @@ handle_message(esrb_client_t *client, es_client_t *native_client, const es_messa
     atomic_store_explicit(&slot->occupied, true, memory_order_release);
     esrb_queue_publish(&client->queue, slot);
     esrb_notify(client);
+    atomic_fetch_sub_explicit(&client->active_callbacks, 1, memory_order_release);
 }
 
 static VALUE
@@ -304,6 +345,7 @@ client_initialize(int argc, VALUE *argv, VALUE self)
     client->min_margin_ticks = min_margin_ns * info.denom / info.numer;
     client->owner_pid = getpid();
     atomic_init(&client->notified, false);
+    atomic_init(&client->active_callbacks, 0);
     atomic_init(&client->dropped, 0);
     atomic_init(&client->delivered, 0);
     atomic_init(&client->timeouts, 0);

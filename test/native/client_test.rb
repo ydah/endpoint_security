@@ -108,6 +108,19 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "answers the current AUTH message before closing from its handler" do
+    client = described_class.new(queue_depth: 8, auth_default: :deny)
+    client.on(:auth_exec) { client.close }
+    client.start
+
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_exec), auth: true)
+    wait_until { client.closed? }
+    expect(ES::Mock.response_count).to eq(1)
+    expect(ES::Mock.last_response).to eq(1)
+  ensure
+    client&.close
+  end
+
   it "releases retained AUTH messages safely while the watchdog races" do
     client = described_class.new(queue_depth: 8)
     retained = Queue.new
@@ -121,6 +134,23 @@ RSpec.describe ES::Client do
     wait_until { ES::Mock.response_count == 200 }
     expect(ES::Mock.response_count).to eq(200)
   ensure
+    client&.close
+  end
+
+  it "answers retained AUTH messages before deleting the client" do
+    client = described_class.new(queue_depth: 8, auth_default: :deny)
+    retained = Queue.new
+    client.on(:auth_exec) { |message| retained << message.retain! }
+    client.start
+
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_exec), auth: true)
+    message = retained.pop
+    client.close
+    expect(ES::Mock.response_count).to eq(1)
+    expect(ES::Mock.last_response).to eq(1)
+    message.release!
+  ensure
+    message&.release! if message&.valid?
     client&.close
   end
 

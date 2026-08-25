@@ -136,6 +136,12 @@ module EndpointSecurity
 
     # @return [nil]
     def close
+      if @thread == ::Thread.current && @dispatching
+        @running = false
+        @close_after_dispatch = true
+        return
+      end
+
       stop
       __native_close
     end
@@ -229,6 +235,7 @@ module EndpointSecurity
     end
 
     def dispatch(message)
+      @dispatching = true
       handler = @handlers[message.event_type]
       handler&.call(message)
     rescue StandardError => e
@@ -237,6 +244,11 @@ module EndpointSecurity
       @error_handler&.call(e)
     ensure
       message.__auto_release!
+      @dispatching = false
+      if @close_after_dispatch
+        @close_after_dispatch = false
+        __native_close
+      end
     end
 
     def report_timeouts

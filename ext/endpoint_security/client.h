@@ -17,6 +17,7 @@ typedef struct {
     _Atomic bool watchdog_running;
     _Atomic bool notified;
     _Atomic bool closed;
+    _Atomic uint32_t active_callbacks;
     _Atomic uint64_t dropped;
     _Atomic uint64_t delivered;
     _Atomic uint64_t timeouts;
