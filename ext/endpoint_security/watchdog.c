@@ -202,12 +202,8 @@ answer_due(esrb_client_t *client, esrb_watchdog_entry_t entry)
     uint32_t expected = ESRB_ANSWER_PENDING;
     if (atomic_compare_exchange_strong_explicit(
             &slot->answer_state, &expected, ESRB_ANSWER_ANSWERED, memory_order_acq_rel, memory_order_acquire)) {
-        if (slot->message->event_type == ES_EVENT_TYPE_AUTH_OPEN) {
-            es_respond_flags_result(slot->client, slot->message,
-                client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
-        } else {
-            es_respond_auth_result(slot->client, slot->message, client->default_auth, client->default_cache);
-        }
+        esrb_send_response(client, slot->client, slot->message, client->default_auth,
+            client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
         atomic_fetch_add_explicit(&client->timeouts, 1, memory_order_relaxed);
         esrb_notify(client);
     }

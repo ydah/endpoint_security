@@ -34,6 +34,7 @@ static _Atomic size_t responses;
 static _Atomic uint32_t last_response;
 static _Atomic bool inverted[3];
 static _Atomic int next_new_client_result;
+static _Atomic int next_respond_result;
 static _Atomic size_t clients;
 static _Atomic bool delete_on_creator_thread;
 
@@ -269,6 +270,11 @@ es_respond_auth_result(es_client_t *client, const es_message_t *message, es_auth
     if (client == NULL || message == NULL) {
         return ES_RESPOND_RESULT_ERR_INVALID_ARGUMENT;
     }
+    es_respond_result_t response = atomic_exchange_explicit(
+        &next_respond_result, ES_RESPOND_RESULT_SUCCESS, memory_order_relaxed);
+    if (response != ES_RESPOND_RESULT_SUCCESS) {
+        return response;
+    }
     atomic_store_explicit(&last_response, (uint32_t)result, memory_order_relaxed);
     atomic_fetch_add_explicit(&responses, 1, memory_order_relaxed);
     return ES_RESPOND_RESULT_SUCCESS;
@@ -280,6 +286,11 @@ es_respond_flags_result(es_client_t *client, const es_message_t *message, uint32
     (void)cache;
     if (client == NULL || message == NULL) {
         return ES_RESPOND_RESULT_ERR_INVALID_ARGUMENT;
+    }
+    es_respond_result_t response = atomic_exchange_explicit(
+        &next_respond_result, ES_RESPOND_RESULT_SUCCESS, memory_order_relaxed);
+    if (response != ES_RESPOND_RESULT_SUCCESS) {
+        return response;
     }
     atomic_store_explicit(&last_response, flags, memory_order_relaxed);
     atomic_fetch_add_explicit(&responses, 1, memory_order_relaxed);
@@ -397,11 +408,18 @@ esmock_set_new_client_result(es_new_client_result_t result)
 }
 
 void
+esmock_set_respond_result(es_respond_result_t result)
+{
+    atomic_store_explicit(&next_respond_result, result, memory_order_relaxed);
+}
+
+void
 esmock_reset(void)
 {
     atomic_store_explicit(&responses, 0, memory_order_relaxed);
     atomic_store_explicit(&last_response, 0, memory_order_relaxed);
     atomic_store_explicit(&next_new_client_result, ES_NEW_CLIENT_RESULT_SUCCESS, memory_order_relaxed);
+    atomic_store_explicit(&next_respond_result, ES_RESPOND_RESULT_SUCCESS, memory_order_relaxed);
     atomic_store_explicit(&clients, 0, memory_order_relaxed);
     atomic_store_explicit(&delete_on_creator_thread, true, memory_order_relaxed);
     for (size_t index = 0; index < 3; index++) {

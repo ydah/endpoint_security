@@ -6,7 +6,9 @@
 
 #include <EndpointSecurity/EndpointSecurity.h>
 #include <bsm/libbsm.h>
+#include <limits.h>
 #include <mach/mach.h>
+#include <stdint.h>
 #include <unistd.h>
 
 #include "client.h"
@@ -166,23 +168,66 @@ event_symbols(const es_event_type_t *events, size_t count)
 }
 
 static VALUE
+copy_muted_paths(VALUE pointer_value)
+{
+    es_muted_paths_t *paths = (es_muted_paths_t *)(uintptr_t)NUM2ULL(pointer_value);
+    if (paths->count > LONG_MAX) {
+        rb_raise(rb_eRangeError, "muted path count is too large");
+    }
+    VALUE result = rb_ary_new_capa((long)paths->count);
+    for (size_t index = 0; index < paths->count; index++) {
+        const es_muted_path_t *path = &paths->paths[index];
+        VALUE item = rb_hash_new();
+        rb_hash_aset(item, ID2SYM(rb_intern("type")), INT2NUM(path->type));
+        rb_hash_aset(item, ID2SYM(rb_intern("path")), esrb_string_token_value(&path->path));
+        rb_hash_aset(item, ID2SYM(rb_intern("events")), event_symbols(path->events, path->event_count));
+        rb_ary_push(result, item);
+    }
+    return result;
+}
+
+static VALUE
+release_muted_paths(VALUE pointer_value)
+{
+    es_release_muted_paths((es_muted_paths_t *)(uintptr_t)NUM2ULL(pointer_value));
+    return Qnil;
+}
+
+static VALUE
 muted_paths(VALUE self)
 {
     es_muted_paths_t *paths = NULL;
     check_mute_result(es_muted_paths_events(mute_client(self)->client, &paths));
-    VALUE result = rb_ary_new_capa(paths == NULL ? 0 : (long)paths->count);
-    if (paths != NULL) {
-        for (size_t index = 0; index < paths->count; index++) {
-            const es_muted_path_t *path = &paths->paths[index];
-            VALUE item = rb_hash_new();
-            rb_hash_aset(item, ID2SYM(rb_intern("type")), INT2NUM(path->type));
-            rb_hash_aset(item, ID2SYM(rb_intern("path")), esrb_string_token_value(&path->path));
-            rb_hash_aset(item, ID2SYM(rb_intern("events")), event_symbols(path->events, path->event_count));
-            rb_ary_push(result, item);
-        }
-        es_release_muted_paths(paths);
+    if (paths == NULL) {
+        return rb_ary_new();
+    }
+    VALUE pointer_value = ULL2NUM((uintptr_t)paths);
+    return rb_ensure(copy_muted_paths, pointer_value, release_muted_paths, pointer_value);
+}
+
+static VALUE
+copy_muted_processes(VALUE pointer_value)
+{
+    es_muted_processes_t *processes = (es_muted_processes_t *)(uintptr_t)NUM2ULL(pointer_value);
+    if (processes->count > LONG_MAX) {
+        rb_raise(rb_eRangeError, "muted process count is too large");
+    }
+    VALUE result = rb_ary_new_capa((long)processes->count);
+    for (size_t index = 0; index < processes->count; index++) {
+        const es_muted_process_t *process = &processes->processes[index];
+        VALUE item = rb_hash_new();
+        rb_hash_aset(item, ID2SYM(rb_intern("audit_token")), audit_token_value(process->audit_token));
+        rb_hash_aset(item, ID2SYM(rb_intern("events")), event_symbols(process->events, process->event_count));
+        rb_ary_push(result, item);
     }
     return result;
+}
+
+static VALUE
+release_muted_processes(VALUE pointer_value)
+{
+    es_release_muted_processes((es_muted_processes_t *)(uintptr_t)NUM2ULL(pointer_value));
+    return Qnil;
 }
 
 static VALUE
@@ -190,18 +235,11 @@ muted_processes(VALUE self)
 {
     es_muted_processes_t *processes = NULL;
     check_mute_result(es_muted_processes_events(mute_client(self)->client, &processes));
-    VALUE result = rb_ary_new_capa(processes == NULL ? 0 : (long)processes->count);
-    if (processes != NULL) {
-        for (size_t index = 0; index < processes->count; index++) {
-            const es_muted_process_t *process = &processes->processes[index];
-            VALUE item = rb_hash_new();
-            rb_hash_aset(item, ID2SYM(rb_intern("audit_token")), audit_token_value(process->audit_token));
-            rb_hash_aset(item, ID2SYM(rb_intern("events")), event_symbols(process->events, process->event_count));
-            rb_ary_push(result, item);
-        }
-        es_release_muted_processes(processes);
+    if (processes == NULL) {
+        return rb_ary_new();
     }
-    return result;
+    VALUE pointer_value = ULL2NUM((uintptr_t)processes);
+    return rb_ensure(copy_muted_processes, pointer_value, release_muted_processes, pointer_value);
 }
 
 static VALUE

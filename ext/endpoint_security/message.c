@@ -43,7 +43,7 @@ message_release(esrb_message_t *message)
     }
     uint32_t flags = message->client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0;
     esrb_respond_slot(
-        message->client, message->slot, message->client->default_auth, flags, message->client->default_cache);
+        message->client, message->slot, message->client->default_auth, flags, message->client->default_cache, NULL);
     esrb_queue_disarm(message->slot);
     es_release_message(message->slot->message);
     esrb_queue_release(&message->client->queue, message->slot);
@@ -240,6 +240,17 @@ message_answered_p(VALUE self)
 }
 
 static VALUE
+respond_slot(esrb_message_t *message, es_auth_result_t result, uint32_t flags, bool cache)
+{
+    es_respond_result_t response = ES_RESPOND_RESULT_SUCCESS;
+    bool sent = esrb_respond_slot(message->client, message->slot, result, flags, cache, &response);
+    if (response != ES_RESPOND_RESULT_SUCCESS) {
+        rb_raise(rb_path2class("EndpointSecurity::MessageError"), "Endpoint Security response failed (%d)", response);
+    }
+    return sent ? Qtrue : Qfalse;
+}
+
+static VALUE
 respond_auth(int argc, VALUE *argv, VALUE self, es_auth_result_t result)
 {
     VALUE options;
@@ -265,7 +276,7 @@ respond_auth(int argc, VALUE *argv, VALUE self, es_auth_result_t result)
         }
     }
     uint32_t flags = result == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0;
-    return esrb_respond_slot(message->client, message->slot, result, flags, cache) ? Qtrue : Qfalse;
+    return respond_slot(message, result, flags, cache);
 }
 
 static VALUE
@@ -293,7 +304,7 @@ message_respond(int argc, VALUE *argv, VALUE self)
         message->slot->message->event_type != ES_EVENT_TYPE_AUTH_OPEN) {
         rb_raise(rb_path2class("EndpointSecurity::MessageError"), "flags responses are only valid for AUTH_OPEN");
     }
-    return esrb_respond_slot(message->client, message->slot, ES_AUTH_RESULT_ALLOW, NUM2UINT(flags), cache) ? Qtrue : Qfalse;
+    return respond_slot(message, ES_AUTH_RESULT_ALLOW, NUM2UINT(flags), cache);
 }
 
 static VALUE
@@ -302,7 +313,7 @@ message_respond_default(VALUE self)
     esrb_message_t *message = get_message(self);
     uint32_t flags = message->client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0;
     return esrb_respond_slot(
-        message->client, message->slot, message->client->default_auth, flags, message->client->default_cache)
+        message->client, message->slot, message->client->default_auth, flags, message->client->default_cache, NULL)
         ? Qtrue
         : Qfalse;
 }

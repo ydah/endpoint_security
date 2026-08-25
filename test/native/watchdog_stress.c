@@ -24,6 +24,19 @@ esrb_notify(esrb_client_t *client)
     (void)client;
 }
 
+es_respond_result_t
+esrb_send_response(esrb_client_t *client, es_client_t *native_client, const es_message_t *message,
+    es_auth_result_t result, uint32_t flags, bool cache)
+{
+    es_respond_result_t response = message->event_type == ES_EVENT_TYPE_AUTH_OPEN
+        ? es_respond_flags_result(native_client, message, flags, cache)
+        : es_respond_auth_result(native_client, message, result, cache);
+    if (response != ES_RESPOND_RESULT_SUCCESS) {
+        atomic_fetch_add_explicit(&client->response_errors, 1, memory_order_relaxed);
+    }
+    return response;
+}
+
 static uint64_t
 ticks_for_nanoseconds(uint64_t nanoseconds)
 {
@@ -44,6 +57,7 @@ main(void)
     CHECK(esrb_watchdog_init(&client.watchdog, CAPACITY));
     atomic_init(&client.watchdog_running, true);
     atomic_init(&client.timeouts, 0);
+    atomic_init(&client.response_errors, 0);
     client.default_auth = ES_AUTH_RESULT_ALLOW;
     esmock_reset();
     CHECK(pthread_create(&client.watchdog_thread, NULL, esrb_watchdog_main, &client) == 0);
@@ -75,6 +89,7 @@ main(void)
     pthread_cond_broadcast(&client.watchdog.condition);
     CHECK(pthread_join(client.watchdog_thread, NULL) == 0);
     CHECK(atomic_load_explicit(&client.timeouts, memory_order_relaxed) == CAPACITY * ROUNDS);
+    CHECK(atomic_load_explicit(&client.response_errors, memory_order_relaxed) == 0);
     esrb_watchdog_destroy(&client.watchdog);
     esrb_queue_destroy(&client.queue);
     puts("1,280 watchdog responses passed");

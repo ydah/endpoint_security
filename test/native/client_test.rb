@@ -63,6 +63,20 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "reports native response failures instead of treating them as duplicate responses" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_exec), auth: true, deadline_ms: 10_000)
+    message = client.send(:__drain, 1).first
+    ES::Mock.respond_result = 2
+
+    expect { message.allow! }.to raise_error(ES::MessageError, /response failed \(2\)/)
+    expect(message).to be_answered
+    expect(client.stats[:response_errors]).to eq(1)
+  ensure
+    message&.__auto_release!
+    client&.close
+  end
+
   it "uses flags responses only for AUTH_OPEN" do
     client = described_class.new(queue_depth: 8, mute_self: false)
     ES::Mock.inject(client, event: ES::EventType.value(:auth_open), auth: true)

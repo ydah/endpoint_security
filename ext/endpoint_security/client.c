@@ -23,6 +23,19 @@ static VALUE c_client;
 
 static void handle_message(esrb_client_t *client, es_client_t *native_client, const es_message_t *message);
 
+es_respond_result_t
+esrb_send_response(esrb_client_t *client, es_client_t *native_client, const es_message_t *message,
+    es_auth_result_t result, uint32_t flags, bool cache)
+{
+    es_respond_result_t response = message->event_type == ES_EVENT_TYPE_AUTH_OPEN
+        ? es_respond_flags_result(native_client, message, flags, cache)
+        : es_respond_auth_result(native_client, message, result, cache);
+    if (response != ES_RESPOND_RESULT_SUCCESS) {
+        atomic_fetch_add_explicit(&client->response_errors, 1, memory_order_relaxed);
+    }
+    return response;
+}
+
 static void *
 client_native_main(void *argument)
 {
@@ -60,12 +73,8 @@ client_answer_slot(esrb_client_t *client, esrb_slot_t *slot)
             &slot->answer_state, &expected, ESRB_ANSWER_ANSWERED, memory_order_acq_rel, memory_order_acquire)) {
         return;
     }
-    if (slot->message->event_type == ES_EVENT_TYPE_AUTH_OPEN) {
-        es_respond_flags_result(slot->client, slot->message,
-            client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
-    } else {
-        es_respond_auth_result(slot->client, slot->message, client->default_auth, client->default_cache);
-    }
+    esrb_send_response(client, slot->client, slot->message, client->default_auth,
+        client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
 }
 
 static void
@@ -291,12 +300,8 @@ handle_message(esrb_client_t *client, es_client_t *native_client, const es_messa
     atomic_fetch_add_explicit(&client->active_callbacks, 1, memory_order_acquire);
     if (atomic_load_explicit(&client->closed, memory_order_acquire)) {
         if (message->action_type == ES_ACTION_TYPE_AUTH) {
-            if (message->event_type == ES_EVENT_TYPE_AUTH_OPEN) {
-                es_respond_flags_result(native_client, message,
-                    client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
-            } else {
-                es_respond_auth_result(native_client, message, client->default_auth, client->default_cache);
-            }
+            esrb_send_response(client, native_client, message, client->default_auth,
+                client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
         }
         atomic_fetch_sub_explicit(&client->active_callbacks, 1, memory_order_release);
         return;
@@ -306,12 +311,8 @@ handle_message(esrb_client_t *client, es_client_t *native_client, const es_messa
     esrb_slot_t *slot = esrb_queue_enqueue(&client->queue);
     if (slot == NULL) {
         if (message->action_type == ES_ACTION_TYPE_AUTH) {
-            if (message->event_type == ES_EVENT_TYPE_AUTH_OPEN) {
-                es_respond_flags_result(native_client, message,
-                    client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
-            } else {
-                es_respond_auth_result(native_client, message, client->default_auth, client->default_cache);
-            }
+            esrb_send_response(client, native_client, message, client->default_auth,
+                client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0, client->default_cache);
         }
         atomic_fetch_add_explicit(&client->dropped, 1, memory_order_relaxed);
         es_release_message(message);
@@ -420,6 +421,7 @@ client_initialize(int argc, VALUE *argv, VALUE self)
     atomic_init(&client->dropped, 0);
     atomic_init(&client->delivered, 0);
     atomic_init(&client->timeouts, 0);
+    atomic_init(&client->response_errors, 0);
     atomic_init(&client->errors, 0);
     atomic_init(&client->seq_gaps, 0);
     atomic_init(&client->leaked_messages, 0);
@@ -597,6 +599,7 @@ client_stats(VALUE self)
     SET_STAT("delivered", atomic_load_explicit(&client->delivered, memory_order_relaxed));
     SET_STAT("dropped", atomic_load_explicit(&client->dropped, memory_order_relaxed));
     SET_STAT("timeouts", atomic_load_explicit(&client->timeouts, memory_order_relaxed));
+    SET_STAT("response_errors", atomic_load_explicit(&client->response_errors, memory_order_relaxed));
     SET_STAT("errors", atomic_load_explicit(&client->errors, memory_order_relaxed));
     SET_STAT("queue_depth_max", atomic_load_explicit(&client->queue.depth_max, memory_order_relaxed));
     SET_STAT("queue_depth", esrb_queue_depth(&client->queue));
@@ -607,7 +610,8 @@ client_stats(VALUE self)
 }
 
 bool
-esrb_respond_slot(esrb_client_t *client, esrb_slot_t *slot, es_auth_result_t result, uint32_t flags, bool cache)
+esrb_respond_slot(esrb_client_t *client, esrb_slot_t *slot, es_auth_result_t result, uint32_t flags, bool cache,
+    es_respond_result_t *response)
 {
     if (atomic_load_explicit(&client->closed, memory_order_acquire)) {
         return false;
@@ -618,13 +622,11 @@ esrb_respond_slot(esrb_client_t *client, esrb_slot_t *slot, es_auth_result_t res
         return false;
     }
 
-    es_respond_result_t response;
-    if (slot->message->event_type == ES_EVENT_TYPE_AUTH_OPEN) {
-        response = es_respond_flags_result(slot->client, slot->message, flags, cache);
-    } else {
-        response = es_respond_auth_result(slot->client, slot->message, result, cache);
+    es_respond_result_t result_code = esrb_send_response(client, slot->client, slot->message, result, flags, cache);
+    if (response != NULL) {
+        *response = result_code;
     }
-    return response == ES_RESPOND_RESULT_SUCCESS;
+    return result_code == ES_RESPOND_RESULT_SUCCESS;
 }
 
 #ifdef ESRB_MOCK
@@ -710,6 +712,14 @@ mock_set_new_client_result(VALUE module, VALUE result)
     esmock_set_new_client_result((es_new_client_result_t)NUM2INT(result));
     return result;
 }
+
+static VALUE
+mock_set_respond_result(VALUE module, VALUE result)
+{
+    (void)module;
+    esmock_set_respond_result((es_respond_result_t)NUM2INT(result));
+    return result;
+}
 #endif
 
 void
@@ -737,6 +747,7 @@ esrb_init_client(VALUE endpoint_security)
     rb_define_singleton_method(mock, "client_count", mock_client_count, 0);
     rb_define_singleton_method(mock, "delete_on_creator_thread?", mock_delete_on_creator_thread, 0);
     rb_define_singleton_method(mock, "new_client_result=", mock_set_new_client_result, 1);
+    rb_define_singleton_method(mock, "respond_result=", mock_set_respond_result, 1);
     rb_define_singleton_method(mock, "reset", mock_reset, 0);
 #endif
 }
