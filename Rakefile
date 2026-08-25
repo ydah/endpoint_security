@@ -51,9 +51,9 @@ task "test:eslogger" do
   expected = EndpointSecurity::EventType.all_notify.map { |event| event.to_s.delete_prefix("notify_").to_sym }.sort
   missing = expected - actual
   extra = actual - expected
-  return if missing.empty? && extra.empty?
-
-  raise "eslogger drifted (missing: #{missing.join(", ")}; extra: #{extra.join(", ")})"
+  unless missing.empty? && extra.empty?
+    raise "eslogger drifted (missing: #{missing.join(", ")}; extra: #{extra.join(", ")})"
+  end
 end
 
 namespace :test do
