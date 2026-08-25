@@ -17,6 +17,7 @@ RSpec.describe EndpointSecurity do
   it "explains client creation failures with an action" do
     expect(ES::Diagnostics.explain(:err_not_privileged)).to include("root")
     expect(ES::Diagnostics.explain(:err_not_permitted)).to include("Full Disk Access")
+    expect(ES::Diagnostics.explain(99)).to include("Unknown", "99")
   end
 
   it "validates native string token encoding" do

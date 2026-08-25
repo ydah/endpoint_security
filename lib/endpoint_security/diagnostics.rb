@@ -18,7 +18,9 @@ module EndpointSecurity
 
     # @return [String] explanation for +result+
     def explain(result)
-      EXPLANATIONS.fetch(result.to_sym) { "Unknown es_new_client result: #{result.inspect}." }
+      EXPLANATIONS.fetch(result.respond_to?(:to_sym) ? result.to_sym : result) do
+        "Unknown es_new_client result: #{result.inspect}."
+      end
     end
   end
 end
