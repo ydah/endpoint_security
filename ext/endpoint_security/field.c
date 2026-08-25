@@ -240,28 +240,39 @@ read_field(VALUE self, VALUE name_value)
     if (strchr(type, '*') != NULL) {
         return Qnil;
     }
-
-    if (strstr(type, "uint64_t") || strstr(type, "unsigned long") || strcmp(type, "size_t") == 0) {
+    if (strncmp(type, "es_", 3) == 0) {
+        VALUE enumeration = rb_path2class("EndpointSecurity::Enum");
+        return rb_funcall(enumeration, rb_intern("symbol"), 2, rb_str_new_cstr(type), INT2NUM(*(const int32_t *)address));
+    }
+    if (strcmp(type, "unsigned long long") == 0 || strcmp(type, "uint64_t") == 0) {
         return ULL2NUM(*(const uint64_t *)address);
     }
-    if (strstr(type, "int64_t") || strstr(type, "long long") || strstr(type, "off_t") || strstr(type, "time_t")) {
+    if (strcmp(type, "long long") == 0 || strcmp(type, "int64_t") == 0) {
         return LL2NUM(*(const int64_t *)address);
     }
-    if (strstr(type, "uint16_t")) {
+    if (strcmp(type, "unsigned long") == 0) {
+        return ULONG2NUM(*(const unsigned long *)address);
+    }
+    if (strcmp(type, "long") == 0) {
+        return LONG2NUM(*(const long *)address);
+    }
+    if (strcmp(type, "unsigned int") == 0 || strcmp(type, "uint32_t") == 0) {
+        return UINT2NUM(*(const uint32_t *)address);
+    }
+    if (strcmp(type, "int") == 0 || strcmp(type, "int32_t") == 0) {
+        return INT2NUM(*(const int32_t *)address);
+    }
+    if (strcmp(type, "unsigned short") == 0 || strcmp(type, "uint16_t") == 0) {
         return UINT2NUM(*(const uint16_t *)address);
     }
-    if (strstr(type, "int16_t")) {
+    if (strcmp(type, "short") == 0 || strcmp(type, "int16_t") == 0) {
         return INT2NUM(*(const int16_t *)address);
     }
-    if (strstr(type, "uint8_t") || strstr(type, "unsigned char")) {
+    if (strcmp(type, "unsigned char") == 0 || strcmp(type, "uint8_t") == 0) {
         return UINT2NUM(*(const uint8_t *)address);
     }
-    if (strstr(type, "int8_t") || strcmp(type, "char") == 0) {
+    if (strcmp(type, "signed char") == 0 || strcmp(type, "int8_t") == 0 || strcmp(type, "char") == 0) {
         return INT2NUM(*(const int8_t *)address);
-    }
-    if (strstr(type, "int") || strstr(type, "pid_t") || strstr(type, "uid_t") || strstr(type, "gid_t") ||
-        strstr(type, "mode_t") || strstr(type, "es_") == type) {
-        return INT2NUM(*(const int32_t *)address);
     }
     return Qnil;
 }

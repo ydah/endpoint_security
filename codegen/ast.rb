@@ -38,6 +38,18 @@ module EndpointSecurity
         end.to_h
       end
 
+      def typedef_enums
+        nodes = walk.to_a
+        by_id = nodes.to_h { |node| [node["id"], node] }
+        nodes.filter_map do |node|
+          next unless node["kind"] == "TypedefDecl" && node["name"]&.start_with?("es_")
+
+          enum_id = node.dig("inner", 0, "ownedTagDecl", "id")
+          enum = by_id[enum_id]
+          [node["name"], enum] if enum&.fetch("kind", nil) == "EnumDecl"
+        end.to_h
+      end
+
       private
 
       def walk

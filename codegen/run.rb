@@ -27,15 +27,20 @@ module EndpointSecurity
           File.read(File.join(sdk, "usr/include/EndpointSecurity", name))
         end
         records = IR.records(ast: schema_ast, version_sources: message_sources)
-        emitter = EmitRuby.new(ir, cacheable: IR.cacheable_events(message_sources.first, ir))
+        enumerations = IR.enumerations(ast: schema_ast)
+        emitter = EmitRuby.new(
+          ir, cacheable: IR.cacheable_events(message_sources.first, ir), enumerations: enumerations
+        )
 
         write("lib/endpoint_security/generated/event_types.rb", emitter.event_types)
+        write("lib/endpoint_security/generated/enums.rb", emitter.enums)
         write("lib/endpoint_security/generated/availability.rb", emitter.availability)
         write("ext/endpoint_security/generated/es_schema.c", EmitC.new(records, ir).schema)
         availability = ir.events.to_h { |event| [event.symbol.to_s, event.minimum_os] }
         write("codegen/overlay/availability.yml", YAML.dump(availability))
         write("codegen/overlay/version_map.yml", YAML.dump(version_map(records)))
-        write("codegen/snapshots/#{version}.json", JSON.pretty_generate(snapshot(version, ir, records)) << "\n")
+        snapshot_json = JSON.pretty_generate(snapshot(version, ir, records, enumerations)) << "\n"
+        write("codegen/snapshots/#{version}.json", snapshot_json)
       end
 
       def capture(*command)
@@ -58,12 +63,13 @@ module EndpointSecurity
         versions.reject { |_record, fields| fields.empty? }
       end
 
-      def snapshot(version, event_types_ir, records)
+      def snapshot(version, event_types_ir, records, enumerations)
         {
           sdk_version: version,
           last: event_types_ir.last,
           events: event_types_ir.events.map(&:to_h),
-          records: records.to_h { |record| [record.name, record.fields.map(&:to_h)] }
+          records: records.to_h { |record| [record.name, record.fields.map(&:to_h)] },
+          enumerations: enumerations.to_h { |enumeration| [enumeration.name, enumeration.values.map(&:to_h)] }
         }
       end
     end

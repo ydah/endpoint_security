@@ -43,6 +43,11 @@ RSpec.describe EndpointSecurity::Codegen::IR do
     expect(ES::EventType.symbol(ES::EventType.value(:notify_exec))).to eq(:notify_exec)
   end
 
+  it "symbolizes known SDK enum values and preserves unknown values" do
+    expect(ES::Enum.symbol("es_auth_result_t", 0)).to eq(:allow)
+    expect(ES::Enum.symbol("es_auth_result_t", 99)).to eq(99)
+  end
+
   it "snapshots every parsed record and its version gates" do
     snapshot = JSON.parse(File.read(Dir[File.expand_path("../../codegen/snapshots/*.json", __dir__)].max))
     expect(snapshot.fetch("records").fetch("es_process_t")).to include(

@@ -6,6 +6,8 @@ module EndpointSecurity
     EventTypes = Data.define(:events, :last)
     Field = Data.define(:name, :type, :minimum_version)
     Record = Data.define(:name, :fields)
+    EnumValue = Data.define(:name, :symbol, :value)
+    Enumeration = Data.define(:name, :values)
 
     class IR
       AVAILABILITY = /available beginning in macOS ([0-9]+(?:\.[0-9]+){1,2})/i
@@ -83,6 +85,21 @@ module EndpointSecurity
 
           Record.new(name, fields.freeze)
         end.freeze
+      end
+
+      def self.enumerations(ast:)
+        ast.typedef_enums.map do |name, node|
+          value = -1
+          prefix = "#{name.delete_suffix("_t").upcase}_"
+          values = node.fetch("inner", []).filter_map do |entry|
+            next unless entry["kind"] == "EnumConstantDecl"
+
+            value = explicit_value(entry) || (value + 1)
+            symbol = entry.fetch("name").delete_prefix(prefix).delete_prefix("ES_").downcase.to_sym
+            EnumValue.new(entry.fetch("name"), symbol, value)
+          end
+          Enumeration.new(name, values.freeze) unless values.empty?
+        end.compact.freeze
       end
 
       def self.scan_field_versions(sources)
