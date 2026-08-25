@@ -64,6 +64,7 @@ task "test:api_surface" do
     [name, statement.include?("API_DEPRECATED")] if name
   end
   native = Dir["ext/endpoint_security/*.c"].map { |path| File.read(path) }.join
+  native = native.gsub(%r{/\*.*?\*/}m, "").gsub(%r{//.*$}, "")
   missing = declarations.reject(&:last).map(&:first).reject { |name| native.match?(/\b#{Regexp.escape(name)}\s*\(/) }
   deprecated = declarations.select(&:last).map(&:first).select { |name| native.match?(/\b#{Regexp.escape(name)}\s*\(/) }
   raise "unbound Endpoint Security functions: #{missing.join(", ")}" unless missing.empty?
