@@ -146,6 +146,18 @@ RSpec.describe ES::Client do
     wait_until { client.closed? }
     expect(ES::Mock.response_count).to eq(1)
     expect(ES::Mock.last_response).to eq(1)
+    expect(ES::Mock.delete_on_creator_thread?).to be(true)
+  ensure
+    client&.close
+  end
+
+  it "deletes the native client on the thread that created it" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+
+    Thread.new { client.close }.join
+    expect(client).to be_closed
+    expect(ES::Mock.delete_on_creator_thread?).to be(true)
+    expect(ES::Mock.client_count).to eq(0)
   ensure
     client&.close
   end
@@ -347,6 +359,12 @@ RSpec.describe ES::Client do
 
     expect { described_class.new(mute_self: false) }
       .to raise_error(ES::NotEntitledError, /lacks the Endpoint Security client entitlement/)
+  end
+
+  it "closes a native client when Ruby initialization fails" do
+    expect { described_class.new(mute_self: false, subscribe: :not_an_event) }.to raise_error(KeyError)
+    expect(ES::Mock.client_count).to eq(0)
+    expect(ES::Mock.delete_on_creator_thread?).to be(true)
   end
 
   it "warns when configured before returning a truncated path" do

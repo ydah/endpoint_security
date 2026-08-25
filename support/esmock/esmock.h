@@ -11,6 +11,8 @@ void esmock_inject(
     size_t event_size, es_result_type_t result_type, uint32_t result, bool source_es_client);
 size_t esmock_response_count(void);
 uint32_t esmock_last_response(void);
+size_t esmock_client_count(void);
+bool esmock_delete_on_creator_thread(void);
 void esmock_set_new_client_result(es_new_client_result_t result);
 void esmock_reset(void);
 

@@ -1,5 +1,5 @@
 /* client.c
- * Calling threads: lifecycle/control = Ruby threads with the GVL; handler = ES thread without the GVL.
+ * Calling threads: lifecycle/control = Ruby threads with the GVL; native lifecycle/watchdog and ES handler = no GVL.
  */
 #include "client.h"
 
@@ -20,6 +20,37 @@
 #endif
 
 static VALUE c_client;
+
+static void handle_message(esrb_client_t *client, es_client_t *native_client, const es_message_t *message);
+
+static void *
+client_native_main(void *argument)
+{
+    esrb_client_t *client = argument;
+    es_new_client_result_t result = es_new_client(&client->client, ^(es_client_t *native, const es_message_t *message) {
+      handle_message(client, native, message);
+    });
+
+    pthread_mutex_lock(&client->watchdog.mutex);
+    atomic_store_explicit(&client->creation_result, result, memory_order_relaxed);
+    atomic_store_explicit(&client->client_ready, true, memory_order_release);
+    pthread_cond_broadcast(&client->watchdog.condition);
+    pthread_mutex_unlock(&client->watchdog.mutex);
+    if (result != ES_NEW_CLIENT_RESULT_SUCCESS) {
+        return NULL;
+    }
+
+    esrb_watchdog_main(client);
+    atomic_store_explicit(&client->watchdog_stopped, true, memory_order_release);
+
+    pthread_mutex_lock(&client->watchdog.mutex);
+    while (!atomic_load_explicit(&client->delete_ready, memory_order_acquire)) {
+        pthread_cond_wait(&client->watchdog.condition, &client->watchdog.mutex);
+    }
+    pthread_mutex_unlock(&client->watchdog.mutex);
+    es_delete_client(client->client);
+    return NULL;
+}
 
 static void
 client_answer_slot(esrb_client_t *client, esrb_slot_t *slot)
@@ -72,14 +103,22 @@ client_close_native(esrb_client_t *client)
     while (atomic_load_explicit(&client->active_callbacks, memory_order_acquire) != 0) {
         sched_yield();
     }
-    if (atomic_exchange_explicit(&client->watchdog_running, false, memory_order_acq_rel)) {
+    if (client->watchdog_thread_started) {
+        atomic_store_explicit(&client->watchdog_running, false, memory_order_release);
         pthread_cond_broadcast(&client->watchdog.condition);
-        pthread_join(client->watchdog_thread, NULL);
+        while (!atomic_load_explicit(&client->watchdog_stopped, memory_order_acquire)) {
+            sched_yield();
+        }
     }
     client_answer_occupied(client);
     client_drain_and_release(client);
-    if (client->client != NULL) {
-        es_delete_client(client->client);
+    if (client->watchdog_thread_started) {
+        pthread_mutex_lock(&client->watchdog.mutex);
+        atomic_store_explicit(&client->delete_ready, true, memory_order_release);
+        pthread_cond_broadcast(&client->watchdog.condition);
+        pthread_mutex_unlock(&client->watchdog.mutex);
+        pthread_join(client->watchdog_thread, NULL);
+        client->watchdog_thread_started = false;
         client->client = NULL;
     }
     esrb_notify(client);
@@ -134,6 +173,7 @@ client_allocate(VALUE klass)
     VALUE object = TypedData_Make_Struct(klass, esrb_client_t, &esrb_client_type, client);
     client->wakeup_fd[0] = -1;
     client->wakeup_fd[1] = -1;
+    client->watchdog_thread_started = false;
     atomic_init(&client->closed, true);
     return object;
 }
@@ -389,12 +429,35 @@ client_initialize(int argc, VALUE *argv, VALUE self)
         atomic_init(&client->last_event_seq[index], 0);
         atomic_init(&client->seen_event_seq[index], false);
     }
+    atomic_init(&client->watchdog_running, true);
+    atomic_init(&client->watchdog_stopped, false);
+    atomic_init(&client->delete_ready, false);
+    atomic_init(&client->client_ready, false);
+    atomic_init(&client->creation_result, ES_NEW_CLIENT_RESULT_ERR_INTERNAL);
     atomic_store_explicit(&client->closed, false, memory_order_release);
 
-    es_new_client_result_t result = es_new_client(&client->client, ^(es_client_t *native, const es_message_t *message) {
-      handle_message(client, native, message);
-    });
+    if (pthread_create(&client->watchdog_thread, NULL, client_native_main, client) != 0) {
+        atomic_store_explicit(&client->watchdog_running, false, memory_order_release);
+        close(client->wakeup_fd[0]);
+        close(client->wakeup_fd[1]);
+        client->wakeup_fd[0] = -1;
+        client->wakeup_fd[1] = -1;
+        esrb_watchdog_destroy(&client->watchdog);
+        esrb_queue_destroy(&client->queue);
+        atomic_store_explicit(&client->closed, true, memory_order_release);
+        rb_raise(rb_eRuntimeError, "failed to create Endpoint Security watchdog");
+    }
+    client->watchdog_thread_started = true;
+
+    pthread_mutex_lock(&client->watchdog.mutex);
+    while (!atomic_load_explicit(&client->client_ready, memory_order_acquire)) {
+        pthread_cond_wait(&client->watchdog.condition, &client->watchdog.mutex);
+    }
+    pthread_mutex_unlock(&client->watchdog.mutex);
+    es_new_client_result_t result = atomic_load_explicit(&client->creation_result, memory_order_relaxed);
     if (result != ES_NEW_CLIENT_RESULT_SUCCESS) {
+        pthread_join(client->watchdog_thread, NULL);
+        client->watchdog_thread_started = false;
         close(client->wakeup_fd[0]);
         close(client->wakeup_fd[1]);
         client->wakeup_fd[0] = -1;
@@ -403,13 +466,6 @@ client_initialize(int argc, VALUE *argv, VALUE self)
         esrb_queue_destroy(&client->queue);
         atomic_store_explicit(&client->closed, true, memory_order_release);
         raise_new_client_error(result);
-    }
-
-    atomic_init(&client->watchdog_running, true);
-    if (pthread_create(&client->watchdog_thread, NULL, esrb_watchdog_main, client) != 0) {
-        atomic_store_explicit(&client->watchdog_running, false, memory_order_release);
-        client_close_native(client);
-        rb_raise(rb_eRuntimeError, "failed to create Endpoint Security watchdog");
     }
     return self;
 }
@@ -626,6 +682,20 @@ mock_last_response(VALUE module)
 }
 
 static VALUE
+mock_client_count(VALUE module)
+{
+    (void)module;
+    return SIZET2NUM(esmock_client_count());
+}
+
+static VALUE
+mock_delete_on_creator_thread(VALUE module)
+{
+    (void)module;
+    return esmock_delete_on_creator_thread() ? Qtrue : Qfalse;
+}
+
+static VALUE
 mock_reset(VALUE module)
 {
     (void)module;
@@ -664,6 +734,8 @@ esrb_init_client(VALUE endpoint_security)
     rb_define_singleton_method(mock, "inject", mock_inject, -1);
     rb_define_singleton_method(mock, "response_count", mock_response_count, 0);
     rb_define_singleton_method(mock, "last_response", mock_last_response, 0);
+    rb_define_singleton_method(mock, "client_count", mock_client_count, 0);
+    rb_define_singleton_method(mock, "delete_on_creator_thread?", mock_delete_on_creator_thread, 0);
     rb_define_singleton_method(mock, "new_client_result=", mock_set_new_client_result, 1);
     rb_define_singleton_method(mock, "reset", mock_reset, 0);
 #endif

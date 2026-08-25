@@ -33,19 +33,25 @@ module EndpointSecurity
       raise ArgumentError, "probe must be :lazy, :eager, or :off" unless %i[lazy eager off].include?(probe.to_sym)
 
       __native_initialize(mute_self: mute_self, **)
-      @probe = probe.to_sym
-      @handlers = {}
-      @subscriptions = []
-      @errors = 0
-      @reported_timeouts = 0
-      @running = false
-      mute_process(pid: ::Process.pid) if mute_self
-      if @probe == :eager
-        EventType.all.each do |event|
-          Availability.probe_cache[event] = probe_event(event) if Availability.supported_event?(event)
+      initialized = false
+      begin
+        @probe = probe.to_sym
+        @handlers = {}
+        @subscriptions = []
+        @errors = 0
+        @reported_timeouts = 0
+        @running = false
+        mute_process(pid: ::Process.pid) if mute_self
+        if @probe == :eager
+          EventType.all.each do |event|
+            Availability.probe_cache[event] = probe_event(event) if Availability.supported_event?(event)
+          end
         end
+        self.subscribe(subscribe) if subscribe
+        initialized = true
+      ensure
+        __native_close unless initialized
       end
-      self.subscribe(subscribe) if subscribe
     end
 
     # @return [Array<Symbol>]

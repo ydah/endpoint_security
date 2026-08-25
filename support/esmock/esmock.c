@@ -5,6 +5,7 @@
 
 #include <Block.h>
 #include <mach/mach_time.h>
+#include <pthread.h>
 #include <stdatomic.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -13,6 +14,7 @@
 
 struct es_client_s {
     es_handler_block_t handler;
+    pthread_t creator;
     bool subscriptions[ES_EVENT_TYPE_LAST];
 };
 
@@ -32,6 +34,8 @@ static _Atomic size_t responses;
 static _Atomic uint32_t last_response;
 static _Atomic bool inverted[3];
 static _Atomic int next_new_client_result;
+static _Atomic size_t clients;
+static _Atomic bool delete_on_creator_thread;
 
 static mock_message_t *
 mock_from_message(const es_message_t *message)
@@ -52,7 +56,9 @@ es_new_client(es_client_t **client, es_handler_block_t handler)
     if (*client == NULL) {
         return ES_NEW_CLIENT_RESULT_ERR_INTERNAL;
     }
+    (*client)->creator = pthread_self();
     (*client)->handler = Block_copy(handler);
+    atomic_fetch_add_explicit(&clients, 1, memory_order_relaxed);
     return ES_NEW_CLIENT_RESULT_SUCCESS;
 }
 
@@ -62,7 +68,10 @@ es_delete_client(es_client_t *client)
     if (client == NULL) {
         return ES_RETURN_ERROR;
     }
+    atomic_store_explicit(
+        &delete_on_creator_thread, pthread_equal(client->creator, pthread_self()), memory_order_relaxed);
     Block_release(client->handler);
+    atomic_fetch_sub_explicit(&clients, 1, memory_order_relaxed);
     free(client);
     return ES_RETURN_SUCCESS;
 }
@@ -369,6 +378,18 @@ esmock_last_response(void)
     return atomic_load_explicit(&last_response, memory_order_relaxed);
 }
 
+size_t
+esmock_client_count(void)
+{
+    return atomic_load_explicit(&clients, memory_order_relaxed);
+}
+
+bool
+esmock_delete_on_creator_thread(void)
+{
+    return atomic_load_explicit(&delete_on_creator_thread, memory_order_relaxed);
+}
+
 void
 esmock_set_new_client_result(es_new_client_result_t result)
 {
@@ -381,6 +402,8 @@ esmock_reset(void)
     atomic_store_explicit(&responses, 0, memory_order_relaxed);
     atomic_store_explicit(&last_response, 0, memory_order_relaxed);
     atomic_store_explicit(&next_new_client_result, ES_NEW_CLIENT_RESULT_SUCCESS, memory_order_relaxed);
+    atomic_store_explicit(&clients, 0, memory_order_relaxed);
+    atomic_store_explicit(&delete_on_creator_thread, true, memory_order_relaxed);
     for (size_t index = 0; index < 3; index++) {
         atomic_store_explicit(&inverted[index], false, memory_order_relaxed);
     }

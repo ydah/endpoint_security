@@ -40,7 +40,12 @@ typedef struct {
     int wakeup_fd[2];
     pthread_t watchdog_thread;
     esrb_watchdog_t watchdog;
+    bool watchdog_thread_started;
     _Atomic bool watchdog_running;
+    _Atomic bool watchdog_stopped;
+    _Atomic bool delete_ready;
+    _Atomic bool client_ready;
+    _Atomic es_new_client_result_t creation_result;
     _Atomic bool notified;
     _Atomic bool closed;
     _Atomic uint32_t active_callbacks;
