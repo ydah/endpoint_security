@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "json"
 require_relative "../../codegen/ir"
 
 RSpec.describe EndpointSecurity::Codegen::IR do
@@ -24,5 +25,13 @@ RSpec.describe EndpointSecurity::Codegen::IR do
     expect(ES::EventType.auth?(:auth_exec)).to be(true)
     expect(ES::EventType.reserved?(:reserved_0)).to be(true)
     expect(ES::EventType.symbol(ES::EventType.value(:notify_exec))).to eq(:notify_exec)
+  end
+
+  it "snapshots every parsed record and its version gates" do
+    snapshot = JSON.parse(File.read(Dir[File.expand_path("../../codegen/snapshots/*.json", __dir__)].max))
+    expect(snapshot.fetch("records").fetch("es_process_t")).to include(
+      a_hash_including("name" => "tty", "minimum_version" => 2),
+      a_hash_including("name" => "cs_validation_category", "minimum_version" => 10)
+    )
   end
 end

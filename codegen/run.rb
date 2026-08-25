@@ -34,7 +34,12 @@ module EndpointSecurity
         write("ext/endpoint_security/generated/es_schema.c", EmitC.new(records, ir).schema)
         availability = ir.events.to_h { |event| [event.symbol.to_s, event.minimum_os] }
         write("codegen/overlay/availability.yml", YAML.dump(availability))
-        write("codegen/snapshots/#{version}.json", JSON.pretty_generate(snapshot(version, ir)) << "\n")
+        version_map = records.to_h do |record|
+          fields = record.fields.select { |field| field.minimum_version > 1 }
+          [record.name, fields.to_h { |field| [field.name, field.minimum_version] }]
+        end.reject { |_record, fields| fields.empty? }
+        write("codegen/overlay/version_map.yml", YAML.dump(version_map))
+        write("codegen/snapshots/#{version}.json", JSON.pretty_generate(snapshot(version, ir, records)) << "\n")
       end
 
       def capture(*command)
@@ -49,11 +54,12 @@ module EndpointSecurity
         File.write(path, content) unless File.exist?(path) && File.binread(path) == content
       end
 
-      def snapshot(version, event_types_ir)
+      def snapshot(version, event_types_ir, records)
         {
           sdk_version: version,
           last: event_types_ir.last,
-          events: event_types_ir.events.map(&:to_h)
+          events: event_types_ir.events.map(&:to_h),
+          records: records.to_h { |record| [record.name, record.fields.map(&:to_h)] }
         }
       end
     end
