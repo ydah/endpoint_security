@@ -2,9 +2,9 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in endpoint_security.gemspec
 gemspec
 
+gem "benchmark", "~> 0.4", require: false
 gem "irb"
 gem "rake", "~> 13.0"
 gem "rake-compiler", "~> 1.3"
