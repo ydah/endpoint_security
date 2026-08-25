@@ -23,8 +23,8 @@ typedef struct {
     es_file_t executable;
     es_file_t target_executable;
     struct statfs statfs;
-    es_event_gatekeeper_user_override_t gatekeeper;
     es_sha256_t sha256;
+    void *event_data;
     es_message_t message;
 } mock_message_t;
 
@@ -279,16 +279,18 @@ es_release_message(const es_message_t *message)
 {
     mock_message_t *mock = mock_from_message(message);
     if (atomic_fetch_sub_explicit(&mock->references, 1, memory_order_acq_rel) == 1) {
+        free(mock->event_data);
         free(mock);
     }
 }
 
 void
-esmock_inject(es_client_t *client, es_event_type_t event_type, bool auth, uint64_t deadline)
+esmock_inject(
+    es_client_t *client, es_event_type_t event_type, bool auth, uint64_t deadline, uint32_t version, size_t event_size)
 {
     mock_message_t *mock = calloc(1, sizeof(*mock));
     atomic_init(&mock->references, 1);
-    mock->message.version = 4;
+    mock->message.version = version;
     clock_gettime(CLOCK_REALTIME, &mock->message.time);
     mock->message.mach_time = mach_absolute_time();
     mock->message.deadline = deadline;
@@ -307,6 +309,14 @@ esmock_inject(es_client_t *client, es_event_type_t event_type, bool auth, uint64
     mock->message.process = &mock->process;
     mock->message.event_type = event_type;
     mock->message.action_type = auth ? ES_ACTION_TYPE_AUTH : ES_ACTION_TYPE_NOTIFY;
+    if (event_size > 0) {
+        mock->event_data = calloc(1, event_size);
+        if (mock->event_data == NULL) {
+            es_release_message(&mock->message);
+            return;
+        }
+        memcpy(&mock->message.event, &mock->event_data, sizeof(mock->event_data));
+    }
     if (event_type == ES_EVENT_TYPE_AUTH_EXEC || event_type == ES_EVENT_TYPE_NOTIFY_EXEC) {
         mock->message.event.exec.target = &mock->target;
     }
@@ -320,9 +330,9 @@ esmock_inject(es_client_t *client, es_event_type_t event_type, bool auth, uint64
         mock->message.event.getattrlist.attrlist.commonattr = 1;
     }
     if (event_type == ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE) {
+        es_event_gatekeeper_user_override_t *gatekeeper = mock->event_data;
         mock->sha256[0] = 0xff;
-        mock->gatekeeper.sha256 = &mock->sha256;
-        mock->message.event.gatekeeper_user_override = &mock->gatekeeper;
+        gatekeeper->sha256 = &mock->sha256;
     }
     client->handler(client, &mock->message);
     es_release_message(&mock->message);

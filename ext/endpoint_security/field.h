@@ -24,6 +24,7 @@ typedef struct {
     es_event_type_t event_type;
     size_t offset;
     const char *schema;
+    size_t size;
     bool indirect;
 } esrb_event_schema_t;
 

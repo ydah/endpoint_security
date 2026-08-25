@@ -155,9 +155,10 @@ RSpec.describe ES::Client do
   it "deep-copies every generated event type without unsupported-field exceptions" do
     client = described_class.new(queue_depth: 256, mute_self: false)
     ES::EventType.all.each do |event|
-      ES::Mock.inject(client, event: ES::EventType.value(event), auth: false)
+      ES::Mock.inject(client, event: ES::EventType.value(event), auth: false, version: 10)
       message = client.send(:__drain, 1).first
       expect { message.to_h }.not_to raise_error
+      expect(message.event).not_to be_nil unless ES::EventType.reserved?(event)
       expect(message.raw_event_bytes).not_to be_empty if ES::EventType.reserved?(event)
       message.__auto_release!
     end

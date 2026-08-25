@@ -15,6 +15,7 @@
 #include "mute.h"
 #ifdef ESRB_MOCK
 #include "esmock.h"
+#include "field.h"
 #endif
 
 static VALUE c_client;
@@ -507,12 +508,22 @@ mock_inject(int argc, VALUE *argv, VALUE module)
     VALUE event = rb_hash_fetch(options, ID2SYM(rb_intern("event")));
     VALUE auth_value = rb_hash_aref(options, ID2SYM(rb_intern("auth")));
     VALUE deadline_ms = rb_hash_aref(options, ID2SYM(rb_intern("deadline_ms")));
+    VALUE version_value = rb_hash_aref(options, ID2SYM(rb_intern("version")));
     esrb_client_t *client = get_open_client(client_value);
     mach_timebase_info_data_t info;
     mach_timebase_info(&info);
     uint64_t delay = NIL_P(deadline_ms) ? 1000 : NUM2ULL(deadline_ms);
     uint64_t deadline = mach_absolute_time() + delay * 1000000ULL * info.denom / info.numer;
-    esmock_inject(client->client, (es_event_type_t)NUM2INT(event), RTEST(auth_value), deadline);
+    es_event_type_t event_type = (es_event_type_t)NUM2INT(event);
+    size_t event_size = 0;
+    for (size_t index = 0; index < esrb_event_schema_count; index++) {
+        if (esrb_event_schemas[index].event_type == event_type && esrb_event_schemas[index].indirect) {
+            event_size = esrb_event_schemas[index].size;
+            break;
+        }
+    }
+    uint32_t version = NIL_P(version_value) ? 4 : NUM2UINT(version_value);
+    esmock_inject(client->client, event_type, RTEST(auth_value), deadline, version, event_size);
     return Qnil;
 }
 
