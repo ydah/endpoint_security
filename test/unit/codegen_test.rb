@@ -62,6 +62,12 @@ RSpec.describe EndpointSecurity::Codegen::IR do
       .to raise_error(ES::CodegenError, /unsupported field type mystery_t/)
   end
 
+  it "removes machine-specific paths from anonymous record types" do
+    type = "union es_example_t::(unnamed at /custom/Xcode/MacOSX.sdk/ESMessage.h:10:2)"
+
+    expect(described_class.normalize_type(type)).to eq("union es_example_t::(anonymous)")
+  end
+
   it "snapshots every parsed record and its version gates" do
     snapshot = JSON.parse(File.read(Dir[File.expand_path("../../codegen/snapshots/*.json", __dir__)].max))
     expect(snapshot.fetch("records").fetch("es_process_t")).to include(

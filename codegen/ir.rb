@@ -95,7 +95,7 @@ module EndpointSecurity
           fields = (direct + indirect).uniq { |field| field["name"] }.filter_map do |field|
             next if field["name"].start_with?("reserved")
 
-            type = field.dig("type", "desugaredQualType") || field.dig("type", "qualType")
+            type = normalize_type(field.dig("type", "desugaredQualType") || field.dig("type", "qualType"))
             minimum_version = versions.fetch([name, field["name"]], 1)
             Field.new(field["name"], type, minimum_version)
           end
@@ -116,6 +116,10 @@ module EndpointSecurity
           end
           Enumeration.new(name, values.freeze) unless values.empty?
         end.compact.freeze
+      end
+
+      def self.normalize_type(type)
+        type.gsub(/\((?:unnamed|anonymous) at .*?:\d+:\d+\)/, "(anonymous)")
       end
 
       def self.validate_field_types!(records:, enumerations:)
