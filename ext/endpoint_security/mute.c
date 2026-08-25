@@ -56,14 +56,19 @@ audit_token_value(audit_token_t token)
 }
 
 static es_event_type_t *
-event_values(VALUE values, size_t *count)
+event_values(VALUE values, size_t *count, VALUE *storage)
 {
     Check_Type(values, T_ARRAY);
     *count = (size_t)RARRAY_LEN(values);
     if (*count == 0) {
+        *storage = Qnil;
         return NULL;
     }
-    es_event_type_t *events = ALLOC_N(es_event_type_t, *count);
+    if (*count > LONG_MAX / sizeof(es_event_type_t)) {
+        rb_raise(rb_eArgError, "too many events");
+    }
+    *storage = rb_str_new(NULL, (long)(*count * sizeof(es_event_type_t)));
+    es_event_type_t *events = (es_event_type_t *)RSTRING_PTR(*storage);
     for (size_t index = 0; index < *count; index++) {
         events[index] = (es_event_type_t)NUM2INT(rb_ary_entry(values, (long)index));
     }
@@ -86,7 +91,8 @@ mute_path(VALUE self, VALUE action, VALUE path, VALUE type_value, VALUE values)
     es_mute_path_type_t type = (es_mute_path_type_t)NUM2INT(type_value);
     const char *path_string = StringValueCStr(path);
     size_t count;
-    es_event_type_t *events = event_values(values, &count);
+    VALUE storage;
+    es_event_type_t *events = event_values(values, &count, &storage);
     es_return_t result;
     if (action_id == rb_intern("mute")) {
         result = count == 0 ? es_mute_path(client->client, path_string, type)
@@ -95,7 +101,7 @@ mute_path(VALUE self, VALUE action, VALUE path, VALUE type_value, VALUE values)
         result = count == 0 ? es_unmute_path(client->client, path_string, type)
                             : es_unmute_path_events(client->client, path_string, type, events, count);
     }
-    xfree(events);
+    RB_GC_GUARD(storage);
     check_mute_result(result);
     return Qtrue;
 }
@@ -106,7 +112,8 @@ mute_process(VALUE self, VALUE action, VALUE token_value, VALUE values)
     esrb_client_t *client = mute_client(self);
     audit_token_t token = audit_token_from_value(token_value);
     size_t count;
-    es_event_type_t *events = event_values(values, &count);
+    VALUE storage;
+    es_event_type_t *events = event_values(values, &count, &storage);
     es_return_t result;
     if (SYM2ID(action) == rb_intern("mute")) {
         result = count == 0 ? es_mute_process(client->client, &token)
@@ -115,7 +122,7 @@ mute_process(VALUE self, VALUE action, VALUE token_value, VALUE values)
         result = count == 0 ? es_unmute_process(client->client, &token)
                             : es_unmute_process_events(client->client, &token, events, count);
     }
-    xfree(events);
+    RB_GC_GUARD(storage);
     check_mute_result(result);
     return Qtrue;
 }

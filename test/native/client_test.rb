@@ -278,6 +278,16 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "releases temporary event storage when native conversion raises" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    invalid_event = Object.new
+
+    expect { client.send(:__subscribe, [invalid_event]) }.to raise_error(TypeError)
+    expect { client.send(:__mute_path, :mute, "/tmp", 0, [invalid_event]) }.to raise_error(TypeError)
+  ensure
+    client&.close
+  end
+
   it "requires an audit token or PID for process muting" do
     client = described_class.new(queue_depth: 8, mute_self: false)
 

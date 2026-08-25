@@ -539,12 +539,13 @@ client_subscribe(VALUE self, VALUE values)
     if (count <= 0 || count > UINT32_MAX) {
         rb_raise(rb_eArgError, "at least one event is required");
     }
-    es_event_type_t *events = ALLOC_N(es_event_type_t, count);
+    VALUE storage = rb_str_new(NULL, count * (long)sizeof(es_event_type_t));
+    es_event_type_t *events = (es_event_type_t *)RSTRING_PTR(storage);
     for (long index = 0; index < count; index++) {
         events[index] = (es_event_type_t)NUM2INT(rb_ary_entry(values, index));
     }
     es_return_t result = es_subscribe(client->client, events, (uint32_t)count);
-    xfree(events);
+    RB_GC_GUARD(storage);
     if (result != ES_RETURN_SUCCESS) {
         rb_raise(rb_path2class("EndpointSecurity::SubscriptionError"), "es_subscribe failed");
     }
@@ -564,12 +565,16 @@ client_unsubscribe(VALUE self, VALUE values)
 
     Check_Type(values, T_ARRAY);
     long count = RARRAY_LEN(values);
-    es_event_type_t *events = ALLOC_N(es_event_type_t, count);
+    if (count > UINT32_MAX) {
+        rb_raise(rb_eArgError, "too many events");
+    }
+    VALUE storage = rb_str_new(NULL, count * (long)sizeof(es_event_type_t));
+    es_event_type_t *events = (es_event_type_t *)RSTRING_PTR(storage);
     for (long index = 0; index < count; index++) {
         events[index] = (es_event_type_t)NUM2INT(rb_ary_entry(values, index));
     }
     es_return_t result = es_unsubscribe(client->client, events, (uint32_t)count);
-    xfree(events);
+    RB_GC_GUARD(storage);
     if (result != ES_RETURN_SUCCESS) {
         rb_raise(rb_path2class("EndpointSecurity::SubscriptionError"), "es_unsubscribe failed");
     }
