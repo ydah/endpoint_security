@@ -5,6 +5,8 @@ require "open3"
 require "shellwords"
 
 abort "endpoint_security requires macOS 13 or newer" unless RUBY_PLATFORM.include?("darwin")
+macos_version, macos_status = Open3.capture2("sw_vers", "-productVersion")
+abort "endpoint_security requires macOS 13 or newer" unless macos_status.success? && macos_version.to_i >= 13
 
 sdk, status = Open3.capture2("xcrun", "--show-sdk-path")
 abort "xcrun could not locate the macOS SDK; install Xcode Command Line Tools" unless status.success?

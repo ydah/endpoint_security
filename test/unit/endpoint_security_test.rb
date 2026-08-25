@@ -29,8 +29,12 @@ RSpec.describe EndpointSecurity do
 
   it "builds a portable source gem for both supported architectures" do
     specification = Gem::Specification.load(File.expand_path("../../endpoint_security.gemspec", __dir__))
+    platform = specification.platform
 
-    expect(specification.platform.to_s).to eq("ruby")
+    expect(platform.to_s).to eq("universal-darwin")
+    expect(platform =~ Gem::Platform.new("arm64-darwin-24")).to be(true)
+    expect(platform =~ Gem::Platform.new("x86_64-darwin-23")).to be(true)
+    expect(platform =~ Gem::Platform.new("x86_64-linux")).to be(false)
     expect(specification.extensions).to eq(["ext/endpoint_security/extconf.rb"])
   end
 end

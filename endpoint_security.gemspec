@@ -13,6 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://github.com/YudaiTakada/endpoint_security"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
+  spec.platform = Gem::Platform.new("universal-darwin")
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["rubygems_mfa_required"] = "true"
 
