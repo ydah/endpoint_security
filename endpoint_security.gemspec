@@ -8,14 +8,14 @@ Gem::Specification.new do |spec|
   spec.authors = ["Yudai Takada"]
   spec.email = ["t.yudai92@gmail.com"]
 
-  spec.summary = "TODO: Write a short summary, because RubyGems requires one."
-  spec.description = "TODO: Write a longer description or delete this line."
-  spec.homepage = "TODO: Put your gem's website or public repo URL here."
+  spec.summary = "Ruby bindings for Apple's EndpointSecurity framework"
+  spec.description = "A native Ruby interface to macOS EndpointSecurity."
+  spec.homepage = "https://github.com/YudaiTakada/endpoint_security"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
-  spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
+  spec.metadata["source_code_uri"] = spec.homepage
+  spec.metadata["rubygems_mfa_required"] = "true"
 
   # Uncomment the line below to require MFA for gem pushes.
   # This helps protect your gem from supply chain attacks by ensuring
@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+  spec.extensions = ["ext/endpoint_security/extconf.rb"]
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
