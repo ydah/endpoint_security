@@ -10,6 +10,8 @@ module EndpointSecurity
 
       def schema
         tables = @records.map do |record|
+          next if record.fields.empty?
+
           fields = record.fields.map do |field|
             %(    {"#{field.name}", "#{field.type}", offsetof(#{record.name}, #{field.name}), #{field.minimum_version}})
           end.join(",\n")
@@ -21,8 +23,12 @@ module EndpointSecurity
         end.join("\n")
 
         schemas = @records.map do |record|
-          table = "fields_#{record.name}"
-          %(    {"#{record.name}", #{table}, sizeof(#{table}) / sizeof(#{table}[0])})
+          if record.fields.empty?
+            %(    {"#{record.name}", NULL, 0})
+          else
+            table = "fields_#{record.name}"
+            %(    {"#{record.name}", #{table}, sizeof(#{table}) / sizeof(#{table}[0])})
+          end
         end.join(",\n")
 
         by_name = @records.to_h { |record| [record.name, record] }

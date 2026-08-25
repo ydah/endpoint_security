@@ -12,6 +12,24 @@ module EndpointSecurity
     class IR
       AVAILABILITY = /available beginning in macOS ([0-9]+(?:\.[0-9]+){1,2})/i
       EVENT = /\b(ES_EVENT_TYPE_[A-Z0-9_]+)\b/
+      SCALAR_TYPES = [
+        "bool", "_Bool", "unsigned long long", "uint64_t", "long long", "int64_t", "unsigned long", "long",
+        "unsigned int", "uint32_t", "int", "int32_t", "unsigned short", "uint16_t", "short", "int16_t",
+        "unsigned char", "uint8_t", "signed char", "int8_t", "char", "es_string_token_t", "es_token_t",
+        "audit_token_t", "struct stat", "struct timespec", "struct timeval", "struct attrlist"
+      ].freeze
+      POINTER_TYPES = ["struct statfs *", "struct _acl *", "es_sha256_t *", "audit_token_t *"].freeze
+      SPECIAL_FIELDS = %w[
+        es_token_t.data es_string_token_t.data es_muted_path_t.events es_muted_process_t.events
+        es_muted_paths_t.paths es_muted_processes_t.processes es_event_su_t.argv es_event_su_t.env
+        es_event_authorization_petition_t.rights es_event_authorization_judgement_t.results
+        es_event_od_attribute_set_t.attribute_values es_message_t.opaque es_message_t.action es_result_t.result
+        es_fd_t.pipe es_event_rename_t.destination es_event_create_t.destination es_event_authentication_t.data
+        es_event_authentication_touchid_t.uid es_event_openssh_login_t.uid es_event_login_login_t.uid
+        es_event_su_t.to_uid es_event_sudo_t.from_uid es_event_sudo_t.to_uid
+        es_event_gatekeeper_user_override_t.file es_event_setacl_t.acl es_od_member_id_t.member_value
+        es_od_member_id_array_t.member_array
+      ].freeze
 
       def self.event_types(ast:, source:)
         availability = scan_availability(source)
@@ -81,8 +99,6 @@ module EndpointSecurity
             minimum_version = versions.fetch([name, field["name"]], 1)
             Field.new(field["name"], type, minimum_version)
           end
-          next if fields.empty?
-
           Record.new(name, fields.freeze)
         end.freeze
       end
@@ -100,6 +116,18 @@ module EndpointSecurity
           end
           Enumeration.new(name, values.freeze) unless values.empty?
         end.compact.freeze
+      end
+
+      def self.validate_field_types!(records:, enumerations:)
+        record_names = records.map(&:name)
+        enum_names = enumerations.map(&:name)
+        records.each do |record|
+          record.fields.each do |field|
+            next if supported_field_type?(record, field, record_names, enum_names)
+
+            raise CodegenError, "unsupported field type #{field.type} at #{record.name}.#{field.name}"
+          end
+        end
       end
 
       def self.scan_field_versions(sources)
@@ -132,6 +160,18 @@ module EndpointSecurity
       end
 
       private_class_method :recursive_field
+
+      def self.supported_field_type?(record, field, record_names, enum_names)
+        type = field.type
+        return true if SPECIAL_FIELDS.include?("#{record.name}.#{field.name}")
+        return true if SCALAR_TYPES.include?(type) || enum_names.include?(type) || record_names.include?(type)
+        return true if type == "uint8_t[20]" || POINTER_TYPES.include?(type)
+
+        pointee = type.delete_prefix("const ").delete_suffix(" *")
+        type.end_with?(" *") && record_names.include?(pointee)
+      end
+
+      private_class_method :supported_field_type?
 
       def self.cacheable_events(source, events)
         cacheable_structs = source.to_enum(:scan, /}\s*(es_event_[a-zA-Z0-9_]+_t);/).filter_map do

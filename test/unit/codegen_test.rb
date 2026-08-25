@@ -48,6 +48,15 @@ RSpec.describe EndpointSecurity::Codegen::IR do
     expect(ES::Enum.symbol("es_auth_result_t", 99)).to eq(99)
   end
 
+  it "rejects field types that the native reader cannot decode" do
+    records = [EndpointSecurity::Codegen::Record.new(
+      "es_example_t", [EndpointSecurity::Codegen::Field.new("value", "mystery_t", 1)]
+    )]
+
+    expect { described_class.validate_field_types!(records: records, enumerations: []) }
+      .to raise_error(ES::CodegenError, /unsupported field type mystery_t/)
+  end
+
   it "snapshots every parsed record and its version gates" do
     snapshot = JSON.parse(File.read(Dir[File.expand_path("../../codegen/snapshots/*.json", __dir__)].max))
     expect(snapshot.fetch("records").fetch("es_process_t")).to include(

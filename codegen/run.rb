@@ -28,6 +28,7 @@ module EndpointSecurity
         end
         records = IR.records(ast: schema_ast, version_sources: message_sources)
         enumerations = IR.enumerations(ast: schema_ast)
+        IR.validate_field_types!(records: records, enumerations: enumerations)
         emitter = EmitRuby.new(
           ir, cacheable: IR.cacheable_events(message_sources.first, ir), enumerations: enumerations
         )
