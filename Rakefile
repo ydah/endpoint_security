@@ -70,6 +70,7 @@ task "test:api_surface" do
   raise "deprecated Endpoint Security functions used: #{deprecated.join(", ")}" unless deprecated.empty?
 end
 
+# rubocop:disable-next Metrics/BlockLength
 namespace :test do
   task native: ["compile:mock", "test:native:spec"]
   task :drift do
@@ -89,12 +90,22 @@ namespace :test do
   end
   task :sanitize do
     sdk = `xcrun --show-sdk-path`.strip
+    ruby_headers = [RbConfig::CONFIG.fetch("rubyhdrdir"), RbConfig::CONFIG.fetch("rubyarchhdrdir")]
     %w[address,undefined thread].each do |sanitizer|
       output = "tmp/queue_#{sanitizer.tr(",", "_")}"
       sh "xcrun", "clang", "-std=c11", "-Wall", "-Wextra", "-Werror", "-pthread", "-isysroot", sdk,
          "-I#{sdk}/usr/include", "-Iext/endpoint_security", "-fsanitize=#{sanitizer}",
          "test/native/queue_stress.c", "ext/endpoint_security/queue.c", "-o", output
       sh output
+
+      watchdog_output = "tmp/watchdog_#{sanitizer.tr(",", "_")}"
+      sh "xcrun", "clang", "-fblocks", "-std=c11", "-Wall", "-Wextra", "-Werror", "-Wno-unused-parameter",
+         "-pthread", "-isysroot", sdk,
+         "-I#{sdk}/usr/include", "-Iext/endpoint_security", "-Isupport/esmock",
+         *ruby_headers.flat_map { |path| ["-isystem", path] },
+         "-fsanitize=#{sanitizer}", "test/native/watchdog_stress.c", "ext/endpoint_security/watchdog.c",
+         "ext/endpoint_security/queue.c", "support/esmock/esmock.c", "-o", watchdog_output
+      sh watchdog_output
     end
   end
   task integration: ["compile:real", "test:integration:spec"]
