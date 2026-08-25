@@ -75,6 +75,35 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "falls back immediately when an AUTH handler returns unanswered" do
+    client = described_class.new(queue_depth: 8, auth_default: :deny)
+    client.on(:auth_exec) { |_message| nil }
+    client.start
+
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_exec), auth: true, deadline_ms: 1000)
+    wait_until { ES::Mock.response_count == 1 }
+    expect(ES::Mock.last_response).to eq(1)
+    expect(client.stats[:timeouts]).to eq(0)
+  ensure
+    client&.close
+  end
+
+  it "releases retained AUTH messages safely while the watchdog races" do
+    client = described_class.new(queue_depth: 8)
+    retained = Queue.new
+    client.on(:auth_exec) { |message| retained << message.retain! }
+    client.start
+
+    200.times do
+      ES::Mock.inject(client, event: ES::EventType.value(:auth_exec), auth: true, deadline_ms: 1)
+      retained.pop.release!
+    end
+    wait_until { ES::Mock.response_count == 200 }
+    expect(ES::Mock.response_count).to eq(200)
+  ensure
+    client&.close
+  end
+
   it "round-trips mute, inversion, and cache control APIs" do
     client = described_class.new(queue_depth: 8)
     expect(client.mute_path("/tmp", type: :prefix)).to be(true)
@@ -135,5 +164,29 @@ RSpec.describe ES::Client do
     expect { described_class.new(auth_default: :maybe) }.to raise_error(ArgumentError)
     expect { described_class.new(on_full: :block) }.to raise_error(ArgumentError)
     expect { described_class.new(probe: :sometimes) }.to raise_error(ArgumentError)
+  end
+
+  it "rejects inherited client operations after fork" do
+    client = described_class.new(queue_depth: 8)
+    reader, writer = IO.pipe
+    pid = fork do
+      reader.close
+      result = begin
+        client.muted_paths
+        "no error"
+      rescue StandardError => e
+        e.class.name
+      end
+      writer.write(result)
+      writer.close
+      exit! 0
+    end
+    writer.close
+    expect(reader.read).to eq("EndpointSecurity::ForkedClientError")
+    Process.wait(pid)
+  ensure
+    reader&.close
+    writer&.close
+    client&.close
   end
 end

@@ -4,6 +4,7 @@
 #include "message.h"
 
 #include <mach/mach_time.h>
+#include <unistd.h>
 
 #include "field.h"
 
@@ -16,6 +17,12 @@ typedef struct {
 } esrb_message_t;
 
 static VALUE c_message;
+
+static bool
+message_owned_here(const esrb_message_t *message)
+{
+    return message->client->owner_pid == getpid();
+}
 
 static void
 message_mark(void *pointer)
@@ -30,6 +37,14 @@ message_release(esrb_message_t *message)
     if (!message->valid) {
         return;
     }
+    if (!message_owned_here(message)) {
+        message->valid = false;
+        return;
+    }
+    uint32_t flags = message->client->default_auth == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0;
+    esrb_respond_slot(
+        message->client, message->slot, message->client->default_auth, flags, message->client->default_cache);
+    esrb_queue_disarm(message->slot);
     es_release_message(message->slot->message);
     esrb_queue_release(&message->client->queue, message->slot);
     message->valid = false;
@@ -39,7 +54,7 @@ static void
 message_free(void *pointer)
 {
     esrb_message_t *message = pointer;
-    if (message->valid && message->held) {
+    if (message->valid && message->held && message_owned_here(message)) {
         atomic_fetch_add_explicit(&message->client->leaked_messages, 1, memory_order_relaxed);
     }
     message_release(message);
@@ -63,6 +78,9 @@ get_message(VALUE self)
 {
     esrb_message_t *message;
     TypedData_Get_Struct(self, esrb_message_t, &message_type, message);
+    if (!message_owned_here(message)) {
+        rb_raise(rb_path2class("EndpointSecurity::ForkedClientError"), "Endpoint Security messages cannot be used after fork");
+    }
     if (!message->valid) {
         rb_raise(rb_path2class("EndpointSecurity::MessageInvalidatedError"), "message has been released");
     }
@@ -274,6 +292,9 @@ message_release_bang(VALUE self)
 {
     esrb_message_t *message;
     TypedData_Get_Struct(self, esrb_message_t, &message_type, message);
+    if (!message_owned_here(message)) {
+        rb_raise(rb_path2class("EndpointSecurity::ForkedClientError"), "Endpoint Security messages cannot be used after fork");
+    }
     message_release(message);
     return Qnil;
 }
@@ -294,6 +315,9 @@ message_valid_p(VALUE self)
 {
     esrb_message_t *message;
     TypedData_Get_Struct(self, esrb_message_t, &message_type, message);
+    if (!message_owned_here(message)) {
+        rb_raise(rb_path2class("EndpointSecurity::ForkedClientError"), "Endpoint Security messages cannot be used after fork");
+    }
     return message->valid ? Qtrue : Qfalse;
 }
 
@@ -318,6 +342,9 @@ esrb_message_valid_object(VALUE object)
         return false;
     }
     TypedData_Get_Struct(object, esrb_message_t, &message_type, message);
+    if (!message_owned_here(message)) {
+        rb_raise(rb_path2class("EndpointSecurity::ForkedClientError"), "Endpoint Security messages cannot be used after fork");
+    }
     return message->valid;
 }
 

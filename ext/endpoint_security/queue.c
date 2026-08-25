@@ -4,6 +4,7 @@
  */
 #include "queue.h"
 
+#include <sched.h>
 #include <stdlib.h>
 
 bool
@@ -27,6 +28,7 @@ esrb_queue_init(esrb_queue_t *queue, size_t capacity)
         atomic_init(&queue->slots[index].sequence, index);
         atomic_init(&queue->slots[index].occupied, false);
         atomic_init(&queue->slots[index].answer_state, ESRB_ANSWER_NOT_AUTH);
+        atomic_init(&queue->slots[index].readers, 0);
     }
     return true;
 }
@@ -97,9 +99,18 @@ esrb_queue_dequeue(esrb_queue_t *queue)
 }
 
 void
-esrb_queue_release(esrb_queue_t *queue, esrb_slot_t *slot)
+esrb_queue_disarm(esrb_slot_t *slot)
 {
     atomic_store_explicit(&slot->occupied, false, memory_order_release);
+    while (atomic_load_explicit(&slot->readers, memory_order_acquire) != 0) {
+        sched_yield();
+    }
+}
+
+void
+esrb_queue_release(esrb_queue_t *queue, esrb_slot_t *slot)
+{
+    esrb_queue_disarm(slot);
     atomic_store_explicit(&slot->sequence, slot->position + queue->capacity, memory_order_release);
 }
 

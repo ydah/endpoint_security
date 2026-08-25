@@ -17,13 +17,19 @@ esrb_watchdog_main(void *argument)
         uint64_t now = mach_absolute_time();
         for (size_t index = 0; index < client->queue.capacity; index++) {
             esrb_slot_t *slot = &client->queue.slots[index];
+            if (!atomic_load_explicit(&slot->occupied, memory_order_acquire)) {
+                continue;
+            }
+            atomic_fetch_add_explicit(&slot->readers, 1, memory_order_acquire);
             if (!atomic_load_explicit(&slot->occupied, memory_order_acquire) || slot->fire_at > now) {
+                atomic_fetch_sub_explicit(&slot->readers, 1, memory_order_release);
                 continue;
             }
 
             uint32_t expected = ESRB_ANSWER_PENDING;
             if (!atomic_compare_exchange_strong_explicit(
                     &slot->answer_state, &expected, ESRB_ANSWER_ANSWERED, memory_order_acq_rel, memory_order_acquire)) {
+                atomic_fetch_sub_explicit(&slot->readers, 1, memory_order_release);
                 continue;
             }
 
@@ -35,6 +41,7 @@ esrb_watchdog_main(void *argument)
             }
             atomic_fetch_add_explicit(&client->timeouts, 1, memory_order_relaxed);
             esrb_notify(client);
+            atomic_fetch_sub_explicit(&slot->readers, 1, memory_order_release);
         }
         nanosleep(&interval, NULL);
     }

@@ -7,6 +7,7 @@
 #include <EndpointSecurity/EndpointSecurity.h>
 #include <bsm/libbsm.h>
 #include <mach/mach.h>
+#include <unistd.h>
 
 #include "client.h"
 
@@ -15,6 +16,9 @@ mute_client(VALUE self)
 {
     esrb_client_t *client;
     TypedData_Get_Struct(self, esrb_client_t, &esrb_client_type, client);
+    if (client->owner_pid != getpid()) {
+        rb_raise(rb_path2class("EndpointSecurity::ForkedClientError"), "Endpoint Security clients cannot be used after fork");
+    }
     if (atomic_load_explicit(&client->closed, memory_order_acquire)) {
         rb_raise(rb_path2class("EndpointSecurity::ClientError"), "client is closed");
     }

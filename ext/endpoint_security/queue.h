@@ -21,6 +21,7 @@ typedef struct {
     size_t position;
     uint64_t fire_at;
     _Atomic uint32_t answer_state;
+    _Atomic uint32_t readers;
 } esrb_slot_t;
 
 typedef struct {
@@ -37,6 +38,7 @@ void esrb_queue_destroy(esrb_queue_t *queue);
 esrb_slot_t *esrb_queue_enqueue(esrb_queue_t *queue);
 void esrb_queue_publish(esrb_queue_t *queue, esrb_slot_t *slot);
 esrb_slot_t *esrb_queue_dequeue(esrb_queue_t *queue);
+void esrb_queue_disarm(esrb_slot_t *slot);
 void esrb_queue_release(esrb_queue_t *queue, esrb_slot_t *slot);
 size_t esrb_queue_depth(const esrb_queue_t *queue);
 

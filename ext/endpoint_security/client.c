@@ -59,7 +59,13 @@ static void
 client_free(void *pointer)
 {
     esrb_client_t *client = pointer;
-    client_close_native(client);
+    if (client->owner_pid == 0 || client->owner_pid == getpid()) {
+        client_close_native(client);
+    } else {
+        client->client = NULL;
+        atomic_store_explicit(&client->watchdog_running, false, memory_order_release);
+        atomic_store_explicit(&client->closed, true, memory_order_release);
+    }
     esrb_queue_destroy(&client->queue);
     if (client->wakeup_fd[0] >= 0) {
         close(client->wakeup_fd[0]);
@@ -174,19 +180,18 @@ deadline_fire_time(esrb_client_t *client, uint64_t deadline)
 static void
 record_sequence_gaps(esrb_client_t *client, const es_message_t *message)
 {
-    if (message->version >= 2 && message->event_type >= 0 && message->event_type < ES_EVENT_TYPE_LAST) {
-        size_t index = (size_t)message->event_type;
-        uint64_t previous = atomic_exchange_explicit(&client->last_event_seq[index], message->seq_num, memory_order_relaxed);
-        bool seen = atomic_exchange_explicit(&client->seen_event_seq[index], true, memory_order_relaxed);
-        if (seen && message->seq_num > previous + 1) {
-            atomic_fetch_add_explicit(&client->seq_gaps, message->seq_num - previous - 1, memory_order_relaxed);
-        }
-    }
     if (message->version >= 4) {
         uint64_t previous = atomic_exchange_explicit(&client->last_global_seq, message->global_seq_num, memory_order_relaxed);
         bool seen = atomic_exchange_explicit(&client->seen_global_seq, true, memory_order_relaxed);
         if (seen && message->global_seq_num > previous + 1) {
             atomic_fetch_add_explicit(&client->seq_gaps, message->global_seq_num - previous - 1, memory_order_relaxed);
+        }
+    } else if (message->version >= 2 && message->event_type >= 0 && message->event_type < ES_EVENT_TYPE_LAST) {
+        size_t index = (size_t)message->event_type;
+        uint64_t previous = atomic_exchange_explicit(&client->last_event_seq[index], message->seq_num, memory_order_relaxed);
+        bool seen = atomic_exchange_explicit(&client->seen_event_seq[index], true, memory_order_relaxed);
+        if (seen && message->seq_num > previous + 1) {
+            atomic_fetch_add_explicit(&client->seq_gaps, message->seq_num - previous - 1, memory_order_relaxed);
         }
     }
 }
