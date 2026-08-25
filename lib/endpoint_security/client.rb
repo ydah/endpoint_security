@@ -184,12 +184,12 @@ module EndpointSecurity
 
     # Mutes a process by audit token or PID.
     def mute_process(token = nil, pid: nil)
-      change_process_mute(:mute, token || __audit_token_for_pid(pid), [])
+      change_process_mute(:mute, token || (__audit_token_for_pid(pid) if pid), [])
     end
 
     # Removes a process mute by audit token or PID.
     def unmute_process(token = nil, pid: nil)
-      change_process_mute(:unmute, token || __audit_token_for_pid(pid), [])
+      change_process_mute(:unmute, token || (__audit_token_for_pid(pid) if pid), [])
     end
 
     # Mutes selected +events+ for a process.

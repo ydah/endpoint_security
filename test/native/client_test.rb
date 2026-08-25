@@ -35,6 +35,19 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "uses the configured encoding for native string tokens" do
+    ES.string_encoding = :binary
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_exec), auth: false)
+    message = client.send(:__drain, 1).first
+
+    expect(message.process.executable.path.encoding).to eq(Encoding::BINARY)
+  ensure
+    message&.__auto_release!
+    client&.close
+    ES.string_encoding = :utf8
+  end
+
   it "responds to AUTH exactly once under competing calls" do
     client = described_class.new(queue_depth: 8)
     results = Queue.new
@@ -229,6 +242,15 @@ RSpec.describe ES::Client do
     expect(client.muted_paths).to eq([])
     expect(client.muted_processes).to eq([])
     expect(client.clear_cache).to be(true)
+  ensure
+    client&.close
+  end
+
+  it "requires an audit token or PID for process muting" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+
+    expect { client.mute_process }.to raise_error(ArgumentError, /audit token or pid is required/)
+    expect { client.unmute_process }.to raise_error(ArgumentError, /audit token or pid is required/)
   ensure
     client&.close
   end

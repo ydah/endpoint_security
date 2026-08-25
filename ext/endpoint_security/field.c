@@ -113,8 +113,8 @@ time_value(time_t seconds, long nanoseconds)
     return rb_time_nano_new(seconds, nanoseconds);
 }
 
-static VALUE
-string_token_value(const es_string_token_t *token)
+VALUE
+esrb_string_token_value(const es_string_token_t *token)
 {
     if (token->length > LONG_MAX) {
         return Qnil;
@@ -213,7 +213,7 @@ destination_union(const esrb_view_t *view, bool create)
     VALUE path = rb_hash_new();
     rb_hash_aset(path, ID2SYM(rb_intern("dir")),
         esrb_view_wrap(view->owner, directory, "es_file_t", view->message_version, view->strict_version));
-    rb_hash_aset(path, ID2SYM(rb_intern("filename")), string_token_value(&filename));
+    rb_hash_aset(path, ID2SYM(rb_intern("filename")), esrb_string_token_value(&filename));
     if (create) {
         rb_hash_aset(path, ID2SYM(rb_intern("mode")), UINT2NUM(mode));
     }
@@ -262,7 +262,7 @@ od_member_union(const esrb_view_t *view)
 {
     const es_od_member_id_t *member = (const es_od_member_id_t *)view->pointer;
     if (member->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
-        return tagged_union_value("name", string_token_value(&member->member_value.name));
+        return tagged_union_value("name", esrb_string_token_value(&member->member_value.name));
     }
     if (member->member_type != ES_OD_MEMBER_TYPE_USER_UUID && member->member_type != ES_OD_MEMBER_TYPE_GROUP_UUID) {
         return tagged_union_value("unknown", Qnil);
@@ -280,7 +280,7 @@ od_member_array_union(const esrb_view_t *view)
     VALUE values = rb_ary_new_capa((long)members->member_count);
     if (members->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
         for (size_t index = 0; index < members->member_count; index++) {
-            rb_ary_push(values, string_token_value(&members->member_array.names[index]));
+            rb_ary_push(values, esrb_string_token_value(&members->member_array.names[index]));
         }
         return tagged_union_value("names", values);
     }
@@ -339,7 +339,7 @@ read_union(const esrb_view_t *view, const esrb_field_t *field)
     if (strcmp(field->name, "file") == 0 && strcmp(schema, "es_event_gatekeeper_user_override_t") == 0) {
         const es_event_gatekeeper_user_override_t *event = (const es_event_gatekeeper_user_override_t *)view->pointer;
         if (event->file_type == ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_PATH) {
-            return tagged_union_value("path", string_token_value(&event->file.file_path));
+            return tagged_union_value("path", esrb_string_token_value(&event->file.file_path));
         }
         if (event->file_type != ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_FILE) {
             return tagged_union_value("unknown", Qnil);
@@ -366,7 +366,7 @@ string_array(const es_string_token_t *tokens, size_t count)
     }
     VALUE values = rb_ary_new_capa((long)count);
     for (size_t index = 0; index < count; index++) {
-        rb_ary_push(values, string_token_value(&tokens[index]));
+        rb_ary_push(values, esrb_string_token_value(&tokens[index]));
     }
     return values;
 }
@@ -524,11 +524,11 @@ read_field(VALUE self, VALUE name_value)
         }
     }
     if (strcmp(type, "es_string_token_t") == 0) {
-        return string_token_value((const es_string_token_t *)address);
+        return esrb_string_token_value((const es_string_token_t *)address);
     }
     if (strcmp(type, "es_string_token_t *") == 0) {
         const es_string_token_t *token = *(const es_string_token_t *const *)address;
-        return token == NULL ? Qnil : string_token_value(token);
+        return token == NULL ? Qnil : esrb_string_token_value(token);
     }
     if (strcmp(type, "es_token_t") == 0) {
         const es_token_t *token = (const es_token_t *)address;
@@ -671,7 +671,7 @@ exec_values(VALUE self, VALUE kind_value)
         values = rb_ary_new_capa(count);
         for (uint32_t index = 0; index < count; index++) {
             es_string_token_t token = kind == rb_intern("args") ? es_exec_arg(event, index) : es_exec_env(event, index);
-            rb_ary_push(values, string_token_value(&token));
+            rb_ary_push(values, esrb_string_token_value(&token));
         }
         return values;
     }

@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "client.h"
+#include "field.h"
 
 static esrb_client_t *
 mute_client(VALUE self)
@@ -175,7 +176,7 @@ muted_paths(VALUE self)
             const es_muted_path_t *path = &paths->paths[index];
             VALUE item = rb_hash_new();
             rb_hash_aset(item, ID2SYM(rb_intern("type")), INT2NUM(path->type));
-            rb_hash_aset(item, ID2SYM(rb_intern("path")), rb_utf8_str_new(path->path.data, (long)path->path.length));
+            rb_hash_aset(item, ID2SYM(rb_intern("path")), esrb_string_token_value(&path->path));
             rb_hash_aset(item, ID2SYM(rb_intern("events")), event_symbols(path->events, path->event_count));
             rb_ary_push(result, item);
         }
