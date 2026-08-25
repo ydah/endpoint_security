@@ -10,6 +10,7 @@ require_relative "endpoint_security/endpoint_security"
 require_relative "endpoint_security/object_model"
 require_relative "endpoint_security/message"
 require_relative "endpoint_security/client"
+require_relative "endpoint_security/recorder"
 
 module EndpointSecurity
 end
