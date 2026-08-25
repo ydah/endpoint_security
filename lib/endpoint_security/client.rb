@@ -62,7 +62,9 @@ module EndpointSecurity
       begin
         __subscribe(events.map { |event| EventType.value(event) })
       rescue SubscriptionError => e
-        raise SubscriptionError, "failed to subscribe: #{events.join(", ")} (#{e.message})"
+        failed = events.reject { |event| probe_event(event) }
+        failed = events if failed.empty?
+        raise SubscriptionError, "failed to subscribe: #{failed.join(", ")} (#{e.message})"
       end
       @subscriptions |= events
     end

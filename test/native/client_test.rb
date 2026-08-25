@@ -231,6 +231,16 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "names the unsupported event when a batch subscription fails" do
+    client = described_class.new(queue_depth: 8, mute_self: false, probe: :off)
+
+    expect { client.subscribe(:notify_exec, :reserved_0) }
+      .to raise_error(ES::SubscriptionError, /reserved_0/)
+    expect(client.subscriptions).to eq([])
+  ensure
+    client&.close
+  end
+
   it "warns when configured before returning a truncated path" do
     client = described_class.new(queue_depth: 8, mute_self: false, warn_on_truncated_path: true)
     ES::Mock.inject(client, event: ES::EventType.value(:notify_exec), auth: false)

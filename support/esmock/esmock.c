@@ -67,9 +67,11 @@ es_subscribe(es_client_t *client, const es_event_type_t *events, uint32_t event_
         return ES_RETURN_ERROR;
     }
     for (uint32_t index = 0; index < event_count; index++) {
-        if (events[index] < 0 || events[index] >= ES_EVENT_TYPE_LAST) {
+        if (events[index] < 0 || events[index] >= ES_EVENT_TYPE_LAST || events[index] == ES_EVENT_TYPE_RESERVED_0) {
             return ES_RETURN_ERROR;
         }
+    }
+    for (uint32_t index = 0; index < event_count; index++) {
         client->subscriptions[events[index]] = true;
     }
     return ES_RETURN_SUCCESS;
