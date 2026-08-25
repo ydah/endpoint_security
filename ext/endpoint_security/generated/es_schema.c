@@ -81,7 +81,7 @@ static const esrb_field_t fields_es_thread_state_t[] = {
 static const esrb_field_t fields_es_fd_t[] = {
     {"fd", "int", offsetof(es_fd_t, fd), 1},
     {"fdtype", "unsigned int", offsetof(es_fd_t, fdtype), 1},
-    {"pipe", "struct es_fd_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:151:3)", offsetof(es_fd_t, pipe), 1}
+    {"pipe", "struct es_fd_t::(anonymous)", offsetof(es_fd_t, pipe), 1}
 };
 
 static const esrb_field_t fields_es_btm_launch_item_t[] = {
@@ -191,7 +191,7 @@ static const esrb_field_t fields_es_event_signal_t[] = {
 static const esrb_field_t fields_es_event_rename_t[] = {
     {"source", "es_file_t *", offsetof(es_event_rename_t, source), 1},
     {"destination_type", "es_destination_type_t", offsetof(es_event_rename_t, destination_type), 1},
-    {"destination", "union es_event_rename_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:521:2)", offsetof(es_event_rename_t, destination), 1}
+    {"destination", "union es_event_rename_t::(anonymous)", offsetof(es_event_rename_t, destination), 1}
 };
 
 static const esrb_field_t fields_es_event_setextattr_t[] = {
@@ -233,7 +233,7 @@ static const esrb_field_t fields_es_event_close_t[] = {
 
 static const esrb_field_t fields_es_event_create_t[] = {
     {"destination_type", "es_destination_type_t", offsetof(es_event_create_t, destination_type), 1},
-    {"destination", "union es_event_create_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:690:2)", offsetof(es_event_create_t, destination), 1},
+    {"destination", "union es_event_create_t::(anonymous)", offsetof(es_event_create_t, destination), 1},
     {"acl", "struct _acl *", offsetof(es_event_create_t, acl), 2}
 };
 
@@ -388,7 +388,7 @@ static const esrb_field_t fields_es_event_uipc_connect_t[] = {
 static const esrb_field_t fields_es_event_setacl_t[] = {
     {"target", "es_file_t *", offsetof(es_event_setacl_t, target), 1},
     {"set_or_clear", "es_set_or_clear_t", offsetof(es_event_setacl_t, set_or_clear), 1},
-    {"acl", "union es_event_setacl_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1202:2)", offsetof(es_event_setacl_t, acl), 1}
+    {"acl", "union es_event_setacl_t::(anonymous)", offsetof(es_event_setacl_t, acl), 1}
 };
 
 static const esrb_field_t fields_es_event_pty_grant_t[] = {
@@ -464,7 +464,7 @@ static const esrb_field_t fields_es_event_authentication_touchid_t[] = {
     {"instigator", "es_process_t *", offsetof(es_event_authentication_touchid_t, instigator), 1},
     {"touchid_mode", "es_touchid_mode_t", offsetof(es_event_authentication_touchid_t, touchid_mode), 1},
     {"has_uid", "bool", offsetof(es_event_authentication_touchid_t, has_uid), 1},
-    {"uid", "union es_event_authentication_touchid_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1446:2)", offsetof(es_event_authentication_touchid_t, uid), 1},
+    {"uid", "union es_event_authentication_touchid_t::(anonymous)", offsetof(es_event_authentication_touchid_t, uid), 1},
     {"instigator_token", "audit_token_t", offsetof(es_event_authentication_touchid_t, instigator_token), 8}
 };
 
@@ -484,7 +484,7 @@ static const esrb_field_t fields_es_event_authentication_auto_unlock_t[] = {
 static const esrb_field_t fields_es_event_authentication_t[] = {
     {"success", "bool", offsetof(es_event_authentication_t, success), 1},
     {"type", "es_authentication_type_t", offsetof(es_event_authentication_t, type), 1},
-    {"data", "union es_event_authentication_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1501:2)", offsetof(es_event_authentication_t, data), 1}
+    {"data", "union es_event_authentication_t::(anonymous)", offsetof(es_event_authentication_t, data), 1}
 };
 
 static const esrb_field_t fields_es_event_xp_malware_detected_t[] = {
@@ -552,7 +552,7 @@ static const esrb_field_t fields_es_event_openssh_login_t[] = {
     {"source_address", "es_string_token_t", offsetof(es_event_openssh_login_t, source_address), 1},
     {"username", "es_string_token_t", offsetof(es_event_openssh_login_t, username), 1},
     {"has_uid", "bool", offsetof(es_event_openssh_login_t, has_uid), 1},
-    {"uid", "union es_event_openssh_login_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1721:2)", offsetof(es_event_openssh_login_t, uid), 1}
+    {"uid", "union es_event_openssh_login_t::(anonymous)", offsetof(es_event_openssh_login_t, uid), 1}
 };
 
 static const esrb_field_t fields_es_event_openssh_logout_t[] = {
@@ -567,7 +567,7 @@ static const esrb_field_t fields_es_event_login_login_t[] = {
     {"failure_message", "es_string_token_t", offsetof(es_event_login_login_t, failure_message), 1},
     {"username", "es_string_token_t", offsetof(es_event_login_login_t, username), 1},
     {"has_uid", "bool", offsetof(es_event_login_login_t, has_uid), 1},
-    {"uid", "union es_event_login_login_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1764:2)", offsetof(es_event_login_login_t, uid), 1}
+    {"uid", "union es_event_login_login_t::(anonymous)", offsetof(es_event_login_login_t, uid), 1}
 };
 
 static const esrb_field_t fields_es_event_login_logout_t[] = {
@@ -598,7 +598,7 @@ static const esrb_field_t fields_es_event_su_t[] = {
     {"from_uid", "unsigned int", offsetof(es_event_su_t, from_uid), 1},
     {"from_username", "es_string_token_t", offsetof(es_event_su_t, from_username), 1},
     {"has_to_uid", "bool", offsetof(es_event_su_t, has_to_uid), 1},
-    {"to_uid", "union es_event_su_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1861:2)", offsetof(es_event_su_t, to_uid), 1},
+    {"to_uid", "union es_event_su_t::(anonymous)", offsetof(es_event_su_t, to_uid), 1},
     {"to_username", "es_string_token_t", offsetof(es_event_su_t, to_username), 1},
     {"shell", "es_string_token_t", offsetof(es_event_su_t, shell), 1},
     {"argc", "unsigned long", offsetof(es_event_su_t, argc), 1},
@@ -617,10 +617,10 @@ static const esrb_field_t fields_es_event_sudo_t[] = {
     {"success", "bool", offsetof(es_event_sudo_t, success), 1},
     {"reject_info", "es_sudo_reject_info_t *", offsetof(es_event_sudo_t, reject_info), 1},
     {"has_from_uid", "bool", offsetof(es_event_sudo_t, has_from_uid), 1},
-    {"from_uid", "union es_event_sudo_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1906:2)", offsetof(es_event_sudo_t, from_uid), 1},
+    {"from_uid", "union es_event_sudo_t::(anonymous)", offsetof(es_event_sudo_t, from_uid), 1},
     {"from_username", "es_string_token_t", offsetof(es_event_sudo_t, from_username), 1},
     {"has_to_uid", "bool", offsetof(es_event_sudo_t, has_to_uid), 1},
-    {"to_uid", "union es_event_sudo_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1913:2)", offsetof(es_event_sudo_t, to_uid), 1},
+    {"to_uid", "union es_event_sudo_t::(anonymous)", offsetof(es_event_sudo_t, to_uid), 1},
     {"to_username", "es_string_token_t", offsetof(es_event_sudo_t, to_username), 1},
     {"command", "es_string_token_t", offsetof(es_event_sudo_t, command), 1}
 };
@@ -666,7 +666,7 @@ static const esrb_field_t fields_es_event_authorization_judgement_t[] = {
 
 static const esrb_field_t fields_es_od_member_id_t[] = {
     {"member_type", "es_od_member_type_t", offsetof(es_od_member_id_t, member_type), 1},
-    {"member_value", "union es_od_member_id_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2025:2)", offsetof(es_od_member_id_t, member_value), 1}
+    {"member_value", "union es_od_member_id_t::(anonymous)", offsetof(es_od_member_id_t, member_value), 1}
 };
 
 static const esrb_field_t fields_es_event_od_group_add_t[] = {
@@ -692,7 +692,7 @@ static const esrb_field_t fields_es_event_od_group_remove_t[] = {
 static const esrb_field_t fields_es_od_member_id_array_t[] = {
     {"member_type", "es_od_member_type_t", offsetof(es_od_member_id_array_t, member_type), 1},
     {"member_count", "unsigned long", offsetof(es_od_member_id_array_t, member_count), 1},
-    {"member_array", "union es_od_member_id_array_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2099:2)", offsetof(es_od_member_id_array_t, member_array), 1}
+    {"member_array", "union es_od_member_id_array_t::(anonymous)", offsetof(es_od_member_id_array_t, member_array), 1}
 };
 
 static const esrb_field_t fields_es_event_od_group_set_t[] = {
@@ -813,7 +813,7 @@ static const esrb_field_t fields_es_event_xpc_connect_t[] = {
 
 static const esrb_field_t fields_es_event_gatekeeper_user_override_t[] = {
     {"file_type", "es_gatekeeper_user_override_file_type_t", offsetof(es_event_gatekeeper_user_override_t, file_type), 1},
-    {"file", "union es_event_gatekeeper_user_override_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2459:2)", offsetof(es_event_gatekeeper_user_override_t, file), 1},
+    {"file", "union es_event_gatekeeper_user_override_t::(anonymous)", offsetof(es_event_gatekeeper_user_override_t, file), 1},
     {"sha256", "es_sha256_t *", offsetof(es_event_gatekeeper_user_override_t, sha256), 1},
     {"signing_info", "es_signed_file_info_t *", offsetof(es_event_gatekeeper_user_override_t, signing_info), 1}
 };
@@ -927,7 +927,7 @@ static const esrb_field_t fields_es_events_t[] = {
 
 static const esrb_field_t fields_es_result_t[] = {
     {"result_type", "es_result_type_t", offsetof(es_result_t, result_type), 1},
-    {"result", "union es_result_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2591:2)", offsetof(es_result_t, result), 1}
+    {"result", "union es_result_t::(anonymous)", offsetof(es_result_t, result), 1}
 };
 
 static const esrb_field_t fields_es_message_t[] = {
@@ -938,7 +938,7 @@ static const esrb_field_t fields_es_message_t[] = {
     {"process", "es_process_t *", offsetof(es_message_t, process), 1},
     {"seq_num", "unsigned long long", offsetof(es_message_t, seq_num), 2},
     {"action_type", "es_action_type_t", offsetof(es_message_t, action_type), 1},
-    {"action", "union es_message_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2680:2)", offsetof(es_message_t, action), 1},
+    {"action", "union es_message_t::(anonymous)", offsetof(es_message_t, action), 1},
     {"event_type", "es_event_type_t", offsetof(es_message_t, event_type), 1},
     {"event", "es_events_t", offsetof(es_message_t, event), 1},
     {"thread", "es_thread_t *", offsetof(es_message_t, thread), 4},

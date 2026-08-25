@@ -1344,7 +1344,7 @@
       },
       {
         "name": "pipe",
-        "type": "struct es_fd_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:151:3)",
+        "type": "struct es_fd_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -1673,7 +1673,7 @@
       },
       {
         "name": "destination",
-        "type": "union es_event_rename_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:521:2)",
+        "type": "union es_event_rename_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -1779,7 +1779,7 @@
       },
       {
         "name": "destination",
-        "type": "union es_event_create_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:690:2)",
+        "type": "union es_event_create_t::(anonymous)",
         "minimum_version": 1
       },
       {
@@ -2160,7 +2160,7 @@
       },
       {
         "name": "acl",
-        "type": "union es_event_setacl_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1202:2)",
+        "type": "union es_event_setacl_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -2341,7 +2341,7 @@
       },
       {
         "name": "uid",
-        "type": "union es_event_authentication_touchid_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1446:2)",
+        "type": "union es_event_authentication_touchid_t::(anonymous)",
         "minimum_version": 1
       },
       {
@@ -2402,7 +2402,7 @@
       },
       {
         "name": "data",
-        "type": "union es_event_authentication_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1501:2)",
+        "type": "union es_event_authentication_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -2625,7 +2625,7 @@
       },
       {
         "name": "uid",
-        "type": "union es_event_openssh_login_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1721:2)",
+        "type": "union es_event_openssh_login_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -2674,7 +2674,7 @@
       },
       {
         "name": "uid",
-        "type": "union es_event_login_login_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1764:2)",
+        "type": "union es_event_login_login_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -2777,7 +2777,7 @@
       },
       {
         "name": "to_uid",
-        "type": "union es_event_su_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1861:2)",
+        "type": "union es_event_su_t::(anonymous)",
         "minimum_version": 1
       },
       {
@@ -2846,7 +2846,7 @@
       },
       {
         "name": "from_uid",
-        "type": "union es_event_sudo_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1906:2)",
+        "type": "union es_event_sudo_t::(anonymous)",
         "minimum_version": 1
       },
       {
@@ -2861,7 +2861,7 @@
       },
       {
         "name": "to_uid",
-        "type": "union es_event_sudo_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1913:2)",
+        "type": "union es_event_sudo_t::(anonymous)",
         "minimum_version": 1
       },
       {
@@ -3013,7 +3013,7 @@
       },
       {
         "name": "member_value",
-        "type": "union es_od_member_id_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2025:2)",
+        "type": "union es_od_member_id_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -3104,7 +3104,7 @@
       },
       {
         "name": "member_array",
-        "type": "union es_od_member_id_array_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2099:2)",
+        "type": "union es_od_member_id_array_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -3540,7 +3540,7 @@
       },
       {
         "name": "file",
-        "type": "union es_event_gatekeeper_user_override_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2459:2)",
+        "type": "union es_event_gatekeeper_user_override_t::(anonymous)",
         "minimum_version": 1
       },
       {
@@ -4084,7 +4084,7 @@
       },
       {
         "name": "result",
-        "type": "union es_result_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2591:2)",
+        "type": "union es_result_t::(anonymous)",
         "minimum_version": 1
       }
     ],
@@ -4126,7 +4126,7 @@
       },
       {
         "name": "action",
-        "type": "union es_message_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2680:2)",
+        "type": "union es_message_t::(anonymous)",
         "minimum_version": 1
       },
       {
