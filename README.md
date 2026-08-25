@@ -1,39 +1,108 @@
-# EndpointSecurity
+# endpoint_security
 
-TODO: Delete this and the text below, and describe your gem
+Native Ruby bindings for Apple's Endpoint Security API on macOS 13 or newer.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/endpoint_security`. To experiment with that code, run `bin/console` for an interactive prompt.
+The gem keeps Apple's callback thread away from the Ruby VM: callbacks retain and enqueue messages into a bounded lock-free ring, a Ruby dispatcher invokes handlers, and a native watchdog guarantees one AUTH response before the deadline.
+
+## Requirements
+
+- macOS 13+
+- CRuby 3.2+
+- Xcode Command Line Tools
+- A host Ruby executable signed with `com.apple.developer.endpoint-security.client`
+- root privileges and Full Disk Access for that executable
+
+The entitlement belongs to the host executable, not to this gem. Apple must grant it for production use.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem "endpoint_security"
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```sh
+bundle install
+rake compile
 ```
 
-## Usage
+## Observe events
 
-TODO: Write usage instructions here
+```ruby
+require "endpoint_security"
+
+ES::Client.open do |client|
+  client.subscribe(:notify_exec)
+  client.on(:notify_exec) do |message|
+    target = message.event.target
+    puts "#{target.executable.path} pid=#{target.pid}"
+  end
+  client.run
+end
+```
+
+## Authorize events
+
+```ruby
+ES::Client.open(auth_default: :allow) do |client|
+  client.subscribe(:auth_exec)
+  client.on(:auth_exec) do |message|
+    path = message.event.target.executable.path
+    path.start_with?("/tmp/") ? message.deny!(cache: false) : message.allow!(cache: false)
+  end
+  client.run
+end
+```
+
+The native watchdog sends `auth_default` if Ruby misses the deadline. `allow!`, `deny!`, and the watchdog share one atomic state, so a message is never answered twice. Keep network, file, and subprocess I/O out of an AUTH handler; use `retain!` and another thread when slow work is unavoidable.
+
+## Muting and recording
+
+```ruby
+client.mute_path("/tmp/", type: :prefix)
+client.mute_process(pid: Process.pid)
+client.invert_muting(:path)
+
+ES::Recorder.new(events: ES::EventType.all_notify, out: $stdout).run
+```
+
+`Message#to_h` makes a JSON-compatible deep copy. Lazy `Event`, `Process`, and `File` views are invalid after the handler returns unless the message was retained.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+Most work needs no entitlement:
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```sh
+rake compile:mock
+rake test
+rake test:sanitize
+rake test:drift
+rake bench
+rake rubocop
+rake dev:doctor
+```
 
-## Contributing
+Generate metadata for a new SDK with `rake codegen`. Generated files under `ext/endpoint_security/generated` and `lib/endpoint_security/generated` must not be edited by hand.
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/endpoint_security.
+For a dedicated development machine, create a signed Ruby copy:
+
+```sh
+rake 'sign:ruby[/path/to/ruby,Developer ID Application: Example (TEAMID)]'
+```
+
+Then grant `build/es-ruby` Full Disk Access and run the bounded integration test:
+
+```sh
+RUN_ES_INTEGRATION=1 sudo -E ./build/es-ruby -S rake test:integration
+```
+
+Do not disable SIP on a general-purpose machine. This project never changes SIP, NVRAM, TCC, or signing settings automatically.
+
+## Limitations
+
+- Fork after client creation is unsupported and raises `ES::ForkedClientError`.
+- Undocumented `RESERVED_*` events expose their enum and `raw_event_bytes`, but no guessed structure.
+- Real integration tests require Apple-granted entitlement, root, signing, and TCC; CI uses `libesmock`.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+MIT. See [LICENSE.txt](LICENSE.txt).

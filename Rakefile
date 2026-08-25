@@ -2,6 +2,7 @@
 
 require "bundler/gem_tasks"
 require "fileutils"
+require "open3"
 require "rake/extensiontask"
 require "rspec/core/rake_task"
 
@@ -81,6 +82,15 @@ task :rubocop do
   sh "rubocop"
 end
 
+desc "Build API documentation"
+task :yard do
+  stats, status = Open3.capture2e("yard", "stats", "--list-undoc", "lib")
+  puts stats
+  raise "YARD coverage is below 100%" unless status.success? && stats.include?("100.00% documented")
+
+  sh "yard", "doc", "lib"
+end
+
 namespace :dev do
   desc "Diagnose the host requirements for Endpoint Security"
   task :doctor do
@@ -104,4 +114,4 @@ task :bench do
   ruby "bench/throughput.rb"
 end
 
-task default: %i[compile test rubocop]
+task default: %i[compile test rubocop yard]
