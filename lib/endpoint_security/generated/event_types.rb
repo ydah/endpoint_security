@@ -492,7 +492,7 @@ module EndpointSecurity
     # Undocumented reserved event slots.
     RESERVED = [:reserved_0, :reserved_1, :reserved_2, :reserved_3, :reserved_4, :reserved_5, :reserved_6, :reserved_7, :reserved_8].freeze
     # Events for which Endpoint Security accepts cached responses.
-    CACHEABLE = [:auth_exec, :auth_open, :auth_mmap, :auth_mount, :notify_exec, :notify_open, :notify_get_task, :notify_mmap, :notify_mount, :notify_setflags, :notify_setmode, :notify_setowner, :auth_setflags, :auth_setmode, :auth_setowner, :auth_chdir, :notify_chdir, :auth_getattrlist, :notify_getattrlist, :auth_chroot, :notify_chroot, :auth_utimes, :notify_utimes, :auth_getextattr, :notify_getextattr, :auth_listextattr, :notify_listextattr, :auth_readdir, :notify_readdir, :auth_fsgetpath, :notify_fsgetpath, :notify_uipc_connect, :auth_uipc_connect, :auth_proc_check, :notify_proc_check, :auth_get_task, :auth_searchfs, :notify_searchfs, :auth_get_task_read, :notify_get_task_read].freeze
+    CACHEABLE = [:auth_exec, :auth_open, :auth_mmap, :auth_mount, :auth_setflags, :auth_setmode, :auth_setowner, :auth_chdir, :auth_getattrlist, :auth_chroot, :auth_utimes, :auth_getextattr, :auth_listextattr, :auth_readdir, :auth_fsgetpath, :auth_uipc_connect, :auth_proc_check, :auth_get_task, :auth_searchfs, :auth_get_task_read].freeze
 
     module_function
 
