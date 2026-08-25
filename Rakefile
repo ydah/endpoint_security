@@ -21,6 +21,11 @@ namespace :test do
   task integration: :compile
 end
 
+desc "Generate Ruby and native schema files from the active macOS SDK"
+task :codegen do
+  ruby "codegen/run.rb"
+end
+
 task test: ["test:unit", "test:native", "test:drift"]
 
 task :rubocop do

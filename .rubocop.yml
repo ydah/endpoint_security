@@ -5,6 +5,8 @@ AllCops:
   Exclude:
     - "tmp/**/*"
     - "vendor/**/*"
+    - "lib/endpoint_security/generated/**/*"
+    - "ext/endpoint_security/generated/**/*"
 
 Style/Documentation:
   Enabled: false
@@ -15,3 +17,15 @@ Style/StringLiterals:
 Style/GlobalVars:
   Exclude:
     - "ext/**/extconf.rb"
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/MethodLength:
+  Max: 50
