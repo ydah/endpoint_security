@@ -1103,6 +1103,7 @@
     }
   ],
   "records": {
+    "es_event_id_t": [],
     "es_token_t": [
       {
         "name": "size",
@@ -2099,6 +2100,7 @@
         "minimum_version": 1
       }
     ],
+    "es_event_settime_t": [],
     "es_event_dup_t": [
       {
         "name": "target",
@@ -2217,6 +2219,7 @@
         "minimum_version": 1
       }
     ],
+    "es_event_cs_invalidated_t": [],
     "es_event_trace_t": [
       {
         "name": "target",

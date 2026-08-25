@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include "field.h"
 
+
 static const esrb_field_t fields_es_token_t[] = {
     {"size", "unsigned long", offsetof(es_token_t, size), 1},
     {"data", "const uint8_t *", offsetof(es_token_t, data), 1}
@@ -366,6 +367,7 @@ static const esrb_field_t fields_es_event_fsgetpath_t[] = {
     {"target", "es_file_t *", offsetof(es_event_fsgetpath_t, target), 1}
 };
 
+
 static const esrb_field_t fields_es_event_dup_t[] = {
     {"target", "es_file_t *", offsetof(es_event_dup_t, target), 1}
 };
@@ -412,6 +414,7 @@ static const esrb_field_t fields_es_event_proc_suspend_resume_t[] = {
     {"target", "es_process_t *", offsetof(es_event_proc_suspend_resume_t, target), 1},
     {"type", "es_proc_suspend_resume_type_t", offsetof(es_event_proc_suspend_resume_t, type), 1}
 };
+
 
 static const esrb_field_t fields_es_event_trace_t[] = {
     {"target", "es_process_t *", offsetof(es_event_trace_t, target), 1}
@@ -944,6 +947,7 @@ static const esrb_field_t fields_es_message_t[] = {
 };
 
 const esrb_schema_t esrb_schemas[] = {
+    {"es_event_id_t", NULL, 0},
     {"es_token_t", fields_es_token_t, sizeof(fields_es_token_t) / sizeof(fields_es_token_t[0])},
     {"es_string_token_t", fields_es_string_token_t, sizeof(fields_es_string_token_t) / sizeof(fields_es_string_token_t[0])},
     {"es_muted_path_t", fields_es_muted_path_t, sizeof(fields_es_muted_path_t) / sizeof(fields_es_muted_path_t[0])},
@@ -1007,6 +1011,7 @@ const esrb_schema_t esrb_schemas[] = {
     {"es_event_fcntl_t", fields_es_event_fcntl_t, sizeof(fields_es_event_fcntl_t) / sizeof(fields_es_event_fcntl_t[0])},
     {"es_event_readdir_t", fields_es_event_readdir_t, sizeof(fields_es_event_readdir_t) / sizeof(fields_es_event_readdir_t[0])},
     {"es_event_fsgetpath_t", fields_es_event_fsgetpath_t, sizeof(fields_es_event_fsgetpath_t) / sizeof(fields_es_event_fsgetpath_t[0])},
+    {"es_event_settime_t", NULL, 0},
     {"es_event_dup_t", fields_es_event_dup_t, sizeof(fields_es_event_dup_t) / sizeof(fields_es_event_dup_t[0])},
     {"es_event_uipc_bind_t", fields_es_event_uipc_bind_t, sizeof(fields_es_event_uipc_bind_t) / sizeof(fields_es_event_uipc_bind_t[0])},
     {"es_event_uipc_connect_t", fields_es_event_uipc_connect_t, sizeof(fields_es_event_uipc_connect_t) / sizeof(fields_es_event_uipc_connect_t[0])},
@@ -1016,6 +1021,7 @@ const esrb_schema_t esrb_schemas[] = {
     {"es_event_proc_check_t", fields_es_event_proc_check_t, sizeof(fields_es_event_proc_check_t) / sizeof(fields_es_event_proc_check_t[0])},
     {"es_event_searchfs_t", fields_es_event_searchfs_t, sizeof(fields_es_event_searchfs_t) / sizeof(fields_es_event_searchfs_t[0])},
     {"es_event_proc_suspend_resume_t", fields_es_event_proc_suspend_resume_t, sizeof(fields_es_event_proc_suspend_resume_t) / sizeof(fields_es_event_proc_suspend_resume_t[0])},
+    {"es_event_cs_invalidated_t", NULL, 0},
     {"es_event_trace_t", fields_es_event_trace_t, sizeof(fields_es_event_trace_t) / sizeof(fields_es_event_trace_t[0])},
     {"es_event_remote_thread_create_t", fields_es_event_remote_thread_create_t, sizeof(fields_es_event_remote_thread_create_t) / sizeof(fields_es_event_remote_thread_create_t[0])},
     {"es_event_setuid_t", fields_es_event_setuid_t, sizeof(fields_es_event_setuid_t) / sizeof(fields_es_event_setuid_t[0])},
@@ -1149,6 +1155,8 @@ const esrb_event_schema_t esrb_event_schemas[] = {
     {71, offsetof(es_events_t, fsgetpath), "es_event_fsgetpath_t", false},
     {72, offsetof(es_events_t, fsgetpath), "es_event_fsgetpath_t", false},
     {73, offsetof(es_events_t, dup), "es_event_dup_t", false},
+    {74, offsetof(es_events_t, settime), "es_event_settime_t", false},
+    {75, offsetof(es_events_t, settime), "es_event_settime_t", false},
     {76, offsetof(es_events_t, uipc_bind), "es_event_uipc_bind_t", false},
     {77, offsetof(es_events_t, uipc_bind), "es_event_uipc_bind_t", false},
     {78, offsetof(es_events_t, uipc_connect), "es_event_uipc_connect_t", false},
@@ -1167,6 +1175,7 @@ const esrb_event_schema_t esrb_event_schemas[] = {
     {91, offsetof(es_events_t, iokit_open), "es_event_iokit_open_t", false},
     {92, offsetof(es_events_t, proc_suspend_resume), "es_event_proc_suspend_resume_t", false},
     {93, offsetof(es_events_t, proc_suspend_resume), "es_event_proc_suspend_resume_t", false},
+    {94, offsetof(es_events_t, cs_invalidated), "es_event_cs_invalidated_t", false},
     {95, offsetof(es_events_t, get_task_name), "es_event_get_task_name_t", false},
     {96, offsetof(es_events_t, trace), "es_event_trace_t", false},
     {97, offsetof(es_events_t, remote_thread_create), "es_event_remote_thread_create_t", false},
