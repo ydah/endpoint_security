@@ -125,10 +125,18 @@ RSpec.describe ES::Client do
   end
 
   it "round-trips mute, inversion, and cache control APIs" do
-    client = described_class.new(queue_depth: 8)
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    token = client.send(:__audit_token_for_pid, Process.pid)
+    expect(client.mute_process(token)).to be(true)
+    expect(client.mute_process_events(token, :notify_exec)).to be(true)
+    expect(client.unmute_process_events(token, :notify_exec)).to be(true)
+    expect(client.unmute_process(token)).to be(true)
     expect(client.mute_path("/tmp", type: :prefix)).to be(true)
     expect(client.mute_path_events("/tmp", :notify_exec, type: :literal)).to be(true)
+    expect(client.unmute_path_events("/tmp", :notify_exec, type: :literal)).to be(true)
     expect(client.unmute_path("/tmp")).to be(true)
+    expect(client.unmute_all_paths).to be(true)
+    expect(client.unmute_all_target_paths).to be(true)
     expect(client.invert_muting(:path)).to be(true)
     expect(client.muting_inverted?(:path)).to be(true)
     expect(client.muted_paths).to eq([])
