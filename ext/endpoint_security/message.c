@@ -250,6 +250,9 @@ respond_auth(int argc, VALUE *argv, VALUE self, es_auth_result_t result)
         cache = NIL_P(cache_value) || RTEST(cache_value);
     }
     esrb_message_t *message = get_message(self);
+    if (message->slot->message->action_type != ES_ACTION_TYPE_AUTH) {
+        rb_raise(rb_path2class("EndpointSecurity::MessageError"), "authorization responses require an AUTH event");
+    }
     if (cache) {
         VALUE event_type = rb_path2class("EndpointSecurity::EventType");
         VALUE event = rb_funcall(event_type, rb_intern("symbol"), 1, INT2NUM(message->slot->message->event_type));
@@ -286,7 +289,8 @@ message_respond(int argc, VALUE *argv, VALUE self)
     VALUE cache_value = rb_hash_aref(options, ID2SYM(rb_intern("cache")));
     bool cache = NIL_P(cache_value) || RTEST(cache_value);
     esrb_message_t *message = get_message(self);
-    if (message->slot->message->event_type != ES_EVENT_TYPE_AUTH_OPEN) {
+    if (message->slot->message->action_type != ES_ACTION_TYPE_AUTH ||
+        message->slot->message->event_type != ES_EVENT_TYPE_AUTH_OPEN) {
         rb_raise(rb_path2class("EndpointSecurity::MessageError"), "flags responses are only valid for AUTH_OPEN");
     }
     return esrb_respond_slot(message->client, message->slot, ES_AUTH_RESULT_ALLOW, NUM2UINT(flags), cache) ? Qtrue : Qfalse;

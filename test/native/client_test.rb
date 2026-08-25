@@ -67,6 +67,22 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "rejects authorization responses for NOTIFY messages" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_exec), auth: false)
+    notify = client.send(:__drain, 1).first
+    expect { notify.allow! }.to raise_error(ES::MessageError, /require an AUTH event/)
+    notify.__auto_release!
+
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_open), auth: false)
+    mismatched_open = client.send(:__drain, 1).first
+    expect { mismatched_open.respond(flags: 1) }.to raise_error(ES::MessageError, /AUTH_OPEN/)
+  ensure
+    notify&.__auto_release! if notify&.valid?
+    mismatched_open&.__auto_release!
+    client&.close
+  end
+
   it "uses the watchdog before a slow handler reaches its deadline" do
     client = described_class.new(queue_depth: 8, auth_default: :deny)
     client.on(:auth_exec) { sleep(0.05) }
