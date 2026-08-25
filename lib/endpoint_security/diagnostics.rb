@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module EndpointSecurity
+  # Turns native client creation results into actionable messages.
   module Diagnostics
+    # Human-readable explanations keyed by native result.
     EXPLANATIONS = {
       success: "Endpoint Security client created successfully.",
       err_invalid_argument: "Endpoint Security rejected an invalid argument; this is likely a binding bug.",
@@ -14,6 +16,7 @@ module EndpointSecurity
 
     module_function
 
+    # @return [String] explanation for +result+
     def explain(result)
       EXPLANATIONS.fetch(result.to_sym) { "Unknown es_new_client result: #{result.inspect}." }
     end

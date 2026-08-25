@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module EndpointSecurity
+  # A retained Endpoint Security message delivered to a handler.
   class Message
     # @return [Time]
     def deadline_at

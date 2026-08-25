@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module EndpointSecurity
+  # Immutable copy of an Endpoint Security audit token.
   AuditToken = Data.define(:pid, :pidversion, :ruid, :euid, :rgid, :egid, :asid, :auid)
+  # Immutable copy of a native +stat+ structure.
   Stat = Data.define(
     :dev, :ino, :mode, :nlink, :uid, :gid, :rdev, :size, :blocks, :block_size, :atime, :mtime, :ctime, :birthtime
   )
@@ -12,12 +14,15 @@ module EndpointSecurity
     end
   end
 
+  # Base for lazy views backed by a native message.
   class NativeView
     # @return [Hash]
     def to_h
       __field_names.to_h { |name| [name, deep_copy(public_send(name))] }
     end
 
+    # Resolves generated native fields lazily.
+    # @api private
     def method_missing(name, ...)
       field = name.to_s.delete_suffix("?")
       predicate = name.to_s.end_with?("?")
@@ -43,6 +48,7 @@ module EndpointSecurity
     end
   end
 
+  # Lazy view of an +es_process_t+.
   class Process
     # @return [Integer]
     def pid = audit_token.pid
@@ -51,6 +57,7 @@ module EndpointSecurity
     def cdhash_hex = cdhash.unpack1("H*")
   end
 
+  # Lazy view of an event-specific Endpoint Security structure.
   class Event
     # @return [Array<String>, nil]
     def args = __exec_values(:args)
@@ -61,6 +68,7 @@ module EndpointSecurity
     # @return [Array<NativeView>, nil]
     def fds = __exec_values(:fds)
 
+    # @return [Hash] deep copy of the event fields
     def to_h
       super.tap do |hash|
         next unless __schema_name == "es_event_exec_t"

@@ -12,7 +12,8 @@ require_relative "endpoint_security/message"
 require_relative "endpoint_security/client"
 require_relative "endpoint_security/recorder"
 
-module EndpointSecurity
-end
+# Ruby bindings for Apple's Endpoint Security API.
+module EndpointSecurity; end
 
+# Short alias for {EndpointSecurity}.
 ES = EndpointSecurity
