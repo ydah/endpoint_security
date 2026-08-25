@@ -17,6 +17,7 @@ enum {
 
 static esrb_queue_t queue;
 static _Atomic size_t consumed;
+static _Atomic bool scanning;
 
 static void *
 produce(void *argument)
@@ -51,6 +52,26 @@ consume(void *argument)
     return NULL;
 }
 
+static void *
+scan(void *argument)
+{
+    (void)argument;
+    while (atomic_load_explicit(&scanning, memory_order_acquire)) {
+        for (size_t index = 0; index < queue.capacity; index++) {
+            esrb_slot_t *slot = &queue.slots[index];
+            if (!atomic_load_explicit(&slot->occupied, memory_order_acquire)) {
+                continue;
+            }
+            atomic_fetch_add_explicit(&slot->readers, 1, memory_order_acquire);
+            if (atomic_load_explicit(&slot->occupied, memory_order_acquire) && slot->message == NULL) {
+                abort();
+            }
+            atomic_fetch_sub_explicit(&slot->readers, 1, memory_order_release);
+        }
+    }
+    return NULL;
+}
+
 int
 main(void)
 {
@@ -60,6 +81,9 @@ main(void)
 
     pthread_t producers[PRODUCERS];
     pthread_t consumer;
+    pthread_t scanner;
+    atomic_init(&scanning, true);
+    pthread_create(&scanner, NULL, scan, NULL);
     pthread_create(&consumer, NULL, consume, NULL);
     for (uintptr_t index = 0; index < PRODUCERS; index++) {
         pthread_create(&producers[index], NULL, produce, (void *)index);
@@ -68,6 +92,8 @@ main(void)
         pthread_join(producers[index], NULL);
     }
     pthread_join(consumer, NULL);
+    atomic_store_explicit(&scanning, false, memory_order_release);
+    pthread_join(scanner, NULL);
 
     esrb_queue_destroy(&queue);
     puts("1,000,000 queue operations passed");
