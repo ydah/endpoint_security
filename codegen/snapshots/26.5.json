@@ -1101,5 +1101,3056 @@
       "minimum_os": "26.5",
       "reserved": true
     }
-  ]
+  ],
+  "records": {
+    "es_token_t": [
+      {
+        "name": "size",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "data",
+        "type": "const uint8_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_string_token_t": [
+      {
+        "name": "length",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "data",
+        "type": "const char *",
+        "minimum_version": 1
+      }
+    ],
+    "es_muted_path_t": [
+      {
+        "name": "type",
+        "type": "es_mute_path_type_t",
+        "minimum_version": 5
+      },
+      {
+        "name": "event_count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "events",
+        "type": "const es_event_type_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_muted_paths_t": [
+      {
+        "name": "count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "paths",
+        "type": "const es_muted_path_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_muted_process_t": [
+      {
+        "name": "audit_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "event_count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "events",
+        "type": "const es_event_type_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_muted_processes_t": [
+      {
+        "name": "count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "processes",
+        "type": "const es_muted_process_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_signed_file_info_t": [
+      {
+        "name": "cdhash",
+        "type": "uint8_t[20]",
+        "minimum_version": 1
+      },
+      {
+        "name": "signing_id",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "team_id",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_file_t": [
+      {
+        "name": "path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "path_truncated",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "stat",
+        "type": "struct stat",
+        "minimum_version": 1
+      }
+    ],
+    "es_process_t": [
+      {
+        "name": "audit_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "ppid",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "original_ppid",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "group_id",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "session_id",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "codesigning_flags",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "is_platform_binary",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "is_es_client",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "cdhash",
+        "type": "uint8_t[20]",
+        "minimum_version": 1
+      },
+      {
+        "name": "signing_id",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "team_id",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "executable",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "tty",
+        "type": "es_file_t *",
+        "minimum_version": 2
+      },
+      {
+        "name": "start_time",
+        "type": "struct timeval",
+        "minimum_version": 3
+      },
+      {
+        "name": "responsible_audit_token",
+        "type": "audit_token_t",
+        "minimum_version": 4
+      },
+      {
+        "name": "parent_audit_token",
+        "type": "audit_token_t",
+        "minimum_version": 4
+      },
+      {
+        "name": "cs_validation_category",
+        "type": "es_cs_validation_category_t",
+        "minimum_version": 10
+      }
+    ],
+    "es_thread_t": [
+      {
+        "name": "thread_id",
+        "type": "unsigned long long",
+        "minimum_version": 1
+      }
+    ],
+    "es_thread_state_t": [
+      {
+        "name": "flavor",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "state",
+        "type": "es_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_fd_t": [
+      {
+        "name": "fd",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "fdtype",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "pipe",
+        "type": "struct es_fd_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:151:3)",
+        "minimum_version": 1
+      }
+    ],
+    "es_btm_launch_item_t": [
+      {
+        "name": "item_type",
+        "type": "es_btm_item_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "legacy",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "managed",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "uid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "item_url",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "app_url",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_profile_t": [
+      {
+        "name": "identifier",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "uuid",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "install_source",
+        "type": "es_profile_source_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "organization",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "display_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "scope",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_exec_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "dyld_exec_path",
+        "type": "es_string_token_t",
+        "minimum_version": 7
+      },
+      {
+        "name": "script",
+        "type": "es_file_t *",
+        "minimum_version": 2
+      },
+      {
+        "name": "cwd",
+        "type": "es_file_t *",
+        "minimum_version": 3
+      },
+      {
+        "name": "last_fd",
+        "type": "int",
+        "minimum_version": 4
+      },
+      {
+        "name": "image_cputype",
+        "type": "int",
+        "minimum_version": 6
+      },
+      {
+        "name": "image_cpusubtype",
+        "type": "int",
+        "minimum_version": 6
+      }
+    ],
+    "es_event_tcc_modify_t": [
+      {
+        "name": "service",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "identity",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "identity_type",
+        "type": "es_tcc_identity_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "update_type",
+        "type": "es_tcc_event_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "responsible_token",
+        "type": "audit_token_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "responsible",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "right",
+        "type": "es_tcc_authorization_right_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "reason",
+        "type": "es_tcc_authorization_reason_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_open_t": [
+      {
+        "name": "fflag",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "file",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_kextload_t": [
+      {
+        "name": "identifier",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_kextunload_t": [
+      {
+        "name": "identifier",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_unlink_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "parent_dir",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_mmap_t": [
+      {
+        "name": "protection",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "max_protection",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "flags",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "file_pos",
+        "type": "unsigned long long",
+        "minimum_version": 1
+      },
+      {
+        "name": "source",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_link_t": [
+      {
+        "name": "source",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target_dir",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target_filename",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_mount_t": [
+      {
+        "name": "statfs",
+        "type": "struct statfs *",
+        "minimum_version": 1
+      },
+      {
+        "name": "disposition",
+        "type": "es_mount_disposition_t",
+        "minimum_version": 8
+      }
+    ],
+    "es_event_unmount_t": [
+      {
+        "name": "statfs",
+        "type": "struct statfs *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_remount_t": [
+      {
+        "name": "statfs",
+        "type": "struct statfs *",
+        "minimum_version": 1
+      },
+      {
+        "name": "remount_flags",
+        "type": "unsigned long long",
+        "minimum_version": 8
+      },
+      {
+        "name": "disposition",
+        "type": "es_mount_disposition_t",
+        "minimum_version": 8
+      }
+    ],
+    "es_event_fork_t": [
+      {
+        "name": "child",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_mprotect_t": [
+      {
+        "name": "protection",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "address",
+        "type": "unsigned long long",
+        "minimum_version": 1
+      },
+      {
+        "name": "size",
+        "type": "unsigned long long",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_signal_t": [
+      {
+        "name": "sig",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      }
+    ],
+    "es_event_rename_t": [
+      {
+        "name": "source",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "destination_type",
+        "type": "es_destination_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "destination",
+        "type": "union es_event_rename_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:521:2)",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setextattr_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "extattr",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_getextattr_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "extattr",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_deleteextattr_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "extattr",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setmode_t": [
+      {
+        "name": "mode",
+        "type": "unsigned short",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setflags_t": [
+      {
+        "name": "flags",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setowner_t": [
+      {
+        "name": "uid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "gid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_close_t": [
+      {
+        "name": "modified",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "was_mapped_writable",
+        "type": "bool",
+        "minimum_version": 6
+      }
+    ],
+    "es_event_create_t": [
+      {
+        "name": "destination_type",
+        "type": "es_destination_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "destination",
+        "type": "union es_event_create_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:690:2)",
+        "minimum_version": 1
+      },
+      {
+        "name": "acl",
+        "type": "struct _acl *",
+        "minimum_version": 2
+      }
+    ],
+    "es_event_exit_t": [
+      {
+        "name": "stat",
+        "type": "int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_exchangedata_t": [
+      {
+        "name": "file1",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "file2",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_write_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_truncate_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_chdir_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_stat_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_chroot_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_listextattr_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_iokit_open_t": [
+      {
+        "name": "user_client_type",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "user_client_class",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "parent_registry_id",
+        "type": "unsigned long long",
+        "minimum_version": 10
+      },
+      {
+        "name": "parent_path",
+        "type": "es_string_token_t",
+        "minimum_version": 10
+      }
+    ],
+    "es_event_get_task_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "es_get_task_type_t",
+        "minimum_version": 5
+      }
+    ],
+    "es_event_get_task_read_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "es_get_task_type_t",
+        "minimum_version": 5
+      }
+    ],
+    "es_event_get_task_inspect_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "es_get_task_type_t",
+        "minimum_version": 5
+      }
+    ],
+    "es_event_get_task_name_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "es_get_task_type_t",
+        "minimum_version": 5
+      }
+    ],
+    "es_event_getattrlist_t": [
+      {
+        "name": "attrlist",
+        "type": "struct attrlist",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setattrlist_t": [
+      {
+        "name": "attrlist",
+        "type": "struct attrlist",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_file_provider_update_t": [
+      {
+        "name": "source",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_file_provider_materialize_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "source",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_readlink_t": [
+      {
+        "name": "source",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_lookup_t": [
+      {
+        "name": "source_dir",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "relative_target",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_access_t": [
+      {
+        "name": "mode",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_utimes_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "atime",
+        "type": "struct timespec",
+        "minimum_version": 1
+      },
+      {
+        "name": "mtime",
+        "type": "struct timespec",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_clone_t": [
+      {
+        "name": "source",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target_dir",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_copyfile_t": [
+      {
+        "name": "source",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target_file",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target_dir",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "target_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "mode",
+        "type": "unsigned short",
+        "minimum_version": 1
+      },
+      {
+        "name": "flags",
+        "type": "int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_fcntl_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "cmd",
+        "type": "int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_readdir_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_fsgetpath_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_dup_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_uipc_bind_t": [
+      {
+        "name": "dir",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "filename",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "mode",
+        "type": "unsigned short",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_uipc_connect_t": [
+      {
+        "name": "file",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "domain",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "int",
+        "minimum_version": 5
+      },
+      {
+        "name": "protocol",
+        "type": "int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setacl_t": [
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "set_or_clear",
+        "type": "es_set_or_clear_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "acl",
+        "type": "union es_event_setacl_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1202:2)",
+        "minimum_version": 2
+      }
+    ],
+    "es_event_pty_grant_t": [
+      {
+        "name": "dev",
+        "type": "int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_pty_close_t": [
+      {
+        "name": "dev",
+        "type": "int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_proc_check_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "es_proc_check_type_t",
+        "minimum_version": 5
+      },
+      {
+        "name": "flavor",
+        "type": "int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_searchfs_t": [
+      {
+        "name": "attrlist",
+        "type": "struct attrlist",
+        "minimum_version": 1
+      },
+      {
+        "name": "target",
+        "type": "es_file_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_proc_suspend_resume_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "es_proc_suspend_resume_type_t",
+        "minimum_version": 5
+      }
+    ],
+    "es_event_trace_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_remote_thread_create_t": [
+      {
+        "name": "target",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "thread_state",
+        "type": "es_thread_state_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setuid_t": [
+      {
+        "name": "uid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setgid_t": [
+      {
+        "name": "gid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_seteuid_t": [
+      {
+        "name": "euid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setegid_t": [
+      {
+        "name": "egid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setreuid_t": [
+      {
+        "name": "ruid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "euid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_setregid_t": [
+      {
+        "name": "rgid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "egid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_authentication_od_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "record_type",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "record_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_authentication_touchid_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "touchid_mode",
+        "type": "es_touchid_mode_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "has_uid",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "uid",
+        "type": "union es_event_authentication_touchid_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1446:2)",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_authentication_token_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "pubkey_hash",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "token_id",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "kerberos_principal",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_authentication_auto_unlock_t": [
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "es_auto_unlock_type_t",
+        "minimum_version": 5
+      }
+    ],
+    "es_event_authentication_t": [
+      {
+        "name": "success",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "type",
+        "type": "es_authentication_type_t",
+        "minimum_version": 5
+      },
+      {
+        "name": "data",
+        "type": "union es_event_authentication_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1501:2)",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_xp_malware_detected_t": [
+      {
+        "name": "signature_version",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "malware_identifier",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "incident_identifier",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "detected_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "detected_executable",
+        "type": "es_string_token_t",
+        "minimum_version": 10
+      }
+    ],
+    "es_event_xp_malware_remediated_t": [
+      {
+        "name": "signature_version",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "malware_identifier",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "incident_identifier",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "action_type",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "success",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "result_description",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "remediated_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "remediated_process_audit_token",
+        "type": "audit_token_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_lw_session_login_t": [
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "graphical_session_id",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_lw_session_logout_t": [
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "graphical_session_id",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_lw_session_lock_t": [
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "graphical_session_id",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_lw_session_unlock_t": [
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "graphical_session_id",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_screensharing_attach_t": [
+      {
+        "name": "success",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "source_address_type",
+        "type": "es_address_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "source_address",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "viewer_appleid",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "authentication_type",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "authentication_username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "session_username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "existing_session",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "graphical_session_id",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_screensharing_detach_t": [
+      {
+        "name": "source_address_type",
+        "type": "es_address_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "source_address",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "viewer_appleid",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "graphical_session_id",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_openssh_login_t": [
+      {
+        "name": "success",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "result_type",
+        "type": "es_openssh_login_result_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "source_address_type",
+        "type": "es_address_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "source_address",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "has_uid",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "uid",
+        "type": "union es_event_openssh_login_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1721:2)",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_openssh_logout_t": [
+      {
+        "name": "source_address_type",
+        "type": "es_address_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "source_address",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "uid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_login_login_t": [
+      {
+        "name": "success",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "failure_message",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "has_uid",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "uid",
+        "type": "union es_event_login_login_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1764:2)",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_login_logout_t": [
+      {
+        "name": "username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "uid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_btm_launch_item_add_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "app",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "item",
+        "type": "es_btm_launch_item_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "executable_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "app_token",
+        "type": "audit_token_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_btm_launch_item_remove_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "app",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "item",
+        "type": "es_btm_launch_item_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "app_token",
+        "type": "audit_token_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_su_t": [
+      {
+        "name": "success",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "failure_message",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "from_uid",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "from_username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "has_to_uid",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "to_uid",
+        "type": "union es_event_su_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1861:2)",
+        "minimum_version": 1
+      },
+      {
+        "name": "to_username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "shell",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "argc",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "argv",
+        "type": "es_string_token_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "env_count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "env",
+        "type": "es_string_token_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_sudo_reject_info_t": [
+      {
+        "name": "plugin_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "plugin_type",
+        "type": "es_sudo_plugin_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "failure_message",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_sudo_t": [
+      {
+        "name": "success",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "reject_info",
+        "type": "es_sudo_reject_info_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "has_from_uid",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "from_uid",
+        "type": "union es_event_sudo_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1906:2)",
+        "minimum_version": 1
+      },
+      {
+        "name": "from_username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "has_to_uid",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "to_uid",
+        "type": "union es_event_sudo_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1913:2)",
+        "minimum_version": 1
+      },
+      {
+        "name": "to_username",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "command",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_profile_add_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "is_update",
+        "type": "bool",
+        "minimum_version": 1
+      },
+      {
+        "name": "profile",
+        "type": "es_profile_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_profile_remove_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "profile",
+        "type": "es_profile_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_authorization_petition_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "petitioner",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "flags",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "right_count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "rights",
+        "type": "es_string_token_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "petitioner_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_authorization_result_t": [
+      {
+        "name": "right_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "rule_class",
+        "type": "es_authorization_rule_class_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "granted",
+        "type": "bool",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_authorization_judgement_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "petitioner",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "return_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "result_count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "results",
+        "type": "es_authorization_result_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "petitioner_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_od_member_id_t": [
+      {
+        "name": "member_type",
+        "type": "es_od_member_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "member_value",
+        "type": "union es_od_member_id_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2025:2)",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_group_add_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "group_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "member",
+        "type": "es_od_member_id_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_group_remove_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "group_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "member",
+        "type": "es_od_member_id_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_od_member_id_array_t": [
+      {
+        "name": "member_type",
+        "type": "es_od_member_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "member_count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "member_array",
+        "type": "union es_od_member_id_array_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2099:2)",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_group_set_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "group_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "members",
+        "type": "es_od_member_id_array_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_modify_password_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "account_type",
+        "type": "es_od_account_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "account_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_disable_user_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "user_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_enable_user_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "user_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_attribute_value_add_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "record_type",
+        "type": "es_od_record_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "record_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "attribute_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "attribute_value",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_attribute_value_remove_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "record_type",
+        "type": "es_od_record_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "record_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "attribute_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "attribute_value",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_attribute_set_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "record_type",
+        "type": "es_od_record_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "record_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "attribute_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "attribute_value_count",
+        "type": "unsigned long",
+        "minimum_version": 1
+      },
+      {
+        "name": "attribute_values",
+        "type": "es_string_token_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_create_user_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "user_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_create_group_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "group_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_delete_user_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "user_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_od_delete_group_t": [
+      {
+        "name": "instigator",
+        "type": "es_process_t *",
+        "minimum_version": 9
+      },
+      {
+        "name": "error_code",
+        "type": "int",
+        "minimum_version": 1
+      },
+      {
+        "name": "group_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "node_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "db_path",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "instigator_token",
+        "type": "audit_token_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_xpc_connect_t": [
+      {
+        "name": "service_name",
+        "type": "es_string_token_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "service_domain_type",
+        "type": "es_xpc_domain_type_t",
+        "minimum_version": 1
+      }
+    ],
+    "es_event_gatekeeper_user_override_t": [
+      {
+        "name": "file_type",
+        "type": "es_gatekeeper_user_override_file_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "file",
+        "type": "union es_event_gatekeeper_user_override_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2459:2)",
+        "minimum_version": 1
+      },
+      {
+        "name": "sha256",
+        "type": "es_sha256_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "signing_info",
+        "type": "es_signed_file_info_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_events_t": [
+      {
+        "name": "access",
+        "type": "es_event_access_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "chdir",
+        "type": "es_event_chdir_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "chroot",
+        "type": "es_event_chroot_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "clone",
+        "type": "es_event_clone_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "close",
+        "type": "es_event_close_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "copyfile",
+        "type": "es_event_copyfile_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "create",
+        "type": "es_event_create_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "cs_invalidated",
+        "type": "es_event_cs_invalidated_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "deleteextattr",
+        "type": "es_event_deleteextattr_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "dup",
+        "type": "es_event_dup_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "exchangedata",
+        "type": "es_event_exchangedata_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "exec",
+        "type": "es_event_exec_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "exit",
+        "type": "es_event_exit_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "file_provider_materialize",
+        "type": "es_event_file_provider_materialize_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "file_provider_update",
+        "type": "es_event_file_provider_update_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "fcntl",
+        "type": "es_event_fcntl_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "fork",
+        "type": "es_event_fork_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "fsgetpath",
+        "type": "es_event_fsgetpath_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "get_task",
+        "type": "es_event_get_task_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "get_task_read",
+        "type": "es_event_get_task_read_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "get_task_inspect",
+        "type": "es_event_get_task_inspect_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "get_task_name",
+        "type": "es_event_get_task_name_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "getattrlist",
+        "type": "es_event_getattrlist_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "getextattr",
+        "type": "es_event_getextattr_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "iokit_open",
+        "type": "es_event_iokit_open_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "kextload",
+        "type": "es_event_kextload_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "kextunload",
+        "type": "es_event_kextunload_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "link",
+        "type": "es_event_link_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "listextattr",
+        "type": "es_event_listextattr_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "lookup",
+        "type": "es_event_lookup_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "mmap",
+        "type": "es_event_mmap_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "mount",
+        "type": "es_event_mount_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "mprotect",
+        "type": "es_event_mprotect_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "open",
+        "type": "es_event_open_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "proc_check",
+        "type": "es_event_proc_check_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "proc_suspend_resume",
+        "type": "es_event_proc_suspend_resume_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "pty_close",
+        "type": "es_event_pty_close_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "pty_grant",
+        "type": "es_event_pty_grant_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "readdir",
+        "type": "es_event_readdir_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "readlink",
+        "type": "es_event_readlink_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "remote_thread_create",
+        "type": "es_event_remote_thread_create_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "remount",
+        "type": "es_event_remount_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "rename",
+        "type": "es_event_rename_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "searchfs",
+        "type": "es_event_searchfs_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setacl",
+        "type": "es_event_setacl_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setattrlist",
+        "type": "es_event_setattrlist_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setextattr",
+        "type": "es_event_setextattr_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setflags",
+        "type": "es_event_setflags_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setmode",
+        "type": "es_event_setmode_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setowner",
+        "type": "es_event_setowner_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "settime",
+        "type": "es_event_settime_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setuid",
+        "type": "es_event_setuid_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setgid",
+        "type": "es_event_setgid_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "seteuid",
+        "type": "es_event_seteuid_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setegid",
+        "type": "es_event_setegid_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setreuid",
+        "type": "es_event_setreuid_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "setregid",
+        "type": "es_event_setregid_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "signal",
+        "type": "es_event_signal_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "stat",
+        "type": "es_event_stat_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "trace",
+        "type": "es_event_trace_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "truncate",
+        "type": "es_event_truncate_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "uipc_bind",
+        "type": "es_event_uipc_bind_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "uipc_connect",
+        "type": "es_event_uipc_connect_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "unlink",
+        "type": "es_event_unlink_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "unmount",
+        "type": "es_event_unmount_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "utimes",
+        "type": "es_event_utimes_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "write",
+        "type": "es_event_write_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "authentication",
+        "type": "es_event_authentication_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "xp_malware_detected",
+        "type": "es_event_xp_malware_detected_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "xp_malware_remediated",
+        "type": "es_event_xp_malware_remediated_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "lw_session_login",
+        "type": "es_event_lw_session_login_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "lw_session_logout",
+        "type": "es_event_lw_session_logout_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "lw_session_lock",
+        "type": "es_event_lw_session_lock_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "lw_session_unlock",
+        "type": "es_event_lw_session_unlock_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "screensharing_attach",
+        "type": "es_event_screensharing_attach_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "screensharing_detach",
+        "type": "es_event_screensharing_detach_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "openssh_login",
+        "type": "es_event_openssh_login_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "openssh_logout",
+        "type": "es_event_openssh_logout_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "login_login",
+        "type": "es_event_login_login_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "login_logout",
+        "type": "es_event_login_logout_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "btm_launch_item_add",
+        "type": "es_event_btm_launch_item_add_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "btm_launch_item_remove",
+        "type": "es_event_btm_launch_item_remove_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "profile_add",
+        "type": "es_event_profile_add_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "profile_remove",
+        "type": "es_event_profile_remove_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "su",
+        "type": "es_event_su_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "authorization_petition",
+        "type": "es_event_authorization_petition_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "authorization_judgement",
+        "type": "es_event_authorization_judgement_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "sudo",
+        "type": "es_event_sudo_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_group_add",
+        "type": "es_event_od_group_add_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_group_remove",
+        "type": "es_event_od_group_remove_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_group_set",
+        "type": "es_event_od_group_set_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_modify_password",
+        "type": "es_event_od_modify_password_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_disable_user",
+        "type": "es_event_od_disable_user_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_enable_user",
+        "type": "es_event_od_enable_user_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_attribute_value_add",
+        "type": "es_event_od_attribute_value_add_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_attribute_value_remove",
+        "type": "es_event_od_attribute_value_remove_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_attribute_set",
+        "type": "es_event_od_attribute_set_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_create_user",
+        "type": "es_event_od_create_user_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_create_group",
+        "type": "es_event_od_create_group_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_delete_user",
+        "type": "es_event_od_delete_user_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "od_delete_group",
+        "type": "es_event_od_delete_group_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "xpc_connect",
+        "type": "es_event_xpc_connect_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "gatekeeper_user_override",
+        "type": "es_event_gatekeeper_user_override_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "tcc_modify",
+        "type": "es_event_tcc_modify_t *",
+        "minimum_version": 1
+      }
+    ],
+    "es_result_t": [
+      {
+        "name": "result_type",
+        "type": "es_result_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "result",
+        "type": "union es_result_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2591:2)",
+        "minimum_version": 1
+      }
+    ],
+    "es_message_t": [
+      {
+        "name": "version",
+        "type": "unsigned int",
+        "minimum_version": 1
+      },
+      {
+        "name": "time",
+        "type": "struct timespec",
+        "minimum_version": 1
+      },
+      {
+        "name": "mach_time",
+        "type": "unsigned long long",
+        "minimum_version": 1
+      },
+      {
+        "name": "deadline",
+        "type": "unsigned long long",
+        "minimum_version": 1
+      },
+      {
+        "name": "process",
+        "type": "es_process_t *",
+        "minimum_version": 1
+      },
+      {
+        "name": "seq_num",
+        "type": "unsigned long long",
+        "minimum_version": 2
+      },
+      {
+        "name": "action_type",
+        "type": "es_action_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "action",
+        "type": "union es_message_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:2680:2)",
+        "minimum_version": 1
+      },
+      {
+        "name": "event_type",
+        "type": "es_event_type_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "event",
+        "type": "es_events_t",
+        "minimum_version": 1
+      },
+      {
+        "name": "thread",
+        "type": "es_thread_t *",
+        "minimum_version": 4
+      },
+      {
+        "name": "global_seq_num",
+        "type": "unsigned long long",
+        "minimum_version": 4
+      },
+      {
+        "name": "opaque",
+        "type": "uint64_t[]",
+        "minimum_version": 1
+      }
+    ]
+  }
 }
