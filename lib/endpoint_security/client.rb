@@ -80,8 +80,8 @@ module EndpointSecurity
       @subscriptions.clear
     end
 
-    # @return [Array<Symbol>]
-    attr_reader :subscriptions
+    # @return [Array<Symbol>] subscriptions reported by Endpoint Security
+    def subscriptions = __subscriptions
 
     # @return [Client]
     def on(event, &handler)

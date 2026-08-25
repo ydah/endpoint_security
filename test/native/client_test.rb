@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "json"
 require "timeout"
 
 RSpec.describe ES::Client do
@@ -27,6 +28,8 @@ RSpec.describe ES::Client do
     event_type, source, target, hash = received.pop
     expect([event_type, source, target]).to eq([:notify_exec, "/usr/bin/mock-source", "/usr/bin/mock-target"])
     expect(hash[:event][:target][:executable][:path]).to eq("/usr/bin/mock-target")
+    expect { JSON.generate(hash) }.not_to raise_error
+    expect(hash.dig(:process, :cdhash, :encoding)).to eq(:base64)
     expect(client.stats[:delivered]).to eq(1)
   ensure
     client&.close
@@ -145,6 +148,46 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "exposes enum and tagged-union event fields without raw discriminators" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_create), auth: false)
+    message = client.send(:__drain, 1).first
+
+    expect(message.event.destination_type).to eq(:existing_file)
+    expect(message.event.destination).to eq(ES::TaggedUnion.new(kind: :existing_file, value: nil))
+    expect(message.to_h.dig(:event, :destination, :kind)).to eq(:existing_file)
+  ensure
+    message&.__auto_release!
+    client&.close
+  end
+
+  it "copies opaque SDK value types instead of silently returning nil" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_mount), auth: false)
+    mount = client.send(:__drain, 1).first
+    expect(mount.event.statfs).to be_a(ES::Statfs)
+    expect(mount.event.statfs.fs_type_name).to eq("mockfs")
+    mount.__auto_release!
+
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_getattrlist), auth: false)
+    getattrlist = client.send(:__drain, 1).first
+    attributes = ES::Attrlist.new(
+      bitmap_count: 5, reserved: 0, common: 1, volume: 0, directory: 0, file: 0, fork: 0
+    )
+    expect(getattrlist.event.attrlist).to eq(attributes)
+    getattrlist.__auto_release!
+
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_gatekeeper_user_override), auth: false)
+    gatekeeper = client.send(:__drain, 1).first
+    expect(gatekeeper.event.sha256).to eq("\xff".b + ("\0".b * 31))
+  ensure
+    mount&.__auto_release!
+    getattrlist&.__auto_release!
+    gatekeeper&.__auto_release!
+    client&.close
+  end
+
   it "enforces message versions and exposes typed process metadata" do
     client = described_class.new(queue_depth: 8, strict_version: true, subscribe: :notify_exec, mute_self: false)
     ES::Mock.inject(client, event: ES::EventType.value(:notify_exec), auth: false)
@@ -154,7 +197,20 @@ RSpec.describe ES::Client do
     expect(message.result).to eq(:allow)
     expect(message.raw_pointer).to be_a(Integer)
     expect(message.process.codesigning_flags).to be_a(ES::CSFlags)
+    expect(message.event.args).to be_a(ES::ExecArgs)
+    expect(message.event.fds).to be_a(ES::FieldArray)
     expect { message.process.cs_validation_category }.to raise_error(ES::FieldUnavailableError)
+  ensure
+    message&.__auto_release!
+    client&.close
+  end
+
+  it "warns when configured before returning a truncated path" do
+    client = described_class.new(queue_depth: 8, mute_self: false, warn_on_truncated_path: true)
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_exec), auth: false)
+    message = client.send(:__drain, 1).first
+
+    expect { message.process.executable.path }.to output(/path is truncated/).to_stderr
   ensure
     message&.__auto_release!
     client&.close

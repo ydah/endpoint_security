@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <mach/mach_time.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "message.h"
@@ -239,6 +240,7 @@ client_initialize(int argc, VALUE *argv, VALUE self)
     client->default_cache = false;
     client->strict_cache = false;
     client->strict_version = false;
+    client->warn_on_truncated_path = false;
     client->deadline_margin = 0.2;
     uint64_t min_margin_ns = 5000000ULL;
     if (!NIL_P(options)) {
@@ -250,12 +252,14 @@ client_initialize(int argc, VALUE *argv, VALUE self)
         VALUE strict_version = rb_hash_aref(options, ID2SYM(rb_intern("strict_version")));
         VALUE default_cache = rb_hash_aref(options, ID2SYM(rb_intern("default_cache")));
         VALUE on_full = rb_hash_aref(options, ID2SYM(rb_intern("on_full")));
+        VALUE warn_on_truncated_path = rb_hash_aref(options, ID2SYM(rb_intern("warn_on_truncated_path")));
         queue_depth = NIL_P(depth) ? queue_depth : NUM2SIZET(depth);
         client->deadline_margin = NIL_P(margin) ? client->deadline_margin : NUM2DBL(margin);
         min_margin_ns = NIL_P(minimum) ? min_margin_ns : NUM2ULL(minimum);
         client->strict_cache = RTEST(strict_cache);
         client->strict_version = RTEST(strict_version);
         client->default_cache = RTEST(default_cache);
+        client->warn_on_truncated_path = RTEST(warn_on_truncated_path);
         if (!NIL_P(on_full)) {
             Check_Type(on_full, T_SYMBOL);
             if (SYM2ID(on_full) != rb_intern("drop") && SYM2ID(on_full) != rb_intern("respond_default")) {
@@ -426,6 +430,24 @@ client_unsubscribe(VALUE self, VALUE values)
 }
 
 static VALUE
+client_subscriptions(VALUE self)
+{
+    esrb_client_t *client = get_open_client(self);
+    size_t count = 0;
+    es_event_type_t *subscriptions = NULL;
+    if (es_subscriptions(client->client, &count, &subscriptions) != ES_RETURN_SUCCESS) {
+        rb_raise(rb_path2class("EndpointSecurity::SubscriptionError"), "es_subscriptions failed");
+    }
+    VALUE values = rb_ary_new_capa((long)count);
+    VALUE event_type = rb_path2class("EndpointSecurity::EventType");
+    for (size_t index = 0; index < count; index++) {
+        rb_ary_push(values, rb_funcall(event_type, rb_intern("symbol"), 1, INT2NUM(subscriptions[index])));
+    }
+    free(subscriptions);
+    return values;
+}
+
+static VALUE
 client_stats(VALUE self)
 {
     esrb_client_t *client = get_client(self);
@@ -520,6 +542,7 @@ esrb_init_client(VALUE endpoint_security)
     rb_define_method(c_client, "__drain", client_drain, -1);
     rb_define_method(c_client, "__subscribe", client_subscribe, 1);
     rb_define_method(c_client, "__unsubscribe", client_unsubscribe, 1);
+    rb_define_method(c_client, "__subscriptions", client_subscriptions, 0);
     rb_define_method(c_client, "stats", client_stats, 0);
     esrb_init_mute(c_client);
 

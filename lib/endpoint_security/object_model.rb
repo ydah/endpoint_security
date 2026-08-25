@@ -7,6 +7,13 @@ module EndpointSecurity
   Stat = Data.define(
     :dev, :ino, :mode, :nlink, :uid, :gid, :rdev, :size, :blocks, :block_size, :atime, :mtime, :ctime, :birthtime
   )
+  # Immutable copy of a native +statfs+ structure.
+  Statfs = Data.define(
+    :block_size, :io_size, :blocks, :blocks_free, :blocks_available, :files, :files_free, :fsid, :owner,
+    :type, :flags, :subtype, :fs_type_name, :mount_path, :mount_source, :extended_flags
+  )
+  # Immutable copy of a native +attrlist+ structure.
+  Attrlist = Data.define(:bitmap_count, :reserved, :common, :volume, :directory, :file, :fork)
 
   # Code-signing flag masks from +kern/cs_blobs.h+.
   CS_FLAG_MASKS = {
@@ -23,7 +30,51 @@ module EndpointSecurity
     CS_FLAG_MASKS.each_key { |flag| define_method("#{flag}?") { include?(flag) } }
   end
 
-  [AuditToken, Stat].each do |value_class|
+  # Selected member of a tagged native union.
+  TaggedUnion = Data.define(:kind, :value) do
+    # @api private
+    # @return [TaggedUnion]
+    def self.__native_new(kind, value) = new(kind: kind, value: value)
+  end
+
+  # Lazily loaded native array field.
+  class FieldArray
+    include Enumerable
+
+    # @api private
+    # @yieldreturn [Array] copied field values
+    def initialize(&loader)
+      @loader = loader
+    end
+
+    # Iterates over field values.
+    # @return [Enumerator, FieldArray]
+    def each(&)
+      return enum_for(__method__) unless block_given?
+
+      values.each(&)
+      self
+    end
+
+    # @return [Object, nil] value at +index+
+    def [](index) = values[index]
+
+    # @return [Integer] number of values
+    def length = values.length
+    alias size length
+
+    # @return [Array] copied values
+    def to_a = values.dup
+
+    private
+
+    def values = (@values ||= Array(@loader.call).freeze)
+  end
+
+  # Lazy enumerable for exec arguments and environment entries.
+  class ExecArgs < FieldArray; end
+
+  [AuditToken, Stat, Statfs, Attrlist].each do |value_class|
     value_class.define_singleton_method(:__native_new) do |*values|
       new(**members.zip(values).to_h)
     end
@@ -44,7 +95,8 @@ module EndpointSecurity
       field = "is_#{field}" if predicate && __field_names.include?(:"is_#{field}")
       return super unless __field_names.include?(field.to_sym)
 
-      __read_field(field)
+      value = __read_field(field)
+      value.is_a?(Array) ? FieldArray.new { value } : value
     end
 
     def respond_to_missing?(name, include_private = false)
@@ -56,8 +108,14 @@ module EndpointSecurity
 
     def deep_copy(value)
       case value
-      when NativeView, Data then value.to_h
-      when Array then value.map { |item| deep_copy(item) }
+      when NativeView then value.to_h
+      when FieldArray, Array then value.map { |item| deep_copy(item) }
+      when Data then deep_copy(value.to_h)
+      when Hash then value.to_h { |key, item| [key, deep_copy(item)] }
+      when String
+        return value.dup if value.encoding != Encoding::BINARY && value.valid_encoding?
+
+        { encoding: :base64, data: [value].pack("m0") }
       else value
       end
     end
@@ -75,24 +133,36 @@ module EndpointSecurity
     def codesigning_flags = CSFlags.new(value: __read_field("codesigning_flags"))
   end
 
+  # Lazy view of an +es_file_t+.
+  class File
+    # Returns the possibly truncated path supplied by Endpoint Security.
+    # @return [String]
+    def path
+      if path_truncated? && __warn_on_truncated_path?
+        warn "Endpoint Security path is truncated; do not use it for authorization"
+      end
+      __read_field("path")
+    end
+  end
+
   # Lazy view of an event-specific Endpoint Security structure.
   class Event
-    # @return [Array<String>, nil]
-    def args = __exec_values(:args)
+    # @return [ExecArgs] exec arguments
+    def args = (@args ||= ExecArgs.new { __exec_values(:args) })
 
-    # @return [Array<String>, nil]
-    def env = __exec_values(:env)
+    # @return [ExecArgs] exec environment
+    def env = (@env ||= ExecArgs.new { __exec_values(:env) })
 
-    # @return [Array<NativeView>, nil]
-    def fds = __exec_values(:fds)
+    # @return [FieldArray] exec file descriptors
+    def fds = (@fds ||= FieldArray.new { __exec_values(:fds) })
 
     # @return [Hash] deep copy of the event fields
     def to_h
       super.tap do |hash|
         next unless __schema_name == "es_event_exec_t"
 
-        hash[:args] = args
-        hash[:env] = env
+        hash[:args] = args.to_a
+        hash[:env] = env.to_a
         hash[:fds] = fds.map(&:to_h)
       end
     end

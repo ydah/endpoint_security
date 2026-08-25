@@ -13,6 +13,7 @@
 
 struct es_client_s {
     es_handler_block_t handler;
+    bool subscriptions[ES_EVENT_TYPE_LAST];
 };
 
 typedef struct {
@@ -21,6 +22,9 @@ typedef struct {
     es_process_t target;
     es_file_t executable;
     es_file_t target_executable;
+    struct statfs statfs;
+    es_event_gatekeeper_user_override_t gatekeeper;
+    es_sha256_t sha256;
     es_message_t message;
 } mock_message_t;
 
@@ -59,19 +63,64 @@ es_delete_client(es_client_t *client)
 es_return_t
 es_subscribe(es_client_t *client, const es_event_type_t *events, uint32_t event_count)
 {
-    return client != NULL && events != NULL && event_count > 0 ? ES_RETURN_SUCCESS : ES_RETURN_ERROR;
+    if (client == NULL || events == NULL || event_count == 0) {
+        return ES_RETURN_ERROR;
+    }
+    for (uint32_t index = 0; index < event_count; index++) {
+        if (events[index] < 0 || events[index] >= ES_EVENT_TYPE_LAST) {
+            return ES_RETURN_ERROR;
+        }
+        client->subscriptions[events[index]] = true;
+    }
+    return ES_RETURN_SUCCESS;
 }
 
 es_return_t
 es_unsubscribe(es_client_t *client, const es_event_type_t *events, uint32_t event_count)
 {
-    return client != NULL && events != NULL && event_count > 0 ? ES_RETURN_SUCCESS : ES_RETURN_ERROR;
+    if (client == NULL || events == NULL || event_count == 0) {
+        return ES_RETURN_ERROR;
+    }
+    for (uint32_t index = 0; index < event_count; index++) {
+        if (events[index] < 0 || events[index] >= ES_EVENT_TYPE_LAST) {
+            return ES_RETURN_ERROR;
+        }
+        client->subscriptions[events[index]] = false;
+    }
+    return ES_RETURN_SUCCESS;
 }
 
 es_return_t
 es_unsubscribe_all(es_client_t *client)
 {
-    return client == NULL ? ES_RETURN_ERROR : ES_RETURN_SUCCESS;
+    if (client == NULL) {
+        return ES_RETURN_ERROR;
+    }
+    memset(client->subscriptions, 0, sizeof(client->subscriptions));
+    return ES_RETURN_SUCCESS;
+}
+
+es_return_t
+es_subscriptions(es_client_t *client, size_t *count, es_event_type_t **subscriptions)
+{
+    if (client == NULL || count == NULL || subscriptions == NULL) {
+        return ES_RETURN_ERROR;
+    }
+    *count = 0;
+    for (size_t index = 0; index < ES_EVENT_TYPE_LAST; index++) {
+        *count += client->subscriptions[index] ? 1 : 0;
+    }
+    *subscriptions = *count == 0 ? NULL : malloc(*count * sizeof(**subscriptions));
+    if (*count > 0 && *subscriptions == NULL) {
+        return ES_RETURN_ERROR;
+    }
+    size_t output = 0;
+    for (size_t index = 0; index < ES_EVENT_TYPE_LAST; index++) {
+        if (client->subscriptions[index]) {
+            (*subscriptions)[output++] = (es_event_type_t)index;
+        }
+    }
+    return ES_RETURN_SUCCESS;
 }
 
 es_return_t
@@ -247,15 +296,33 @@ esmock_inject(es_client_t *client, es_event_type_t event_type, bool auth, uint64
     static const char target_path[] = "/usr/bin/mock-target";
     mock->executable.path.data = executable_path;
     mock->executable.path.length = sizeof(executable_path) - 1;
+    mock->executable.path_truncated = true;
     mock->target_executable.path.data = target_path;
     mock->target_executable.path.length = sizeof(target_path) - 1;
+    mock->target_executable.path_truncated = true;
     mock->process.executable = &mock->executable;
     mock->target.executable = &mock->target_executable;
+    mock->process.cdhash[0] = 0xff;
+    mock->target.cdhash[0] = 0xff;
     mock->message.process = &mock->process;
     mock->message.event_type = event_type;
     mock->message.action_type = auth ? ES_ACTION_TYPE_AUTH : ES_ACTION_TYPE_NOTIFY;
     if (event_type == ES_EVENT_TYPE_AUTH_EXEC || event_type == ES_EVENT_TYPE_NOTIFY_EXEC) {
         mock->message.event.exec.target = &mock->target;
+    }
+    if (event_type == ES_EVENT_TYPE_NOTIFY_MOUNT) {
+        mock->statfs.f_bsize = 4096;
+        memcpy(mock->statfs.f_fstypename, "mockfs", sizeof("mockfs"));
+        mock->message.event.mount.statfs = &mock->statfs;
+    }
+    if (event_type == ES_EVENT_TYPE_NOTIFY_GETATTRLIST) {
+        mock->message.event.getattrlist.attrlist.bitmapcount = ATTR_BIT_MAP_COUNT;
+        mock->message.event.getattrlist.attrlist.commonattr = 1;
+    }
+    if (event_type == ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE) {
+        mock->sha256[0] = 0xff;
+        mock->gatekeeper.sha256 = &mock->sha256;
+        mock->message.event.gatekeeper_user_override = &mock->gatekeeper;
     }
     client->handler(client, &mock->message);
     es_release_message(&mock->message);

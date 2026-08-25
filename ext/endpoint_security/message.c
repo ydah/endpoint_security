@@ -321,6 +321,12 @@ message_valid_p(VALUE self)
     return message->valid ? Qtrue : Qfalse;
 }
 
+static VALUE
+message_warn_on_truncated_path(VALUE self)
+{
+    return get_message(self)->client->warn_on_truncated_path ? Qtrue : Qfalse;
+}
+
 VALUE
 esrb_message_wrap(VALUE owner, esrb_client_t *client, esrb_slot_t *slot)
 {
@@ -376,6 +382,7 @@ esrb_init_message(VALUE endpoint_security)
     rb_define_method(c_message, "retain!", message_retain, 0);
     rb_define_method(c_message, "release!", message_release_bang, 0);
     rb_define_method(c_message, "valid?", message_valid_p, 0);
+    rb_define_method(c_message, "__warn_on_truncated_path?", message_warn_on_truncated_path, 0);
     rb_define_method(c_message, "__respond_default!", message_respond_default, 0);
     rb_define_method(c_message, "__auto_release!", message_auto_release, 0);
 }

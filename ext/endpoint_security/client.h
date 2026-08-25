@@ -31,6 +31,7 @@ typedef struct {
     bool default_cache;
     bool strict_cache;
     bool strict_version;
+    bool warn_on_truncated_path;
     double deadline_margin;
     uint64_t min_margin_ticks;
     pid_t owner_pid;

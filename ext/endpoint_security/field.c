@@ -6,6 +6,10 @@
 #include <bsm/libbsm.h>
 #include <ruby/encoding.h>
 #include <string.h>
+#include <sys/acl.h>
+#include <sys/attr.h>
+#include <sys/mount.h>
+#include <sys/proc_info.h>
 
 #include "message.h"
 
@@ -118,6 +122,274 @@ string_token_value(const es_string_token_t *token)
 }
 
 static VALUE
+tagged_union_value(const char *kind, VALUE value)
+{
+    return rb_funcall(rb_path2class("EndpointSecurity::TaggedUnion"), rb_intern("__native_new"), 2,
+        ID2SYM(rb_intern(kind)), value);
+}
+
+static VALUE
+hex_value(const uint8_t *bytes, size_t length)
+{
+    static const char digits[] = "0123456789abcdef";
+    VALUE string = rb_str_new(NULL, (long)(length * 2));
+    char *output = RSTRING_PTR(string);
+    for (size_t index = 0; index < length; index++) {
+        output[index * 2] = digits[bytes[index] >> 4];
+        output[index * 2 + 1] = digits[bytes[index] & 0x0f];
+    }
+    return string;
+}
+
+static VALUE
+binary_value(const void *bytes, size_t length)
+{
+    VALUE value = rb_str_new(bytes, (long)length);
+    rb_enc_associate(value, rb_ascii8bit_encoding());
+    return value;
+}
+
+static VALUE
+acl_value(acl_t acl)
+{
+    if (acl == NULL) {
+        return Qnil;
+    }
+    ssize_t size = acl_size(acl);
+    if (size <= 0) {
+        return Qnil;
+    }
+    VALUE value = rb_str_new(NULL, size);
+    ssize_t copied = acl_copy_ext(RSTRING_PTR(value), acl, size);
+    if (copied < 0) {
+        return Qnil;
+    }
+    rb_str_set_len(value, copied);
+    rb_enc_associate(value, rb_ascii8bit_encoding());
+    return value;
+}
+
+static VALUE
+uid_union(bool available, uid_t uid)
+{
+    return tagged_union_value(available ? "uid" : "unavailable", available ? UINT2NUM(uid) : Qnil);
+}
+
+static VALUE
+destination_union(const esrb_view_t *view, bool create)
+{
+    es_destination_type_t type;
+    es_file_t *existing_file;
+    es_file_t *directory;
+    es_string_token_t filename;
+    mode_t mode = 0;
+    if (create) {
+        const es_event_create_t *event = (const es_event_create_t *)view->pointer;
+        type = event->destination_type;
+        existing_file = event->destination.existing_file;
+        directory = event->destination.new_path.dir;
+        filename = event->destination.new_path.filename;
+        mode = event->destination.new_path.mode;
+    } else {
+        const es_event_rename_t *event = (const es_event_rename_t *)view->pointer;
+        type = event->destination_type;
+        existing_file = event->destination.existing_file;
+        directory = event->destination.new_path.dir;
+        filename = event->destination.new_path.filename;
+    }
+    if (type == ES_DESTINATION_TYPE_EXISTING_FILE) {
+        VALUE file = esrb_view_wrap(
+            view->owner, existing_file, "es_file_t", view->message_version, view->strict_version);
+        return tagged_union_value("existing_file", file);
+    }
+
+    VALUE path = rb_hash_new();
+    rb_hash_aset(path, ID2SYM(rb_intern("dir")),
+        esrb_view_wrap(view->owner, directory, "es_file_t", view->message_version, view->strict_version));
+    rb_hash_aset(path, ID2SYM(rb_intern("filename")), string_token_value(&filename));
+    if (create) {
+        rb_hash_aset(path, ID2SYM(rb_intern("mode")), UINT2NUM(mode));
+    }
+    return tagged_union_value("new_path", path);
+}
+
+static VALUE
+authentication_union(const esrb_view_t *view)
+{
+    const es_event_authentication_t *event = (const es_event_authentication_t *)view->pointer;
+    const void *pointer = NULL;
+    const char *kind = "unknown";
+    const char *schema = NULL;
+    switch (event->type) {
+        case ES_AUTHENTICATION_TYPE_OD:
+            kind = "od";
+            schema = "es_event_authentication_od_t";
+            pointer = event->data.od;
+            break;
+        case ES_AUTHENTICATION_TYPE_TOUCHID:
+            kind = "touchid";
+            schema = "es_event_authentication_touchid_t";
+            pointer = event->data.touchid;
+            break;
+        case ES_AUTHENTICATION_TYPE_TOKEN:
+            kind = "token";
+            schema = "es_event_authentication_token_t";
+            pointer = event->data.token;
+            break;
+        case ES_AUTHENTICATION_TYPE_AUTO_UNLOCK:
+            kind = "auto_unlock";
+            schema = "es_event_authentication_auto_unlock_t";
+            pointer = event->data.auto_unlock;
+            break;
+        default:
+            break;
+    }
+    VALUE value = schema == NULL
+        ? Qnil
+        : esrb_view_wrap(view->owner, pointer, schema, view->message_version, view->strict_version);
+    return tagged_union_value(kind, value);
+}
+
+static VALUE
+od_member_union(const esrb_view_t *view)
+{
+    const es_od_member_id_t *member = (const es_od_member_id_t *)view->pointer;
+    if (member->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
+        return tagged_union_value("name", string_token_value(&member->member_value.name));
+    }
+    return tagged_union_value("uuid", hex_value(member->member_value.uuid, sizeof(uuid_t)));
+}
+
+static VALUE
+od_member_array_union(const esrb_view_t *view)
+{
+    const es_od_member_id_array_t *members = (const es_od_member_id_array_t *)view->pointer;
+    if (members->member_count > UINT32_MAX) {
+        return tagged_union_value("invalid", Qnil);
+    }
+    VALUE values = rb_ary_new_capa((long)members->member_count);
+    if (members->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
+        for (size_t index = 0; index < members->member_count; index++) {
+            rb_ary_push(values, string_token_value(&members->member_array.names[index]));
+        }
+        return tagged_union_value("names", values);
+    }
+    for (size_t index = 0; index < members->member_count; index++) {
+        rb_ary_push(values, hex_value(members->member_array.uuids[index], sizeof(uuid_t)));
+    }
+    return tagged_union_value("uuids", values);
+}
+
+static VALUE
+read_union(const esrb_view_t *view, const esrb_field_t *field)
+{
+    const char *schema = view->schema->name;
+    if (strcmp(field->name, "destination") == 0 && strcmp(schema, "es_event_rename_t") == 0) {
+        return destination_union(view, false);
+    }
+    if (strcmp(field->name, "destination") == 0 && strcmp(schema, "es_event_create_t") == 0) {
+        return destination_union(view, true);
+    }
+    if (strcmp(field->name, "uid") == 0 && strcmp(schema, "es_event_authentication_touchid_t") == 0) {
+        const es_event_authentication_touchid_t *event = (const es_event_authentication_touchid_t *)view->pointer;
+        return uid_union(event->has_uid, event->uid.uid);
+    }
+    if (strcmp(field->name, "uid") == 0 && strcmp(schema, "es_event_openssh_login_t") == 0) {
+        const es_event_openssh_login_t *event = (const es_event_openssh_login_t *)view->pointer;
+        return uid_union(event->has_uid, event->uid.uid);
+    }
+    if (strcmp(field->name, "uid") == 0 && strcmp(schema, "es_event_login_login_t") == 0) {
+        const es_event_login_login_t *event = (const es_event_login_login_t *)view->pointer;
+        return uid_union(event->has_uid, event->uid.uid);
+    }
+    if (strcmp(field->name, "to_uid") == 0 && strcmp(schema, "es_event_su_t") == 0) {
+        const es_event_su_t *event = (const es_event_su_t *)view->pointer;
+        return uid_union(event->has_to_uid, event->to_uid.uid);
+    }
+    if (strcmp(schema, "es_event_sudo_t") == 0 && strcmp(field->name, "from_uid") == 0) {
+        const es_event_sudo_t *event = (const es_event_sudo_t *)view->pointer;
+        return uid_union(event->has_from_uid, event->from_uid.uid);
+    }
+    if (strcmp(schema, "es_event_sudo_t") == 0 && strcmp(field->name, "to_uid") == 0) {
+        const es_event_sudo_t *event = (const es_event_sudo_t *)view->pointer;
+        return uid_union(event->has_to_uid, event->to_uid.uid);
+    }
+    if (strcmp(field->name, "data") == 0 && strcmp(schema, "es_event_authentication_t") == 0) {
+        return authentication_union(view);
+    }
+    if (strcmp(field->name, "member_value") == 0 && strcmp(schema, "es_od_member_id_t") == 0) {
+        return od_member_union(view);
+    }
+    if (strcmp(field->name, "member_array") == 0 && strcmp(schema, "es_od_member_id_array_t") == 0) {
+        return od_member_array_union(view);
+    }
+    if (strcmp(field->name, "file") == 0 && strcmp(schema, "es_event_gatekeeper_user_override_t") == 0) {
+        const es_event_gatekeeper_user_override_t *event = (const es_event_gatekeeper_user_override_t *)view->pointer;
+        if (event->file_type == ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_PATH) {
+            return tagged_union_value("path", string_token_value(&event->file.file_path));
+        }
+        VALUE file = esrb_view_wrap(
+            view->owner, event->file.file, "es_file_t", view->message_version, view->strict_version);
+        return tagged_union_value("file", file);
+    }
+    if (strcmp(field->name, "acl") == 0 && strcmp(schema, "es_event_setacl_t") == 0) {
+        const es_event_setacl_t *event = (const es_event_setacl_t *)view->pointer;
+        return tagged_union_value(
+            event->set_or_clear == ES_SET ? "set" : "clear", event->set_or_clear == ES_SET ? acl_value(event->acl.set) : Qnil);
+    }
+    return Qundef;
+}
+
+static VALUE
+string_array(const es_string_token_t *tokens, size_t count)
+{
+    if (tokens == NULL || count > UINT32_MAX) {
+        return rb_ary_new();
+    }
+    VALUE values = rb_ary_new_capa((long)count);
+    for (size_t index = 0; index < count; index++) {
+        rb_ary_push(values, string_token_value(&tokens[index]));
+    }
+    return values;
+}
+
+static VALUE
+read_array(const esrb_view_t *view, const esrb_field_t *field)
+{
+    const char *schema = view->schema->name;
+    if (strcmp(schema, "es_event_su_t") == 0) {
+        const es_event_su_t *event = (const es_event_su_t *)view->pointer;
+        if (strcmp(field->name, "argv") == 0) {
+            return string_array(event->argv, event->argc);
+        }
+        if (strcmp(field->name, "env") == 0) {
+            return string_array(event->env, event->env_count);
+        }
+    }
+    if (strcmp(schema, "es_event_authorization_petition_t") == 0 && strcmp(field->name, "rights") == 0) {
+        const es_event_authorization_petition_t *event = (const es_event_authorization_petition_t *)view->pointer;
+        return string_array(event->rights, event->right_count);
+    }
+    if (strcmp(schema, "es_event_od_attribute_set_t") == 0 && strcmp(field->name, "attribute_values") == 0) {
+        const es_event_od_attribute_set_t *event = (const es_event_od_attribute_set_t *)view->pointer;
+        return string_array(event->attribute_values, event->attribute_value_count);
+    }
+    if (strcmp(schema, "es_event_authorization_judgement_t") == 0 && strcmp(field->name, "results") == 0) {
+        const es_event_authorization_judgement_t *event = (const es_event_authorization_judgement_t *)view->pointer;
+        if (event->results == NULL || event->result_count > UINT32_MAX) {
+            return rb_ary_new();
+        }
+        VALUE values = rb_ary_new_capa((long)event->result_count);
+        for (size_t index = 0; index < event->result_count; index++) {
+            rb_ary_push(values, esrb_view_wrap(view->owner, &event->results[index], "es_authorization_result_t",
+                                    view->message_version, view->strict_version));
+        }
+        return values;
+    }
+    return Qundef;
+}
+
+static VALUE
 audit_token_value(const audit_token_t *token)
 {
     VALUE arguments[] = {
@@ -145,6 +417,34 @@ stat_value(const struct stat *stat)
         time_value(stat->st_birthtimespec.tv_sec, stat->st_birthtimespec.tv_nsec)
     };
     return rb_funcallv(rb_path2class("EndpointSecurity::Stat"), rb_intern("__native_new"), 14, arguments);
+}
+
+static VALUE
+statfs_value(const struct statfs *statfs)
+{
+    size_t type_length = strnlen(statfs->f_fstypename, sizeof(statfs->f_fstypename));
+    size_t path_length = strnlen(statfs->f_mntonname, sizeof(statfs->f_mntonname));
+    size_t source_length = strnlen(statfs->f_mntfromname, sizeof(statfs->f_mntfromname));
+    VALUE fsid = rb_ary_new_from_args(2, INT2NUM(statfs->f_fsid.val[0]), INT2NUM(statfs->f_fsid.val[1]));
+    VALUE arguments[] = {
+        UINT2NUM(statfs->f_bsize), INT2NUM(statfs->f_iosize), ULL2NUM(statfs->f_blocks), ULL2NUM(statfs->f_bfree),
+        ULL2NUM(statfs->f_bavail), ULL2NUM(statfs->f_files), ULL2NUM(statfs->f_ffree), fsid,
+        UINT2NUM(statfs->f_owner), UINT2NUM(statfs->f_type), UINT2NUM(statfs->f_flags), UINT2NUM(statfs->f_fssubtype),
+        rb_str_new(statfs->f_fstypename, (long)type_length), rb_str_new(statfs->f_mntonname, (long)path_length),
+        rb_str_new(statfs->f_mntfromname, (long)source_length), UINT2NUM(statfs->f_flags_ext)
+    };
+    return rb_funcallv(rb_path2class("EndpointSecurity::Statfs"), rb_intern("__native_new"), 16, arguments);
+}
+
+static VALUE
+attrlist_value(const struct attrlist *attributes)
+{
+    VALUE arguments[] = {
+        UINT2NUM(attributes->bitmapcount), UINT2NUM(attributes->reserved), UINT2NUM(attributes->commonattr),
+        UINT2NUM(attributes->volattr), UINT2NUM(attributes->dirattr), UINT2NUM(attributes->fileattr),
+        UINT2NUM(attributes->forkattr)
+    };
+    return rb_funcallv(rb_path2class("EndpointSecurity::Attrlist"), rb_intern("__native_new"), 7, arguments);
 }
 
 static const esrb_field_t *
@@ -195,6 +495,16 @@ read_field(VALUE self, VALUE name_value)
 
     const unsigned char *address = view->pointer + field->offset;
     const char *type = field->type;
+    if (strncmp(type, "union ", 6) == 0) {
+        VALUE value = read_union(view, field);
+        return value == Qundef ? Qnil : value;
+    }
+    if (strchr(type, '*') != NULL) {
+        VALUE value = read_array(view, field);
+        if (value != Qundef) {
+            return value;
+        }
+    }
     if (strcmp(type, "es_string_token_t") == 0) {
         return string_token_value((const es_string_token_t *)address);
     }
@@ -216,6 +526,13 @@ read_field(VALUE self, VALUE name_value)
     if (strcmp(type, "struct stat") == 0) {
         return stat_value((const struct stat *)address);
     }
+    if (strcmp(type, "struct statfs *") == 0) {
+        const struct statfs *statfs = *(const struct statfs *const *)address;
+        return statfs == NULL ? Qnil : statfs_value(statfs);
+    }
+    if (strcmp(type, "struct attrlist") == 0) {
+        return attrlist_value((const struct attrlist *)address);
+    }
     if (strcmp(type, "struct timespec") == 0) {
         const struct timespec *time = (const struct timespec *)address;
         return time_value(time->tv_sec, time->tv_nsec);
@@ -228,7 +545,23 @@ read_field(VALUE self, VALUE name_value)
         return *(const bool *)address ? Qtrue : Qfalse;
     }
     if (strstr(type, "[20]") != NULL) {
-        return rb_str_new((const char *)address, 20);
+        return binary_value(address, 20);
+    }
+    if (strcmp(type, "es_sha256_t *") == 0) {
+        const es_sha256_t *sha256 = *(const es_sha256_t *const *)address;
+        return sha256 == NULL ? Qnil : binary_value(*sha256, sizeof(*sha256));
+    }
+    if (strcmp(type, "struct _acl *") == 0) {
+        return acl_value(*(acl_t const *)address);
+    }
+    if (strcmp(view->schema->name, "es_fd_t") == 0 && strcmp(field->name, "pipe") == 0) {
+        const es_fd_t *descriptor = (const es_fd_t *)view->pointer;
+        if (descriptor->fdtype != PROX_FDTYPE_PIPE) {
+            return Qnil;
+        }
+        VALUE pipe = rb_hash_new();
+        rb_hash_aset(pipe, ID2SYM(rb_intern("pipe_id")), ULL2NUM(descriptor->pipe.pipe_id));
+        return pipe;
     }
 
     char schema_name[128];
@@ -296,6 +629,12 @@ schema_name(VALUE self)
 }
 
 static VALUE
+warn_on_truncated_path(VALUE self)
+{
+    return rb_funcall(get_view(self)->owner, rb_intern("__warn_on_truncated_path?"), 0);
+}
+
+static VALUE
 exec_values(VALUE self, VALUE kind_value)
 {
     esrb_view_t *view = get_view(self);
@@ -350,6 +689,7 @@ esrb_init_field(VALUE endpoint_security)
     rb_define_method(c_native_view, "__read_field", read_field, 1);
     rb_define_method(c_native_view, "__field_names", field_names, 0);
     rb_define_method(c_native_view, "__schema_name", schema_name, 0);
+    rb_define_method(c_native_view, "__warn_on_truncated_path?", warn_on_truncated_path, 0);
     rb_define_method(c_native_view, "__exec_values", exec_values, 1);
     rb_define_class_under(endpoint_security, "Event", c_native_view);
     rb_define_class_under(endpoint_security, "Process", c_native_view);
