@@ -27,4 +27,7 @@ end
 abort "EndpointSecurity library is unavailable" unless endpoint_security_found
 abort "libbsm is unavailable" unless have_library("bsm")
 
+$VPATH << "$(srcdir)/generated"
+$srcs = Dir[File.join(__dir__, "*.c")].map { |path| File.basename(path) }
+$srcs << "es_schema.c" if File.exist?(File.join(__dir__, "generated/es_schema.c"))
 create_makefile("endpoint_security/endpoint_security")

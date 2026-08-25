@@ -5,6 +5,8 @@
 
 #include <mach/mach_time.h>
 
+#include "field.h"
+
 typedef struct {
     VALUE owner;
     esrb_client_t *client;
@@ -103,6 +105,57 @@ message_mach_time(VALUE self)
 }
 
 static VALUE
+message_seq_num(VALUE self)
+{
+    const es_message_t *message = get_message(self)->slot->message;
+    return message->version >= 2 ? ULL2NUM(message->seq_num) : Qnil;
+}
+
+static VALUE
+message_global_seq_num(VALUE self)
+{
+    const es_message_t *message = get_message(self)->slot->message;
+    return message->version >= 4 ? ULL2NUM(message->global_seq_num) : Qnil;
+}
+
+static VALUE
+message_time(VALUE self)
+{
+    const es_message_t *message = get_message(self)->slot->message;
+    return rb_time_nano_new(message->time.tv_sec, message->time.tv_nsec);
+}
+
+static VALUE
+message_process(VALUE self)
+{
+    esrb_message_t *wrapper = get_message(self);
+    const es_message_t *message = wrapper->slot->message;
+    return esrb_view_wrap(self, message->process, "es_process_t", message->version);
+}
+
+static VALUE
+message_thread(VALUE self)
+{
+    esrb_message_t *wrapper = get_message(self);
+    const es_message_t *message = wrapper->slot->message;
+    return message->version >= 4 ? esrb_view_wrap(self, message->thread, "es_thread_t", message->version) : Qnil;
+}
+
+static VALUE
+message_event(VALUE self)
+{
+    esrb_message_t *wrapper = get_message(self);
+    return esrb_event_wrap(self, wrapper->slot->message);
+}
+
+static VALUE
+message_raw_event_bytes(VALUE self)
+{
+    const es_message_t *message = get_message(self)->slot->message;
+    return rb_str_new((const char *)&message->event, sizeof(message->event));
+}
+
+static VALUE
 message_time_left(VALUE self)
 {
     esrb_message_t *message = get_message(self);
@@ -135,6 +188,17 @@ respond_auth(int argc, VALUE *argv, VALUE self, es_auth_result_t result)
         cache = NIL_P(cache_value) || RTEST(cache_value);
     }
     esrb_message_t *message = get_message(self);
+    if (cache) {
+        VALUE event_type = rb_path2class("EndpointSecurity::EventType");
+        VALUE event = rb_funcall(event_type, rb_intern("symbol"), 1, INT2NUM(message->slot->message->event_type));
+        if (!RTEST(rb_funcall(event_type, rb_intern("cacheable?"), 1, event))) {
+            if (message->client->strict_cache) {
+                rb_raise(rb_path2class("EndpointSecurity::NonCacheableEventError"), "event cannot be cached");
+            }
+            rb_warn("Endpoint Security event cannot be cached; using cache: false");
+            cache = false;
+        }
+    }
     uint32_t flags = result == ES_AUTH_RESULT_ALLOW ? UINT32_MAX : 0;
     return esrb_respond_slot(message->client, message->slot, result, flags, cache) ? Qtrue : Qfalse;
 }
@@ -222,6 +286,17 @@ esrb_message_wrap(VALUE owner, esrb_client_t *client, esrb_slot_t *slot)
     return object;
 }
 
+bool
+esrb_message_valid_object(VALUE object)
+{
+    esrb_message_t *message;
+    if (!rb_typeddata_is_kind_of(object, &message_type)) {
+        return false;
+    }
+    TypedData_Get_Struct(object, esrb_message_t, &message_type, message);
+    return message->valid;
+}
+
 void
 esrb_init_message(VALUE endpoint_security)
 {
@@ -233,6 +308,13 @@ esrb_init_message(VALUE endpoint_security)
     rb_define_method(c_message, "auth?", message_auth_p, 0);
     rb_define_method(c_message, "deadline", message_deadline, 0);
     rb_define_method(c_message, "mach_time", message_mach_time, 0);
+    rb_define_method(c_message, "seq_num", message_seq_num, 0);
+    rb_define_method(c_message, "global_seq_num", message_global_seq_num, 0);
+    rb_define_method(c_message, "time", message_time, 0);
+    rb_define_method(c_message, "process", message_process, 0);
+    rb_define_method(c_message, "thread", message_thread, 0);
+    rb_define_method(c_message, "event", message_event, 0);
+    rb_define_method(c_message, "raw_event_bytes", message_raw_event_bytes, 0);
     rb_define_method(c_message, "time_left", message_time_left, 0);
     rb_define_method(c_message, "answered?", message_answered_p, 0);
     rb_define_method(c_message, "allow!", message_allow, -1);

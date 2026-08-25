@@ -23,10 +23,13 @@ typedef struct {
     _Atomic uint64_t errors;
     es_auth_result_t default_auth;
     bool default_cache;
+    bool strict_cache;
     double deadline_margin;
     uint64_t min_margin_ticks;
     pid_t owner_pid;
 } esrb_client_t;
+
+extern const rb_data_type_t esrb_client_type;
 
 void esrb_init_client(VALUE endpoint_security);
 void esrb_notify(esrb_client_t *client);

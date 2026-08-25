@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "message.h"
+#include "mute.h"
 #ifdef ESRB_MOCK
 #include "esmock.h"
 #endif
@@ -76,7 +77,7 @@ client_size(const void *pointer)
     return client == NULL ? 0 : sizeof(*client) + client->queue.capacity * sizeof(esrb_slot_t);
 }
 
-static const rb_data_type_t client_type = {
+const rb_data_type_t esrb_client_type = {
     .wrap_struct_name = "EndpointSecurity::Client",
     .function = {.dfree = client_free, .dsize = client_size},
     .flags = RUBY_TYPED_FREE_IMMEDIATELY
@@ -86,7 +87,7 @@ static VALUE
 client_allocate(VALUE klass)
 {
     esrb_client_t *client;
-    VALUE object = TypedData_Make_Struct(klass, esrb_client_t, &client_type, client);
+    VALUE object = TypedData_Make_Struct(klass, esrb_client_t, &esrb_client_type, client);
     client->wakeup_fd[0] = -1;
     client->wakeup_fd[1] = -1;
     atomic_init(&client->closed, true);
@@ -97,7 +98,7 @@ static esrb_client_t *
 get_client(VALUE self)
 {
     esrb_client_t *client;
-    TypedData_Get_Struct(self, esrb_client_t, &client_type, client);
+    TypedData_Get_Struct(self, esrb_client_t, &esrb_client_type, client);
     if (client->owner_pid != getpid()) {
         rb_raise(rb_path2class("EndpointSecurity::ForkedClientError"), "Endpoint Security clients cannot be used after fork");
     }
@@ -205,11 +206,12 @@ client_initialize(int argc, VALUE *argv, VALUE self)
     VALUE options;
     rb_scan_args(argc, argv, "0:", &options);
     esrb_client_t *client;
-    TypedData_Get_Struct(self, esrb_client_t, &client_type, client);
+    TypedData_Get_Struct(self, esrb_client_t, &esrb_client_type, client);
 
     size_t queue_depth = 8192;
     client->default_auth = ES_AUTH_RESULT_ALLOW;
     client->default_cache = false;
+    client->strict_cache = false;
     client->deadline_margin = 0.2;
     uint64_t min_margin_ns = 5000000ULL;
     if (!NIL_P(options)) {
@@ -217,9 +219,11 @@ client_initialize(int argc, VALUE *argv, VALUE self)
         VALUE auth = rb_hash_aref(options, ID2SYM(rb_intern("auth_default")));
         VALUE margin = rb_hash_aref(options, ID2SYM(rb_intern("deadline_margin")));
         VALUE minimum = rb_hash_aref(options, ID2SYM(rb_intern("min_margin_ns")));
+        VALUE strict_cache = rb_hash_aref(options, ID2SYM(rb_intern("strict_cache")));
         queue_depth = NIL_P(depth) ? queue_depth : NUM2SIZET(depth);
         client->deadline_margin = NIL_P(margin) ? client->deadline_margin : NUM2DBL(margin);
         min_margin_ns = NIL_P(minimum) ? min_margin_ns : NUM2ULL(minimum);
+        client->strict_cache = RTEST(strict_cache);
         if (!NIL_P(auth) && SYM2ID(auth) == rb_intern("deny")) {
             client->default_auth = ES_AUTH_RESULT_DENY;
         }
@@ -346,6 +350,31 @@ client_subscribe(VALUE self, VALUE values)
 }
 
 static VALUE
+client_unsubscribe(VALUE self, VALUE values)
+{
+    esrb_client_t *client = get_open_client(self);
+    if (NIL_P(values)) {
+        if (es_unsubscribe_all(client->client) != ES_RETURN_SUCCESS) {
+            rb_raise(rb_path2class("EndpointSecurity::SubscriptionError"), "es_unsubscribe_all failed");
+        }
+        return Qtrue;
+    }
+
+    Check_Type(values, T_ARRAY);
+    long count = RARRAY_LEN(values);
+    es_event_type_t *events = ALLOC_N(es_event_type_t, count);
+    for (long index = 0; index < count; index++) {
+        events[index] = (es_event_type_t)NUM2INT(rb_ary_entry(values, index));
+    }
+    es_return_t result = es_unsubscribe(client->client, events, (uint32_t)count);
+    xfree(events);
+    if (result != ES_RETURN_SUCCESS) {
+        rb_raise(rb_path2class("EndpointSecurity::SubscriptionError"), "es_unsubscribe failed");
+    }
+    return Qtrue;
+}
+
+static VALUE
 client_stats(VALUE self)
 {
     esrb_client_t *client = get_client(self);
@@ -439,7 +468,9 @@ esrb_init_client(VALUE endpoint_security)
     rb_define_method(c_client, "__wake", client_wake, 0);
     rb_define_method(c_client, "__drain", client_drain, -1);
     rb_define_method(c_client, "__subscribe", client_subscribe, 1);
+    rb_define_method(c_client, "__unsubscribe", client_unsubscribe, 1);
     rb_define_method(c_client, "stats", client_stats, 0);
+    esrb_init_mute(c_client);
 
 #ifdef ESRB_MOCK
     VALUE mock = rb_define_module_under(endpoint_security, "Mock");

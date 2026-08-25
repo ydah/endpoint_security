@@ -16,11 +16,17 @@ RSpec.describe ES::Client do
     client = described_class.new(queue_depth: 8)
     received = Queue.new
     client.subscribe(:notify_exec)
-    client.on(:notify_exec) { |message| received << message.event_type }
+    client.on(:notify_exec) do |message|
+      received << [
+        message.event_type, message.process.executable.path, message.event.target.executable.path, message.to_h
+      ]
+    end
     client.start
 
     ES::Mock.inject(client, event: ES::EventType.value(:notify_exec), auth: false)
-    expect(received.pop).to eq(:notify_exec)
+    event_type, source, target, hash = received.pop
+    expect([event_type, source, target]).to eq([:notify_exec, "/usr/bin/mock-source", "/usr/bin/mock-target"])
+    expect(hash[:event][:target][:executable][:path]).to eq("/usr/bin/mock-target")
     expect(client.stats[:delivered]).to eq(1)
   ensure
     client&.close
@@ -65,6 +71,47 @@ RSpec.describe ES::Client do
     expect(errors.pop).to eq("boom")
     expect(ES::Mock.response_count).to eq(1)
     expect(client.stats[:errors]).to eq(1)
+  ensure
+    client&.close
+  end
+
+  it "round-trips mute, inversion, and cache control APIs" do
+    client = described_class.new(queue_depth: 8)
+    expect(client.mute_path("/tmp", type: :prefix)).to be(true)
+    expect(client.mute_path_events("/tmp", :notify_exec, type: :literal)).to be(true)
+    expect(client.unmute_path("/tmp")).to be(true)
+    expect(client.invert_muting(:path)).to be(true)
+    expect(client.muting_inverted?(:path)).to be(true)
+    expect(client.muted_paths).to eq([])
+    expect(client.muted_processes).to eq([])
+    expect(client.clear_cache).to be(true)
+  ensure
+    client&.close
+  end
+
+  it "rejects caching for a non-cacheable event in strict mode" do
+    client = described_class.new(queue_depth: 8, strict_cache: true)
+    errors = Queue.new
+    client.on(:auth_signal) { |message| message.allow!(cache: true) }
+    client.on_error { |error| errors << error }
+    client.start
+
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_signal), auth: true)
+    expect(errors.pop).to be_a(ES::NonCacheableEventError)
+    expect(ES::Mock.response_count).to eq(1)
+  ensure
+    client&.close
+  end
+
+  it "deep-copies every generated event type without unsupported-field exceptions" do
+    client = described_class.new(queue_depth: 256, mute_self: false)
+    ES::EventType.all.each do |event|
+      ES::Mock.inject(client, event: ES::EventType.value(event), auth: false)
+      message = client.send(:__drain, 1).first
+      expect { message.to_h }.not_to raise_error
+      expect(message.raw_event_bytes).not_to be_empty if ES::EventType.reserved?(event)
+      message.__auto_release!
+    end
   ensure
     client&.close
   end
