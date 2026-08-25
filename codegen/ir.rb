@@ -181,7 +181,7 @@ module EndpointSecurity
         end
         suffixes = cacheable_structs.map { |name| name.delete_prefix("es_event_").delete_suffix("_t") }
         events.events.select do |event|
-          suffixes.include?(event.symbol.to_s.sub(/\A(?:auth|notify)_/, ""))
+          event.symbol.start_with?("auth_") && suffixes.include?(event.symbol.to_s.delete_prefix("auth_"))
         end.map(&:symbol)
       end
     end

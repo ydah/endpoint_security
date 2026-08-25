@@ -48,6 +48,11 @@ RSpec.describe EndpointSecurity::Codegen::IR do
     expect(ES::Enum.symbol("es_auth_result_t", 99)).to eq(99)
   end
 
+  it "marks only answerable AUTH events as cacheable" do
+    expect(ES::EventType.cacheable?(:auth_exec)).to be(true)
+    expect(ES::EventType.cacheable?(:notify_exec)).to be(false)
+  end
+
   it "rejects field types that the native reader cannot decode" do
     records = [EndpointSecurity::Codegen::Record.new(
       "es_example_t", [EndpointSecurity::Codegen::Field.new("value", "mystery_t", 1)]
