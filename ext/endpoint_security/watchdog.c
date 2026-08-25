@@ -177,7 +177,6 @@ esrb_watchdog_arm(esrb_watchdog_t *watchdog, esrb_slot_t *slot)
                 request->position = slot->position;
                 request->fire_at = slot->fire_at;
                 atomic_store_explicit(&request->sequence, position + 1, memory_order_release);
-                pthread_cond_signal(&watchdog->condition);
                 return true;
             }
         } else if (difference < 0) {

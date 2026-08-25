@@ -31,6 +31,7 @@ typedef struct {
 static _Atomic size_t responses;
 static _Atomic uint32_t last_response;
 static _Atomic bool inverted[3];
+static _Atomic int next_new_client_result;
 
 static mock_message_t *
 mock_from_message(const es_message_t *message)
@@ -41,6 +42,12 @@ mock_from_message(const es_message_t *message)
 es_new_client_result_t
 es_new_client(es_client_t **client, es_handler_block_t handler)
 {
+    es_new_client_result_t result = atomic_exchange_explicit(
+        &next_new_client_result, ES_NEW_CLIENT_RESULT_SUCCESS, memory_order_relaxed);
+    if (result != ES_NEW_CLIENT_RESULT_SUCCESS) {
+        *client = NULL;
+        return result;
+    }
     *client = calloc(1, sizeof(**client));
     if (*client == NULL) {
         return ES_NEW_CLIENT_RESULT_ERR_INTERNAL;
@@ -288,7 +295,8 @@ es_release_message(const es_message_t *message)
 
 void
 esmock_inject(
-    es_client_t *client, es_event_type_t event_type, bool auth, uint64_t deadline, uint32_t version, size_t event_size)
+    es_client_t *client, es_event_type_t event_type, es_action_type_t action_type, uint64_t deadline, uint32_t version,
+    size_t event_size, es_result_type_t result_type, uint32_t result, bool source_es_client)
 {
     mock_message_t *mock = calloc(1, sizeof(*mock));
     atomic_init(&mock->references, 1);
@@ -307,10 +315,19 @@ esmock_inject(
     mock->process.executable = &mock->executable;
     mock->target.executable = &mock->target_executable;
     mock->process.cdhash[0] = 0xff;
+    mock->process.is_es_client = source_es_client;
     mock->target.cdhash[0] = 0xff;
     mock->message.process = &mock->process;
     mock->message.event_type = event_type;
-    mock->message.action_type = auth ? ES_ACTION_TYPE_AUTH : ES_ACTION_TYPE_NOTIFY;
+    mock->message.action_type = action_type;
+    if (action_type == ES_ACTION_TYPE_NOTIFY) {
+        mock->message.action.notify.result_type = result_type;
+        if (result_type == ES_RESULT_TYPE_FLAGS) {
+            mock->message.action.notify.result.flags = result;
+        } else {
+            mock->message.action.notify.result.auth = (es_auth_result_t)result;
+        }
+    }
     if (event_size > 0) {
         mock->event_data = calloc(1, event_size);
         if (mock->event_data == NULL) {
@@ -353,10 +370,17 @@ esmock_last_response(void)
 }
 
 void
+esmock_set_new_client_result(es_new_client_result_t result)
+{
+    atomic_store_explicit(&next_new_client_result, result, memory_order_relaxed);
+}
+
+void
 esmock_reset(void)
 {
     atomic_store_explicit(&responses, 0, memory_order_relaxed);
     atomic_store_explicit(&last_response, 0, memory_order_relaxed);
+    atomic_store_explicit(&next_new_client_result, ES_NEW_CLIENT_RESULT_SUCCESS, memory_order_relaxed);
     for (size_t index = 0; index < 3; index++) {
         atomic_store_explicit(&inverted[index], false, memory_order_relaxed);
     }

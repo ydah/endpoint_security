@@ -72,6 +72,8 @@ module EndpointSecurity
     # @return [Array<Symbol>] remaining subscriptions
     def unsubscribe(*events)
       events = events.flatten.map(&:to_sym)
+      return @subscriptions if events.empty?
+
       __unsubscribe(events.map { |event| EventType.value(event) })
       @subscriptions -= events
     end
@@ -102,6 +104,13 @@ module EndpointSecurity
     # @return [Client]
     def on_timeout(&handler)
       @timeout_handler = handler
+      self
+    end
+
+    # Mutes other Endpoint Security clients when their first event is observed.
+    # @return [Client]
+    def mute_all_es_clients!
+      @mute_es_clients = true
       self
     end
 
@@ -200,7 +209,7 @@ module EndpointSecurity
 
     # @return [Array<Hash>] copied path mute entries
     def muted_paths
-      __muted_paths.map { |item| item.merge(type: PATH_TYPES.key(item[:type])) }
+      __muted_paths.map { |item| item.merge(type: PATH_TYPES.key(item[:type]) || item[:type]) }
     end
 
     # @return [Array<Hash>] copied process mute entries
@@ -236,6 +245,11 @@ module EndpointSecurity
 
     def dispatch(message)
       @dispatching = true
+      if @mute_es_clients && message.process.es_client?
+        mute_process(message.process.audit_token)
+        return
+      end
+
       handler = @handlers[message.event_type]
       handler&.call(message)
     rescue StandardError => e

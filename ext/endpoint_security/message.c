@@ -104,7 +104,14 @@ message_event_type(VALUE self)
 static VALUE
 message_action_type(VALUE self)
 {
-    return ID2SYM(rb_intern(get_message(self)->slot->message->action_type == ES_ACTION_TYPE_AUTH ? "auth" : "notify"));
+    es_action_type_t action = get_message(self)->slot->message->action_type;
+    if (action == ES_ACTION_TYPE_AUTH) {
+        return ID2SYM(rb_intern("auth"));
+    }
+    if (action == ES_ACTION_TYPE_NOTIFY) {
+        return ID2SYM(rb_intern("notify"));
+    }
+    return INT2NUM(action);
 }
 
 static VALUE
@@ -178,10 +185,23 @@ message_result(VALUE self)
     if (message->action_type == ES_ACTION_TYPE_AUTH) {
         return Qnil;
     }
-    if (message->action.notify.result_type == ES_RESULT_TYPE_FLAGS) {
-        return UINT2NUM(message->action.notify.result.flags);
+    if (message->action_type != ES_ACTION_TYPE_NOTIFY) {
+        return Qnil;
     }
-    return ID2SYM(rb_intern(message->action.notify.result.auth == ES_AUTH_RESULT_ALLOW ? "allow" : "deny"));
+    switch (message->action.notify.result_type) {
+        case ES_RESULT_TYPE_FLAGS:
+            return UINT2NUM(message->action.notify.result.flags);
+        case ES_RESULT_TYPE_AUTH:
+            if (message->action.notify.result.auth == ES_AUTH_RESULT_ALLOW) {
+                return ID2SYM(rb_intern("allow"));
+            }
+            if (message->action.notify.result.auth == ES_AUTH_RESULT_DENY) {
+                return ID2SYM(rb_intern("deny"));
+            }
+            return INT2NUM(message->action.notify.result.auth);
+        default:
+            return INT2NUM(message->action.notify.result_type);
+    }
 }
 
 static VALUE

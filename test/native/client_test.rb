@@ -80,6 +80,18 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "answers watchdog entries in deadline order rather than insertion order" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_exec), auth: true, deadline_ms: 10_000)
+    ES::Mock.inject(client, event: ES::EventType.value(:auth_open), auth: true, deadline_ms: 30)
+
+    wait_until { ES::Mock.response_count == 1 }
+    expect(ES::Mock.last_response).to eq(0xffff_ffff)
+    expect(client.stats[:timeouts]).to eq(1)
+  ensure
+    client&.close
+  end
+
   it "falls back immediately when a handler raises" do
     client = described_class.new(queue_depth: 8)
     errors = Queue.new
@@ -104,6 +116,23 @@ RSpec.describe ES::Client do
     wait_until { ES::Mock.response_count == 1 }
     expect(ES::Mock.last_response).to eq(1)
     expect(client.stats[:timeouts]).to eq(0)
+  ensure
+    client&.close
+  end
+
+  it "mutes events from other Endpoint Security clients before user dispatch" do
+    client = described_class.new(queue_depth: 8, mute_self: false).mute_all_es_clients!
+    received = Queue.new
+    client.on(:notify_exec) { received << :es_client }
+    client.on(:notify_open) { received << :done }
+    client.start
+
+    ES::Mock.inject(
+      client, event: ES::EventType.value(:notify_exec), auth: false, source_es_client: true
+    )
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_open), auth: false)
+    expect(received.pop).to eq(:done)
+    expect(received).to be_empty
   ensure
     client&.close
   end
@@ -172,6 +201,15 @@ RSpec.describe ES::Client do
     expect(client.muted_paths).to eq([])
     expect(client.muted_processes).to eq([])
     expect(client.clear_cache).to be(true)
+  ensure
+    client&.close
+  end
+
+  it "preserves unknown path mute types" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    allow(client).to receive(:__muted_paths).and_return([{ type: 99, path: "/tmp", events: [] }])
+
+    expect(client.muted_paths.first[:type]).to eq(99)
   ensure
     client&.close
   end
@@ -261,6 +299,30 @@ RSpec.describe ES::Client do
     client&.close
   end
 
+  it "preserves unknown action and result enum values without reading inactive unions" do
+    client = described_class.new(queue_depth: 8, mute_self: false)
+    event = ES::EventType.value(:notify_exec)
+
+    ES::Mock.inject(client, event: event, action_type: 99)
+    unknown_action = client.send(:__drain, 1).first
+    expect([unknown_action.action_type, unknown_action.result]).to eq([99, nil])
+    unknown_action.__auto_release!
+
+    ES::Mock.inject(client, event: event, result_type: 99)
+    unknown_result_type = client.send(:__drain, 1).first
+    expect(unknown_result_type.result).to eq(99)
+    unknown_result_type.__auto_release!
+
+    ES::Mock.inject(client, event: event, result_type: 0, result: 99)
+    unknown_auth_result = client.send(:__drain, 1).first
+    expect(unknown_auth_result.result).to eq(99)
+  ensure
+    unknown_action&.__auto_release! if unknown_action&.valid?
+    unknown_result_type&.__auto_release! if unknown_result_type&.valid?
+    unknown_auth_result&.__auto_release!
+    client&.close
+  end
+
   it "names the unsupported event when a batch subscription fails" do
     client = described_class.new(queue_depth: 8, mute_self: false, probe: :off)
 
@@ -269,6 +331,22 @@ RSpec.describe ES::Client do
     expect(client.subscriptions).to eq([])
   ensure
     client&.close
+  end
+
+  it "treats an empty unsubscribe as a no-op" do
+    client = described_class.new(queue_depth: 8, mute_self: false, subscribe: :notify_exec)
+
+    expect(client.unsubscribe).to eq([:notify_exec])
+    expect(client.subscriptions).to eq([:notify_exec])
+  ensure
+    client&.close
+  end
+
+  it "includes actionable diagnostics in client creation failures" do
+    ES::Mock.new_client_result = 3
+
+    expect { described_class.new(mute_self: false) }
+      .to raise_error(ES::NotEntitledError, /lacks the Endpoint Security client entitlement/)
   end
 
   it "warns when configured before returning a truncated path" do
@@ -288,6 +366,9 @@ RSpec.describe ES::Client do
     expect { described_class.new(probe: :sometimes) }.to raise_error(ArgumentError)
     expect { described_class.new(deadline_margin: Float::NAN) }.to raise_error(ArgumentError)
     expect { described_class.new(deadline_margin: Float::INFINITY) }.to raise_error(ArgumentError)
+    expect do
+      described_class.new(deadline_margin: 1.0, min_margin_ns: (1 << 64) - 1, mute_self: false).close
+    end.not_to raise_error
   end
 
   it "rejects inherited client operations after fork" do

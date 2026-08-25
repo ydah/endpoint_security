@@ -163,27 +163,36 @@ static void __attribute__((noreturn))
 raise_new_client_error(es_new_client_result_t result)
 {
     const char *klass;
+    const char *name;
     switch (result) {
         case ES_NEW_CLIENT_RESULT_ERR_INVALID_ARGUMENT:
             klass = "EndpointSecurity::InvalidArgumentError";
+            name = "err_invalid_argument";
             break;
         case ES_NEW_CLIENT_RESULT_ERR_NOT_ENTITLED:
             klass = "EndpointSecurity::NotEntitledError";
+            name = "err_not_entitled";
             break;
         case ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED:
             klass = "EndpointSecurity::NotPermittedError";
+            name = "err_not_permitted";
             break;
         case ES_NEW_CLIENT_RESULT_ERR_NOT_PRIVILEGED:
             klass = "EndpointSecurity::NotPrivilegedError";
+            name = "err_not_privileged";
             break;
         case ES_NEW_CLIENT_RESULT_ERR_TOO_MANY_CLIENTS:
             klass = "EndpointSecurity::TooManyClientsError";
+            name = "err_too_many_clients";
             break;
         default:
             klass = "EndpointSecurity::InternalError";
+            name = "err_internal";
             break;
     }
-    rb_raise(rb_path2class(klass), "es_new_client failed with result %d", result);
+    VALUE diagnostics = rb_path2class("EndpointSecurity::Diagnostics");
+    VALUE message = rb_funcall(diagnostics, rb_intern("explain"), 1, ID2SYM(rb_intern(name)));
+    rb_exc_raise(rb_exc_new_str(rb_path2class(klass), message));
 }
 
 void
@@ -208,7 +217,9 @@ deadline_fire_time(esrb_client_t *client, uint64_t deadline)
         return now;
     }
     uint64_t remaining = deadline - now;
-    uint64_t advance = (uint64_t)((double)remaining * client->deadline_margin);
+    uint64_t advance = client->deadline_margin == 1.0
+        ? remaining
+        : (uint64_t)((double)remaining * client->deadline_margin);
     if (advance < client->min_margin_ticks) {
         advance = client->min_margin_ticks;
     }
@@ -360,7 +371,9 @@ client_initialize(int argc, VALUE *argv, VALUE self)
 
     mach_timebase_info_data_t info;
     mach_timebase_info(&info);
-    client->min_margin_ticks = min_margin_ns * info.denom / info.numer;
+    client->min_margin_ticks = min_margin_ns > UINT64_MAX / info.denom
+        ? UINT64_MAX
+        : min_margin_ns * info.denom / info.numer;
     client->owner_pid = getpid();
     atomic_init(&client->notified, false);
     atomic_init(&client->active_callbacks, 0);
@@ -568,8 +581,12 @@ mock_inject(int argc, VALUE *argv, VALUE module)
     rb_scan_args(argc, argv, "1:", &client_value, &options);
     VALUE event = rb_hash_fetch(options, ID2SYM(rb_intern("event")));
     VALUE auth_value = rb_hash_aref(options, ID2SYM(rb_intern("auth")));
+    VALUE action_value = rb_hash_aref(options, ID2SYM(rb_intern("action_type")));
     VALUE deadline_ms = rb_hash_aref(options, ID2SYM(rb_intern("deadline_ms")));
     VALUE version_value = rb_hash_aref(options, ID2SYM(rb_intern("version")));
+    VALUE result_type_value = rb_hash_aref(options, ID2SYM(rb_intern("result_type")));
+    VALUE result_value = rb_hash_aref(options, ID2SYM(rb_intern("result")));
+    VALUE source_es_client = rb_hash_aref(options, ID2SYM(rb_intern("source_es_client")));
     esrb_client_t *client = get_open_client(client_value);
     mach_timebase_info_data_t info;
     mach_timebase_info(&info);
@@ -584,7 +601,13 @@ mock_inject(int argc, VALUE *argv, VALUE module)
         }
     }
     uint32_t version = NIL_P(version_value) ? 4 : NUM2UINT(version_value);
-    esmock_inject(client->client, event_type, RTEST(auth_value), deadline, version, event_size);
+    es_action_type_t action_type = NIL_P(action_value)
+        ? (RTEST(auth_value) ? ES_ACTION_TYPE_AUTH : ES_ACTION_TYPE_NOTIFY)
+        : (es_action_type_t)NUM2INT(action_value);
+    es_result_type_t result_type = NIL_P(result_type_value) ? ES_RESULT_TYPE_AUTH : (es_result_type_t)NUM2INT(result_type_value);
+    uint32_t result = NIL_P(result_value) ? ES_AUTH_RESULT_ALLOW : NUM2UINT(result_value);
+    esmock_inject(
+        client->client, event_type, action_type, deadline, version, event_size, result_type, result, RTEST(source_es_client));
     return Qnil;
 }
 
@@ -608,6 +631,14 @@ mock_reset(VALUE module)
     (void)module;
     esmock_reset();
     return Qnil;
+}
+
+static VALUE
+mock_set_new_client_result(VALUE module, VALUE result)
+{
+    (void)module;
+    esmock_set_new_client_result((es_new_client_result_t)NUM2INT(result));
+    return result;
 }
 #endif
 
@@ -633,6 +664,7 @@ esrb_init_client(VALUE endpoint_security)
     rb_define_singleton_method(mock, "inject", mock_inject, -1);
     rb_define_singleton_method(mock, "response_count", mock_response_count, 0);
     rb_define_singleton_method(mock, "last_response", mock_last_response, 0);
+    rb_define_singleton_method(mock, "new_client_result=", mock_set_new_client_result, 1);
     rb_define_singleton_method(mock, "reset", mock_reset, 0);
 #endif
 }

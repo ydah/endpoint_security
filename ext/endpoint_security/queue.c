@@ -1,6 +1,6 @@
 /* queue.c
  * Calling threads: producer = ES handler (no GVL), consumer = Ruby dispatcher (GVL).
- * The watchdog scans occupied slots without taking a lock.
+ * The watchdog reads occupied slots without taking a lock.
  */
 #include "queue.h"
 
