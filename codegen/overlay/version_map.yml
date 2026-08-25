@@ -1,6 +1,4 @@
 ---
-es_muted_path_t:
-  type: 5
 es_process_t:
   tty: 2
   start_time: 3
@@ -14,8 +12,6 @@ es_event_exec_t:
   last_fd: 4
   image_cputype: 6
   image_cpusubtype: 6
-es_event_tcc_modify_t:
-  instigator: 9
 es_event_mount_t:
   disposition: 8
 es_event_remount_t:
@@ -39,65 +35,57 @@ es_event_get_task_inspect_t:
 es_event_get_task_name_t:
   type: 5
 es_event_file_provider_materialize_t:
-  instigator: 9
-es_event_uipc_connect_t:
-  type: 5
-es_event_setacl_t:
-  acl: 2
-es_event_proc_check_t:
-  type: 5
-es_event_proc_suspend_resume_t:
-  type: 5
+  instigator_token: 8
 es_event_authentication_od_t:
-  instigator: 9
+  instigator_token: 8
 es_event_authentication_touchid_t:
-  instigator: 9
+  instigator_token: 8
 es_event_authentication_token_t:
-  instigator: 9
-es_event_authentication_auto_unlock_t:
-  type: 5
-es_event_authentication_t:
-  type: 5
+  instigator_token: 8
 es_event_xp_malware_detected_t:
   detected_executable: 10
 es_event_btm_launch_item_add_t:
-  instigator: 9
+  instigator_token: 8
+  app_token: 8
 es_event_btm_launch_item_remove_t:
-  instigator: 9
+  instigator_token: 8
+  app_token: 8
 es_event_profile_add_t:
-  instigator: 9
+  instigator_token: 8
 es_event_profile_remove_t:
-  instigator: 9
+  instigator_token: 8
 es_event_authorization_petition_t:
-  instigator: 9
+  instigator_token: 8
+  petitioner_token: 8
 es_event_authorization_judgement_t:
-  instigator: 9
+  instigator_token: 8
+  petitioner_token: 8
 es_event_od_group_add_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_group_remove_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_group_set_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_modify_password_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_disable_user_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_enable_user_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_attribute_value_add_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_attribute_value_remove_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_attribute_set_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_create_user_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_create_group_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_delete_user_t:
-  instigator: 9
+  instigator_token: 8
 es_event_od_delete_group_t:
-  instigator: 9
+  instigator_token: 8
 es_message_t:
   seq_num: 2
   thread: 4

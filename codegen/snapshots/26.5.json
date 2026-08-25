@@ -1131,7 +1131,7 @@
       {
         "name": "type",
         "type": "es_mute_path_type_t",
-        "minimum_version": 5
+        "minimum_version": 1
       },
       {
         "name": "event_count",
@@ -1477,7 +1477,7 @@
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "responsible_token",
@@ -1958,7 +1958,7 @@
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "source",
@@ -1973,7 +1973,7 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_readlink_t": [
@@ -2137,7 +2137,7 @@
       {
         "name": "type",
         "type": "int",
-        "minimum_version": 5
+        "minimum_version": 1
       },
       {
         "name": "protocol",
@@ -2159,7 +2159,7 @@
       {
         "name": "acl",
         "type": "union es_event_setacl_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1202:2)",
-        "minimum_version": 2
+        "minimum_version": 1
       }
     ],
     "es_event_pty_grant_t": [
@@ -2185,7 +2185,7 @@
       {
         "name": "type",
         "type": "es_proc_check_type_t",
-        "minimum_version": 5
+        "minimum_version": 1
       },
       {
         "name": "flavor",
@@ -2214,7 +2214,7 @@
       {
         "name": "type",
         "type": "es_proc_suspend_resume_type_t",
-        "minimum_version": 5
+        "minimum_version": 1
       }
     ],
     "es_event_trace_t": [
@@ -2292,7 +2292,7 @@
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "record_type",
@@ -2317,14 +2317,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_authentication_touchid_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "touchid_mode",
@@ -2344,14 +2344,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_authentication_token_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "pubkey_hash",
@@ -2371,7 +2371,7 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_authentication_auto_unlock_t": [
@@ -2383,7 +2383,7 @@
       {
         "name": "type",
         "type": "es_auto_unlock_type_t",
-        "minimum_version": 5
+        "minimum_version": 1
       }
     ],
     "es_event_authentication_t": [
@@ -2395,7 +2395,7 @@
       {
         "name": "type",
         "type": "es_authentication_type_t",
-        "minimum_version": 5
+        "minimum_version": 1
       },
       {
         "name": "data",
@@ -2691,7 +2691,7 @@
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "app",
@@ -2711,19 +2711,19 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t *",
-        "minimum_version": 1
+        "minimum_version": 8
       },
       {
         "name": "app_token",
         "type": "audit_token_t *",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_btm_launch_item_remove_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "app",
@@ -2738,12 +2738,12 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t *",
-        "minimum_version": 1
+        "minimum_version": 8
       },
       {
         "name": "app_token",
         "type": "audit_token_t *",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_su_t": [
@@ -2876,7 +2876,7 @@
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "is_update",
@@ -2891,14 +2891,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_profile_remove_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "profile",
@@ -2908,14 +2908,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_authorization_petition_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "petitioner",
@@ -2940,12 +2940,12 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       },
       {
         "name": "petitioner_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_authorization_result_t": [
@@ -2969,7 +2969,7 @@
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "petitioner",
@@ -2994,12 +2994,12 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       },
       {
         "name": "petitioner_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_od_member_id_t": [
@@ -3018,7 +3018,7 @@
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3048,14 +3048,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_group_remove_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3085,7 +3085,7 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_od_member_id_array_t": [
@@ -3109,7 +3109,7 @@
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3139,14 +3139,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_modify_password_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3176,14 +3176,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_disable_user_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3208,14 +3208,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_enable_user_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3240,14 +3240,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_attribute_value_add_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3287,14 +3287,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_attribute_value_remove_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3334,14 +3334,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_attribute_set_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3386,14 +3386,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_create_user_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3418,14 +3418,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_create_group_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3450,14 +3450,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_delete_user_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3482,14 +3482,14 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_od_delete_group_t": [
       {
         "name": "instigator",
         "type": "es_process_t *",
-        "minimum_version": 9
+        "minimum_version": 1
       },
       {
         "name": "error_code",
@@ -3514,7 +3514,7 @@
       {
         "name": "instigator_token",
         "type": "audit_token_t",
-        "minimum_version": 1
+        "minimum_version": 8
       }
     ],
     "es_event_xpc_connect_t": [

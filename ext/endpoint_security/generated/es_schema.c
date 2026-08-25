@@ -14,7 +14,7 @@ static const esrb_field_t fields_es_string_token_t[] = {
 };
 
 static const esrb_field_t fields_es_muted_path_t[] = {
-    {"type", "es_mute_path_type_t", offsetof(es_muted_path_t, type), 5},
+    {"type", "es_mute_path_type_t", offsetof(es_muted_path_t, type), 1},
     {"event_count", "unsigned long", offsetof(es_muted_path_t, event_count), 1},
     {"events", "const es_event_type_t *", offsetof(es_muted_path_t, events), 1},
     {"path", "es_string_token_t", offsetof(es_muted_path_t, path), 1}
@@ -117,7 +117,7 @@ static const esrb_field_t fields_es_event_tcc_modify_t[] = {
     {"identity_type", "es_tcc_identity_type_t", offsetof(es_event_tcc_modify_t, identity_type), 1},
     {"update_type", "es_tcc_event_type_t", offsetof(es_event_tcc_modify_t, update_type), 1},
     {"instigator_token", "audit_token_t", offsetof(es_event_tcc_modify_t, instigator_token), 1},
-    {"instigator", "es_process_t *", offsetof(es_event_tcc_modify_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_tcc_modify_t, instigator), 1},
     {"responsible_token", "audit_token_t *", offsetof(es_event_tcc_modify_t, responsible_token), 1},
     {"responsible", "es_process_t *", offsetof(es_event_tcc_modify_t, responsible), 1},
     {"right", "es_tcc_authorization_right_t", offsetof(es_event_tcc_modify_t, right), 1},
@@ -312,10 +312,10 @@ static const esrb_field_t fields_es_event_file_provider_update_t[] = {
 };
 
 static const esrb_field_t fields_es_event_file_provider_materialize_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_file_provider_materialize_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_file_provider_materialize_t, instigator), 1},
     {"source", "es_file_t *", offsetof(es_event_file_provider_materialize_t, source), 1},
     {"target", "es_file_t *", offsetof(es_event_file_provider_materialize_t, target), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_file_provider_materialize_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_file_provider_materialize_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_readlink_t[] = {
@@ -379,14 +379,14 @@ static const esrb_field_t fields_es_event_uipc_bind_t[] = {
 static const esrb_field_t fields_es_event_uipc_connect_t[] = {
     {"file", "es_file_t *", offsetof(es_event_uipc_connect_t, file), 1},
     {"domain", "int", offsetof(es_event_uipc_connect_t, domain), 1},
-    {"type", "int", offsetof(es_event_uipc_connect_t, type), 5},
+    {"type", "int", offsetof(es_event_uipc_connect_t, type), 1},
     {"protocol", "int", offsetof(es_event_uipc_connect_t, protocol), 1}
 };
 
 static const esrb_field_t fields_es_event_setacl_t[] = {
     {"target", "es_file_t *", offsetof(es_event_setacl_t, target), 1},
     {"set_or_clear", "es_set_or_clear_t", offsetof(es_event_setacl_t, set_or_clear), 1},
-    {"acl", "union es_event_setacl_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1202:2)", offsetof(es_event_setacl_t, acl), 2}
+    {"acl", "union es_event_setacl_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1202:2)", offsetof(es_event_setacl_t, acl), 1}
 };
 
 static const esrb_field_t fields_es_event_pty_grant_t[] = {
@@ -399,7 +399,7 @@ static const esrb_field_t fields_es_event_pty_close_t[] = {
 
 static const esrb_field_t fields_es_event_proc_check_t[] = {
     {"target", "es_process_t *", offsetof(es_event_proc_check_t, target), 1},
-    {"type", "es_proc_check_type_t", offsetof(es_event_proc_check_t, type), 5},
+    {"type", "es_proc_check_type_t", offsetof(es_event_proc_check_t, type), 1},
     {"flavor", "int", offsetof(es_event_proc_check_t, flavor), 1}
 };
 
@@ -410,7 +410,7 @@ static const esrb_field_t fields_es_event_searchfs_t[] = {
 
 static const esrb_field_t fields_es_event_proc_suspend_resume_t[] = {
     {"target", "es_process_t *", offsetof(es_event_proc_suspend_resume_t, target), 1},
-    {"type", "es_proc_suspend_resume_type_t", offsetof(es_event_proc_suspend_resume_t, type), 5}
+    {"type", "es_proc_suspend_resume_type_t", offsetof(es_event_proc_suspend_resume_t, type), 1}
 };
 
 static const esrb_field_t fields_es_event_trace_t[] = {
@@ -449,38 +449,38 @@ static const esrb_field_t fields_es_event_setregid_t[] = {
 };
 
 static const esrb_field_t fields_es_event_authentication_od_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_authentication_od_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_authentication_od_t, instigator), 1},
     {"record_type", "es_string_token_t", offsetof(es_event_authentication_od_t, record_type), 1},
     {"record_name", "es_string_token_t", offsetof(es_event_authentication_od_t, record_name), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_authentication_od_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_authentication_od_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_authentication_od_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_authentication_od_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_authentication_touchid_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_authentication_touchid_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_authentication_touchid_t, instigator), 1},
     {"touchid_mode", "es_touchid_mode_t", offsetof(es_event_authentication_touchid_t, touchid_mode), 1},
     {"has_uid", "bool", offsetof(es_event_authentication_touchid_t, has_uid), 1},
     {"uid", "union es_event_authentication_touchid_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1446:2)", offsetof(es_event_authentication_touchid_t, uid), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_authentication_touchid_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_authentication_touchid_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_authentication_token_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_authentication_token_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_authentication_token_t, instigator), 1},
     {"pubkey_hash", "es_string_token_t", offsetof(es_event_authentication_token_t, pubkey_hash), 1},
     {"token_id", "es_string_token_t", offsetof(es_event_authentication_token_t, token_id), 1},
     {"kerberos_principal", "es_string_token_t", offsetof(es_event_authentication_token_t, kerberos_principal), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_authentication_token_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_authentication_token_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_authentication_auto_unlock_t[] = {
     {"username", "es_string_token_t", offsetof(es_event_authentication_auto_unlock_t, username), 1},
-    {"type", "es_auto_unlock_type_t", offsetof(es_event_authentication_auto_unlock_t, type), 5}
+    {"type", "es_auto_unlock_type_t", offsetof(es_event_authentication_auto_unlock_t, type), 1}
 };
 
 static const esrb_field_t fields_es_event_authentication_t[] = {
     {"success", "bool", offsetof(es_event_authentication_t, success), 1},
-    {"type", "es_authentication_type_t", offsetof(es_event_authentication_t, type), 5},
+    {"type", "es_authentication_type_t", offsetof(es_event_authentication_t, type), 1},
     {"data", "union es_event_authentication_t::(unnamed at /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/EndpointSecurity/ESMessage.h:1501:2)", offsetof(es_event_authentication_t, data), 1}
 };
 
@@ -573,20 +573,20 @@ static const esrb_field_t fields_es_event_login_logout_t[] = {
 };
 
 static const esrb_field_t fields_es_event_btm_launch_item_add_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_btm_launch_item_add_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_btm_launch_item_add_t, instigator), 1},
     {"app", "es_process_t *", offsetof(es_event_btm_launch_item_add_t, app), 1},
     {"item", "es_btm_launch_item_t *", offsetof(es_event_btm_launch_item_add_t, item), 1},
     {"executable_path", "es_string_token_t", offsetof(es_event_btm_launch_item_add_t, executable_path), 1},
-    {"instigator_token", "audit_token_t *", offsetof(es_event_btm_launch_item_add_t, instigator_token), 1},
-    {"app_token", "audit_token_t *", offsetof(es_event_btm_launch_item_add_t, app_token), 1}
+    {"instigator_token", "audit_token_t *", offsetof(es_event_btm_launch_item_add_t, instigator_token), 8},
+    {"app_token", "audit_token_t *", offsetof(es_event_btm_launch_item_add_t, app_token), 8}
 };
 
 static const esrb_field_t fields_es_event_btm_launch_item_remove_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_btm_launch_item_remove_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_btm_launch_item_remove_t, instigator), 1},
     {"app", "es_process_t *", offsetof(es_event_btm_launch_item_remove_t, app), 1},
     {"item", "es_btm_launch_item_t *", offsetof(es_event_btm_launch_item_remove_t, item), 1},
-    {"instigator_token", "audit_token_t *", offsetof(es_event_btm_launch_item_remove_t, instigator_token), 1},
-    {"app_token", "audit_token_t *", offsetof(es_event_btm_launch_item_remove_t, app_token), 1}
+    {"instigator_token", "audit_token_t *", offsetof(es_event_btm_launch_item_remove_t, instigator_token), 8},
+    {"app_token", "audit_token_t *", offsetof(es_event_btm_launch_item_remove_t, app_token), 8}
 };
 
 static const esrb_field_t fields_es_event_su_t[] = {
@@ -623,26 +623,26 @@ static const esrb_field_t fields_es_event_sudo_t[] = {
 };
 
 static const esrb_field_t fields_es_event_profile_add_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_profile_add_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_profile_add_t, instigator), 1},
     {"is_update", "bool", offsetof(es_event_profile_add_t, is_update), 1},
     {"profile", "es_profile_t *", offsetof(es_event_profile_add_t, profile), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_profile_add_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_profile_add_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_profile_remove_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_profile_remove_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_profile_remove_t, instigator), 1},
     {"profile", "es_profile_t *", offsetof(es_event_profile_remove_t, profile), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_profile_remove_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_profile_remove_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_authorization_petition_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_authorization_petition_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_authorization_petition_t, instigator), 1},
     {"petitioner", "es_process_t *", offsetof(es_event_authorization_petition_t, petitioner), 1},
     {"flags", "unsigned int", offsetof(es_event_authorization_petition_t, flags), 1},
     {"right_count", "unsigned long", offsetof(es_event_authorization_petition_t, right_count), 1},
     {"rights", "es_string_token_t *", offsetof(es_event_authorization_petition_t, rights), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_authorization_petition_t, instigator_token), 1},
-    {"petitioner_token", "audit_token_t", offsetof(es_event_authorization_petition_t, petitioner_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_authorization_petition_t, instigator_token), 8},
+    {"petitioner_token", "audit_token_t", offsetof(es_event_authorization_petition_t, petitioner_token), 8}
 };
 
 static const esrb_field_t fields_es_authorization_result_t[] = {
@@ -652,13 +652,13 @@ static const esrb_field_t fields_es_authorization_result_t[] = {
 };
 
 static const esrb_field_t fields_es_event_authorization_judgement_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_authorization_judgement_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_authorization_judgement_t, instigator), 1},
     {"petitioner", "es_process_t *", offsetof(es_event_authorization_judgement_t, petitioner), 1},
     {"return_code", "int", offsetof(es_event_authorization_judgement_t, return_code), 1},
     {"result_count", "unsigned long", offsetof(es_event_authorization_judgement_t, result_count), 1},
     {"results", "es_authorization_result_t *", offsetof(es_event_authorization_judgement_t, results), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_authorization_judgement_t, instigator_token), 1},
-    {"petitioner_token", "audit_token_t", offsetof(es_event_authorization_judgement_t, petitioner_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_authorization_judgement_t, instigator_token), 8},
+    {"petitioner_token", "audit_token_t", offsetof(es_event_authorization_judgement_t, petitioner_token), 8}
 };
 
 static const esrb_field_t fields_es_od_member_id_t[] = {
@@ -667,23 +667,23 @@ static const esrb_field_t fields_es_od_member_id_t[] = {
 };
 
 static const esrb_field_t fields_es_event_od_group_add_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_group_add_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_group_add_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_group_add_t, error_code), 1},
     {"group_name", "es_string_token_t", offsetof(es_event_od_group_add_t, group_name), 1},
     {"member", "es_od_member_id_t *", offsetof(es_event_od_group_add_t, member), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_group_add_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_group_add_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_group_add_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_group_add_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_group_remove_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_group_remove_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_group_remove_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_group_remove_t, error_code), 1},
     {"group_name", "es_string_token_t", offsetof(es_event_od_group_remove_t, group_name), 1},
     {"member", "es_od_member_id_t *", offsetof(es_event_od_group_remove_t, member), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_group_remove_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_group_remove_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_group_remove_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_group_remove_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_od_member_id_array_t[] = {
@@ -693,45 +693,45 @@ static const esrb_field_t fields_es_od_member_id_array_t[] = {
 };
 
 static const esrb_field_t fields_es_event_od_group_set_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_group_set_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_group_set_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_group_set_t, error_code), 1},
     {"group_name", "es_string_token_t", offsetof(es_event_od_group_set_t, group_name), 1},
     {"members", "es_od_member_id_array_t *", offsetof(es_event_od_group_set_t, members), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_group_set_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_group_set_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_group_set_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_group_set_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_modify_password_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_modify_password_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_modify_password_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_modify_password_t, error_code), 1},
     {"account_type", "es_od_account_type_t", offsetof(es_event_od_modify_password_t, account_type), 1},
     {"account_name", "es_string_token_t", offsetof(es_event_od_modify_password_t, account_name), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_modify_password_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_modify_password_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_modify_password_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_modify_password_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_disable_user_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_disable_user_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_disable_user_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_disable_user_t, error_code), 1},
     {"user_name", "es_string_token_t", offsetof(es_event_od_disable_user_t, user_name), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_disable_user_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_disable_user_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_disable_user_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_disable_user_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_enable_user_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_enable_user_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_enable_user_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_enable_user_t, error_code), 1},
     {"user_name", "es_string_token_t", offsetof(es_event_od_enable_user_t, user_name), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_enable_user_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_enable_user_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_enable_user_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_enable_user_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_attribute_value_add_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_attribute_value_add_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_attribute_value_add_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_attribute_value_add_t, error_code), 1},
     {"record_type", "es_od_record_type_t", offsetof(es_event_od_attribute_value_add_t, record_type), 1},
     {"record_name", "es_string_token_t", offsetof(es_event_od_attribute_value_add_t, record_name), 1},
@@ -739,11 +739,11 @@ static const esrb_field_t fields_es_event_od_attribute_value_add_t[] = {
     {"attribute_value", "es_string_token_t", offsetof(es_event_od_attribute_value_add_t, attribute_value), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_attribute_value_add_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_attribute_value_add_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_attribute_value_add_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_attribute_value_add_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_attribute_value_remove_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_attribute_value_remove_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_attribute_value_remove_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_attribute_value_remove_t, error_code), 1},
     {"record_type", "es_od_record_type_t", offsetof(es_event_od_attribute_value_remove_t, record_type), 1},
     {"record_name", "es_string_token_t", offsetof(es_event_od_attribute_value_remove_t, record_name), 1},
@@ -751,11 +751,11 @@ static const esrb_field_t fields_es_event_od_attribute_value_remove_t[] = {
     {"attribute_value", "es_string_token_t", offsetof(es_event_od_attribute_value_remove_t, attribute_value), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_attribute_value_remove_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_attribute_value_remove_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_attribute_value_remove_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_attribute_value_remove_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_attribute_set_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_attribute_set_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_attribute_set_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_attribute_set_t, error_code), 1},
     {"record_type", "es_od_record_type_t", offsetof(es_event_od_attribute_set_t, record_type), 1},
     {"record_name", "es_string_token_t", offsetof(es_event_od_attribute_set_t, record_name), 1},
@@ -764,43 +764,43 @@ static const esrb_field_t fields_es_event_od_attribute_set_t[] = {
     {"attribute_values", "es_string_token_t *", offsetof(es_event_od_attribute_set_t, attribute_values), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_attribute_set_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_attribute_set_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_attribute_set_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_attribute_set_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_create_user_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_create_user_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_create_user_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_create_user_t, error_code), 1},
     {"user_name", "es_string_token_t", offsetof(es_event_od_create_user_t, user_name), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_create_user_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_create_user_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_create_user_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_create_user_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_create_group_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_create_group_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_create_group_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_create_group_t, error_code), 1},
     {"group_name", "es_string_token_t", offsetof(es_event_od_create_group_t, group_name), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_create_group_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_create_group_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_create_group_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_create_group_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_delete_user_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_delete_user_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_delete_user_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_delete_user_t, error_code), 1},
     {"user_name", "es_string_token_t", offsetof(es_event_od_delete_user_t, user_name), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_delete_user_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_delete_user_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_delete_user_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_delete_user_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_od_delete_group_t[] = {
-    {"instigator", "es_process_t *", offsetof(es_event_od_delete_group_t, instigator), 9},
+    {"instigator", "es_process_t *", offsetof(es_event_od_delete_group_t, instigator), 1},
     {"error_code", "int", offsetof(es_event_od_delete_group_t, error_code), 1},
     {"group_name", "es_string_token_t", offsetof(es_event_od_delete_group_t, group_name), 1},
     {"node_name", "es_string_token_t", offsetof(es_event_od_delete_group_t, node_name), 1},
     {"db_path", "es_string_token_t", offsetof(es_event_od_delete_group_t, db_path), 1},
-    {"instigator_token", "audit_token_t", offsetof(es_event_od_delete_group_t, instigator_token), 1}
+    {"instigator_token", "audit_token_t", offsetof(es_event_od_delete_group_t, instigator_token), 8}
 };
 
 static const esrb_field_t fields_es_event_xpc_connect_t[] = {
