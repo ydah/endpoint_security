@@ -237,6 +237,8 @@ RSpec.describe ES::Client do
     expect { described_class.new(auth_default: :maybe) }.to raise_error(ArgumentError)
     expect { described_class.new(on_full: :block) }.to raise_error(ArgumentError)
     expect { described_class.new(probe: :sometimes) }.to raise_error(ArgumentError)
+    expect { described_class.new(deadline_margin: Float::NAN) }.to raise_error(ArgumentError)
+    expect { described_class.new(deadline_margin: Float::INFINITY) }.to raise_error(ArgumentError)
   end
 
   it "rejects inherited client operations after fork" do

@@ -4,6 +4,7 @@
 #include "field.h"
 
 #include <bsm/libbsm.h>
+#include <limits.h>
 #include <ruby/encoding.h>
 #include <string.h>
 #include <sys/acl.h>
@@ -115,6 +116,9 @@ time_value(time_t seconds, long nanoseconds)
 static VALUE
 string_token_value(const es_string_token_t *token)
 {
+    if (token->length > LONG_MAX) {
+        return Qnil;
+    }
     VALUE string = token->data == NULL ? rb_str_new("", 0) : rb_str_new(token->data, (long)token->length);
     VALUE mode = rb_funcall(rb_path2class("EndpointSecurity"), rb_intern("string_encoding"), 0);
     rb_enc_associate(string, mode == ID2SYM(rb_intern("binary")) ? rb_ascii8bit_encoding() : rb_utf8_encoding());
@@ -202,6 +206,9 @@ destination_union(const esrb_view_t *view, bool create)
             view->owner, existing_file, "es_file_t", view->message_version, view->strict_version);
         return tagged_union_value("existing_file", file);
     }
+    if (type != ES_DESTINATION_TYPE_NEW_PATH) {
+        return tagged_union_value("unknown", Qnil);
+    }
 
     VALUE path = rb_hash_new();
     rb_hash_aset(path, ID2SYM(rb_intern("dir")),
@@ -257,6 +264,9 @@ od_member_union(const esrb_view_t *view)
     if (member->member_type == ES_OD_MEMBER_TYPE_USER_NAME) {
         return tagged_union_value("name", string_token_value(&member->member_value.name));
     }
+    if (member->member_type != ES_OD_MEMBER_TYPE_USER_UUID && member->member_type != ES_OD_MEMBER_TYPE_GROUP_UUID) {
+        return tagged_union_value("unknown", Qnil);
+    }
     return tagged_union_value("uuid", hex_value(member->member_value.uuid, sizeof(uuid_t)));
 }
 
@@ -273,6 +283,9 @@ od_member_array_union(const esrb_view_t *view)
             rb_ary_push(values, string_token_value(&members->member_array.names[index]));
         }
         return tagged_union_value("names", values);
+    }
+    if (members->member_type != ES_OD_MEMBER_TYPE_USER_UUID && members->member_type != ES_OD_MEMBER_TYPE_GROUP_UUID) {
+        return tagged_union_value("unknown", Qnil);
     }
     for (size_t index = 0; index < members->member_count; index++) {
         rb_ary_push(values, hex_value(members->member_array.uuids[index], sizeof(uuid_t)));
@@ -328,14 +341,19 @@ read_union(const esrb_view_t *view, const esrb_field_t *field)
         if (event->file_type == ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_PATH) {
             return tagged_union_value("path", string_token_value(&event->file.file_path));
         }
+        if (event->file_type != ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_FILE) {
+            return tagged_union_value("unknown", Qnil);
+        }
         VALUE file = esrb_view_wrap(
             view->owner, event->file.file, "es_file_t", view->message_version, view->strict_version);
         return tagged_union_value("file", file);
     }
     if (strcmp(field->name, "acl") == 0 && strcmp(schema, "es_event_setacl_t") == 0) {
         const es_event_setacl_t *event = (const es_event_setacl_t *)view->pointer;
-        return tagged_union_value(
-            event->set_or_clear == ES_SET ? "set" : "clear", event->set_or_clear == ES_SET ? acl_value(event->acl.set) : Qnil);
+        if (event->set_or_clear == ES_SET) {
+            return tagged_union_value("set", acl_value(event->acl.set));
+        }
+        return tagged_union_value(event->set_or_clear == ES_CLEAR ? "clear" : "unknown", Qnil);
     }
     return Qundef;
 }
@@ -514,6 +532,9 @@ read_field(VALUE self, VALUE name_value)
     }
     if (strcmp(type, "es_token_t") == 0) {
         const es_token_t *token = (const es_token_t *)address;
+        if (token->size > LONG_MAX) {
+            return Qnil;
+        }
         return token->data == NULL ? rb_str_new("", 0) : rb_str_new((const char *)token->data, (long)token->size);
     }
     if (strcmp(type, "audit_token_t") == 0) {

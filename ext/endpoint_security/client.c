@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <mach/mach_time.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -275,7 +276,7 @@ client_initialize(int argc, VALUE *argv, VALUE self)
             }
         }
     }
-    if (client->deadline_margin < 0.0 || client->deadline_margin > 1.0) {
+    if (!isfinite(client->deadline_margin) || client->deadline_margin < 0.0 || client->deadline_margin > 1.0) {
         rb_raise(rb_eArgError, "deadline_margin must be between 0.0 and 1.0");
     }
     if (!esrb_queue_init(&client->queue, queue_depth)) {
@@ -285,8 +286,17 @@ client_initialize(int argc, VALUE *argv, VALUE self)
         esrb_queue_destroy(&client->queue);
         rb_sys_fail("pipe");
     }
-    fcntl(client->wakeup_fd[0], F_SETFL, O_NONBLOCK);
-    fcntl(client->wakeup_fd[1], F_SETFL, O_NONBLOCK);
+    if (fcntl(client->wakeup_fd[0], F_SETFL, O_NONBLOCK) == -1 ||
+        fcntl(client->wakeup_fd[1], F_SETFL, O_NONBLOCK) == -1) {
+        int error = errno;
+        close(client->wakeup_fd[0]);
+        close(client->wakeup_fd[1]);
+        client->wakeup_fd[0] = -1;
+        client->wakeup_fd[1] = -1;
+        esrb_queue_destroy(&client->queue);
+        errno = error;
+        rb_sys_fail("fcntl");
+    }
 
     mach_timebase_info_data_t info;
     mach_timebase_info(&info);
