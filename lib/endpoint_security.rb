@@ -6,6 +6,7 @@ require_relative "endpoint_security/diagnostics"
 require_relative "endpoint_security/generated/event_types"
 require_relative "endpoint_security/generated/availability"
 require_relative "endpoint_security/endpoint_security"
+require_relative "endpoint_security/client"
 
 module EndpointSecurity
 end
