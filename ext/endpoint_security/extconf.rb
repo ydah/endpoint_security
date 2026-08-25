@@ -12,6 +12,8 @@ abort "xcrun could not locate the macOS SDK; install Xcode Command Line Tools" u
 sdk = sdk.strip
 dir_config("endpoint_security", File.join(sdk, "usr/include"), File.join(sdk, "usr/lib"))
 $CFLAGS << " -std=c11 -fblocks -Wall -Wextra -Wno-unused-parameter -Werror=implicit-function-declaration"
+$CFLAGS << " -Wno-default-const-init-field-unsafe" if try_compile("int main(void) { return 0; }",
+                                                                  "-Werror -Wno-default-const-init-field-unsafe")
 $CFLAGS << " -fvisibility=hidden -mmacosx-version-min=13.0"
 $LDFLAGS << " -isysroot #{sdk.shellescape} -mmacosx-version-min=13.0"
 $INCFLAGS << " -I#{File.expand_path("../../support/esmock", __dir__).shellescape}"
