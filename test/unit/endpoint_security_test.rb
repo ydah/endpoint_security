@@ -26,4 +26,11 @@ RSpec.describe EndpointSecurity do
   ensure
     ES.string_encoding = :utf8
   end
+
+  it "builds a portable source gem for both supported architectures" do
+    specification = Gem::Specification.load(File.expand_path("../../endpoint_security.gemspec", __dir__))
+
+    expect(specification.platform.to_s).to eq("ruby")
+    expect(specification.extensions).to eq(["ext/endpoint_security/extconf.rb"])
+  end
 end
