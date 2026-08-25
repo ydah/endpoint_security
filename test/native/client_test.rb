@@ -134,5 +134,6 @@ RSpec.describe ES::Client do
   it "validates safety-sensitive client options" do
     expect { described_class.new(auth_default: :maybe) }.to raise_error(ArgumentError)
     expect { described_class.new(on_full: :block) }.to raise_error(ArgumentError)
+    expect { described_class.new(probe: :sometimes) }.to raise_error(ArgumentError)
   end
 end

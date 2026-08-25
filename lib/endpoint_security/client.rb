@@ -29,21 +29,29 @@ module EndpointSecurity
     alias __native_stats stats
 
     # @return [Client]
-    def initialize(mute_self: true, subscribe: nil, **)
+    def initialize(mute_self: true, subscribe: nil, probe: :lazy, **)
+      raise ArgumentError, "probe must be :lazy, :eager, or :off" unless %i[lazy eager off].include?(probe.to_sym)
+
       __native_initialize(mute_self: mute_self, **)
+      @probe = probe.to_sym
       @handlers = {}
       @subscriptions = []
       @errors = 0
       @reported_timeouts = 0
       @running = false
       mute_process(pid: ::Process.pid) if mute_self
+      if @probe == :eager
+        EventType.all.each do |event|
+          Availability.probe_cache[event] = probe_event(event) if Availability.supported_event?(event)
+        end
+      end
       self.subscribe(subscribe) if subscribe
     end
 
     # @return [Array<Symbol>]
     def subscribe(*events, skip_unsupported: true, **_options)
-      events = events.flatten.map(&:to_sym)
-      unsupported = events.reject { |event| Availability.supported_event?(event) }
+      events = events.flatten.map(&:to_sym) - @subscriptions
+      unsupported = events.reject { |event| supported_event?(event) }
       if !skip_unsupported && !unsupported.empty?
         raise UnsupportedEventError, "unsupported events: #{unsupported.join(", ")}"
       end
@@ -51,7 +59,11 @@ module EndpointSecurity
       events -= unsupported
       return @subscriptions if events.empty?
 
-      __subscribe(events.map { |event| EventType.value(event) })
+      begin
+        __subscribe(events.map { |event| EventType.value(event) })
+      rescue SubscriptionError => e
+        raise SubscriptionError, "failed to subscribe: #{events.join(", ")} (#{e.message})"
+      end
       @subscriptions |= events
     end
 
@@ -187,6 +199,22 @@ module EndpointSecurity
     def muted_processes = __muted_processes
 
     private
+
+    def supported_event?(event)
+      return false unless Availability.supported_event?(event)
+      return true if @probe == :off
+
+      Availability.probe_cache.fetch(event) { Availability.probe_cache[event] = probe_event(event) }
+    end
+
+    def probe_event(event)
+      value = EventType.value(event)
+      __subscribe([value])
+      __unsubscribe([value])
+      true
+    rescue SubscriptionError
+      false
+    end
 
     def change_path_mute(action, path, type, events)
       __mute_path(action, String(path), PATH_TYPES.fetch(type.to_sym), events.map { |event| EventType.value(event) })
