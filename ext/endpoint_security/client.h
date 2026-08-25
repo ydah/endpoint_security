@@ -21,9 +21,16 @@ typedef struct {
     _Atomic uint64_t delivered;
     _Atomic uint64_t timeouts;
     _Atomic uint64_t errors;
+    _Atomic uint64_t seq_gaps;
+    _Atomic uint64_t leaked_messages;
+    _Atomic uint64_t last_global_seq;
+    _Atomic bool seen_global_seq;
+    _Atomic uint64_t last_event_seq[ES_EVENT_TYPE_LAST];
+    _Atomic bool seen_event_seq[ES_EVENT_TYPE_LAST];
     es_auth_result_t default_auth;
     bool default_cache;
     bool strict_cache;
+    bool strict_version;
     double deadline_margin;
     uint64_t min_margin_ticks;
     pid_t owner_pid;

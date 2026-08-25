@@ -14,6 +14,7 @@ module EndpointSecurity
         version: version,
         event_type: event_type,
         action_type: action_type,
+        result: result,
         time: time,
         mach_time: mach_time,
         deadline: deadline,

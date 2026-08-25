@@ -33,7 +33,8 @@ extern const esrb_event_schema_t esrb_event_schemas[];
 extern const size_t esrb_event_schema_count;
 
 void esrb_init_field(VALUE endpoint_security);
-VALUE esrb_view_wrap(VALUE owner, const void *pointer, const char *schema_name, uint32_t message_version);
-VALUE esrb_event_wrap(VALUE owner, const es_message_t *message);
+VALUE esrb_view_wrap(
+    VALUE owner, const void *pointer, const char *schema_name, uint32_t message_version, bool strict_version);
+VALUE esrb_event_wrap(VALUE owner, const es_message_t *message, bool strict_version);
 
 #endif

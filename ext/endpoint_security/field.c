@@ -14,6 +14,7 @@ typedef struct {
     const unsigned char *pointer;
     const esrb_schema_t *schema;
     uint32_t message_version;
+    bool strict_version;
 } esrb_view_t;
 
 static VALUE c_native_view;
@@ -81,7 +82,7 @@ class_for_schema(const char *schema)
 }
 
 VALUE
-esrb_view_wrap(VALUE owner, const void *pointer, const char *schema_name, uint32_t message_version)
+esrb_view_wrap(VALUE owner, const void *pointer, const char *schema_name, uint32_t message_version, bool strict_version)
 {
     if (pointer == NULL) {
         return Qnil;
@@ -97,6 +98,7 @@ esrb_view_wrap(VALUE owner, const void *pointer, const char *schema_name, uint32
     view->pointer = pointer;
     view->schema = schema;
     view->message_version = message_version;
+    view->strict_version = strict_version;
     return object;
 }
 
@@ -104,6 +106,15 @@ static VALUE
 time_value(time_t seconds, long nanoseconds)
 {
     return rb_time_nano_new(seconds, nanoseconds);
+}
+
+static VALUE
+string_token_value(const es_string_token_t *token)
+{
+    VALUE string = token->data == NULL ? rb_str_new("", 0) : rb_str_new(token->data, (long)token->length);
+    VALUE mode = rb_funcall(rb_path2class("EndpointSecurity"), rb_intern("string_encoding"), 0);
+    rb_enc_associate(string, mode == ID2SYM(rb_intern("binary")) ? rb_ascii8bit_encoding() : rb_utf8_encoding());
+    return string;
 }
 
 static VALUE
@@ -175,14 +186,21 @@ read_field(VALUE self, VALUE name_value)
         return Qundef;
     }
     if (field->minimum_version > view->message_version) {
+        if (view->strict_version) {
+            rb_raise(rb_path2class("EndpointSecurity::FieldUnavailableError"),
+                "%s requires message version %u (got %u)", field->name, field->minimum_version, view->message_version);
+        }
         return Qnil;
     }
 
     const unsigned char *address = view->pointer + field->offset;
     const char *type = field->type;
     if (strcmp(type, "es_string_token_t") == 0) {
-        const es_string_token_t *token = (const es_string_token_t *)address;
-        return token->data == NULL ? rb_utf8_str_new("", 0) : rb_utf8_str_new(token->data, (long)token->length);
+        return string_token_value((const es_string_token_t *)address);
+    }
+    if (strcmp(type, "es_string_token_t *") == 0) {
+        const es_string_token_t *token = *(const es_string_token_t *const *)address;
+        return token == NULL ? Qnil : string_token_value(token);
     }
     if (strcmp(type, "es_token_t") == 0) {
         const es_token_t *token = (const es_token_t *)address;
@@ -190,6 +208,10 @@ read_field(VALUE self, VALUE name_value)
     }
     if (strcmp(type, "audit_token_t") == 0) {
         return audit_token_value((const audit_token_t *)address);
+    }
+    if (strcmp(type, "audit_token_t *") == 0) {
+        const audit_token_t *token = *(const audit_token_t *const *)address;
+        return token == NULL ? Qnil : audit_token_value(token);
     }
     if (strcmp(type, "struct stat") == 0) {
         return stat_value((const struct stat *)address);
@@ -213,7 +235,10 @@ read_field(VALUE self, VALUE name_value)
     referenced_schema_name(type, schema_name, sizeof(schema_name));
     if (schema_name[0] != '\0' && find_schema(schema_name) != NULL) {
         const void *nested = strchr(type, '*') == NULL ? address : *(const void *const *)address;
-        return esrb_view_wrap(view->owner, nested, schema_name, view->message_version);
+        return esrb_view_wrap(view->owner, nested, schema_name, view->message_version, view->strict_version);
+    }
+    if (strchr(type, '*') != NULL) {
+        return Qnil;
     }
 
     if (strstr(type, "uint64_t") || strstr(type, "unsigned long") || strcmp(type, "size_t") == 0) {
@@ -248,9 +273,7 @@ field_names(VALUE self)
     VALUE names = rb_ary_new_capa((long)view->schema->field_count);
     for (size_t index = 0; index < view->schema->field_count; index++) {
         const esrb_field_t *field = &view->schema->fields[index];
-        if (field->minimum_version <= view->message_version) {
-            rb_ary_push(names, ID2SYM(rb_intern(field->name)));
-        }
+        rb_ary_push(names, ID2SYM(rb_intern(field->name)));
     }
     return names;
 }
@@ -277,7 +300,7 @@ exec_values(VALUE self, VALUE kind_value)
         values = rb_ary_new_capa(count);
         for (uint32_t index = 0; index < count; index++) {
             es_string_token_t token = kind == rb_intern("args") ? es_exec_arg(event, index) : es_exec_env(event, index);
-            rb_ary_push(values, token.data == NULL ? rb_utf8_str_new("", 0) : rb_utf8_str_new(token.data, (long)token.length));
+            rb_ary_push(values, string_token_value(&token));
         }
         return values;
     }
@@ -285,7 +308,8 @@ exec_values(VALUE self, VALUE kind_value)
         count = es_exec_fd_count(event);
         values = rb_ary_new_capa(count);
         for (uint32_t index = 0; index < count; index++) {
-            rb_ary_push(values, esrb_view_wrap(view->owner, es_exec_fd(event, index), "es_fd_t", view->message_version));
+            rb_ary_push(values,
+                esrb_view_wrap(view->owner, es_exec_fd(event, index), "es_fd_t", view->message_version, view->strict_version));
         }
         return values;
     }
@@ -293,7 +317,7 @@ exec_values(VALUE self, VALUE kind_value)
 }
 
 VALUE
-esrb_event_wrap(VALUE owner, const es_message_t *message)
+esrb_event_wrap(VALUE owner, const es_message_t *message, bool strict_version)
 {
     for (size_t index = 0; index < esrb_event_schema_count; index++) {
         const esrb_event_schema_t *event = &esrb_event_schemas[index];
@@ -302,7 +326,7 @@ esrb_event_wrap(VALUE owner, const es_message_t *message)
         }
         const unsigned char *address = (const unsigned char *)&message->event + event->offset;
         const void *pointer = event->indirect ? *(const void *const *)address : address;
-        return esrb_view_wrap(owner, pointer, event->schema, message->version);
+        return esrb_view_wrap(owner, pointer, event->schema, message->version, strict_version);
     }
     return Qnil;
 }

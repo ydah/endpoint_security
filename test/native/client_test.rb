@@ -115,4 +115,24 @@ RSpec.describe ES::Client do
   ensure
     client&.close
   end
+
+  it "enforces message versions and exposes typed process metadata" do
+    client = described_class.new(queue_depth: 8, strict_version: true, subscribe: :notify_exec, mute_self: false)
+    ES::Mock.inject(client, event: ES::EventType.value(:notify_exec), auth: false)
+    message = client.send(:__drain, 1).first
+
+    expect(client.subscriptions).to eq([:notify_exec])
+    expect(message.result).to eq(:allow)
+    expect(message.raw_pointer).to be_a(Integer)
+    expect(message.process.codesigning_flags).to be_a(ES::CSFlags)
+    expect { message.process.cs_validation_category }.to raise_error(ES::FieldUnavailableError)
+  ensure
+    message&.__auto_release!
+    client&.close
+  end
+
+  it "validates safety-sensitive client options" do
+    expect { described_class.new(auth_default: :maybe) }.to raise_error(ArgumentError)
+    expect { described_class.new(on_full: :block) }.to raise_error(ArgumentError)
+  end
 end

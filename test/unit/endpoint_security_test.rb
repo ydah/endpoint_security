@@ -18,4 +18,11 @@ RSpec.describe EndpointSecurity do
     expect(ES::Diagnostics.explain(:err_not_privileged)).to include("root")
     expect(ES::Diagnostics.explain(:err_not_permitted)).to include("Full Disk Access")
   end
+
+  it "validates native string token encoding" do
+    expect { ES.string_encoding = :invalid }.to raise_error(ArgumentError)
+    expect(ES.string_encoding = :binary).to eq(:binary)
+  ensure
+    ES.string_encoding = :utf8
+  end
 end

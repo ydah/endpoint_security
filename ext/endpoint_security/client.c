@@ -172,8 +172,29 @@ deadline_fire_time(esrb_client_t *client, uint64_t deadline)
 }
 
 static void
+record_sequence_gaps(esrb_client_t *client, const es_message_t *message)
+{
+    if (message->version >= 2 && message->event_type >= 0 && message->event_type < ES_EVENT_TYPE_LAST) {
+        size_t index = (size_t)message->event_type;
+        uint64_t previous = atomic_exchange_explicit(&client->last_event_seq[index], message->seq_num, memory_order_relaxed);
+        bool seen = atomic_exchange_explicit(&client->seen_event_seq[index], true, memory_order_relaxed);
+        if (seen && message->seq_num > previous + 1) {
+            atomic_fetch_add_explicit(&client->seq_gaps, message->seq_num - previous - 1, memory_order_relaxed);
+        }
+    }
+    if (message->version >= 4) {
+        uint64_t previous = atomic_exchange_explicit(&client->last_global_seq, message->global_seq_num, memory_order_relaxed);
+        bool seen = atomic_exchange_explicit(&client->seen_global_seq, true, memory_order_relaxed);
+        if (seen && message->global_seq_num > previous + 1) {
+            atomic_fetch_add_explicit(&client->seq_gaps, message->global_seq_num - previous - 1, memory_order_relaxed);
+        }
+    }
+}
+
+static void
 handle_message(esrb_client_t *client, es_client_t *native_client, const es_message_t *message)
 {
+    record_sequence_gaps(client, message);
     es_retain_message(message);
     esrb_slot_t *slot = esrb_queue_enqueue(&client->queue);
     if (slot == NULL) {
@@ -212,6 +233,7 @@ client_initialize(int argc, VALUE *argv, VALUE self)
     client->default_auth = ES_AUTH_RESULT_ALLOW;
     client->default_cache = false;
     client->strict_cache = false;
+    client->strict_version = false;
     client->deadline_margin = 0.2;
     uint64_t min_margin_ns = 5000000ULL;
     if (!NIL_P(options)) {
@@ -220,12 +242,28 @@ client_initialize(int argc, VALUE *argv, VALUE self)
         VALUE margin = rb_hash_aref(options, ID2SYM(rb_intern("deadline_margin")));
         VALUE minimum = rb_hash_aref(options, ID2SYM(rb_intern("min_margin_ns")));
         VALUE strict_cache = rb_hash_aref(options, ID2SYM(rb_intern("strict_cache")));
+        VALUE strict_version = rb_hash_aref(options, ID2SYM(rb_intern("strict_version")));
+        VALUE default_cache = rb_hash_aref(options, ID2SYM(rb_intern("default_cache")));
+        VALUE on_full = rb_hash_aref(options, ID2SYM(rb_intern("on_full")));
         queue_depth = NIL_P(depth) ? queue_depth : NUM2SIZET(depth);
         client->deadline_margin = NIL_P(margin) ? client->deadline_margin : NUM2DBL(margin);
         min_margin_ns = NIL_P(minimum) ? min_margin_ns : NUM2ULL(minimum);
         client->strict_cache = RTEST(strict_cache);
-        if (!NIL_P(auth) && SYM2ID(auth) == rb_intern("deny")) {
-            client->default_auth = ES_AUTH_RESULT_DENY;
+        client->strict_version = RTEST(strict_version);
+        client->default_cache = RTEST(default_cache);
+        if (!NIL_P(on_full)) {
+            Check_Type(on_full, T_SYMBOL);
+            if (SYM2ID(on_full) != rb_intern("drop") && SYM2ID(on_full) != rb_intern("respond_default")) {
+                rb_raise(rb_eArgError, "on_full must be :drop or :respond_default");
+            }
+        }
+        if (!NIL_P(auth)) {
+            Check_Type(auth, T_SYMBOL);
+            if (SYM2ID(auth) == rb_intern("deny")) {
+                client->default_auth = ES_AUTH_RESULT_DENY;
+            } else if (SYM2ID(auth) != rb_intern("allow")) {
+                rb_raise(rb_eArgError, "auth_default must be :allow or :deny");
+            }
         }
     }
     if (client->deadline_margin < 0.0 || client->deadline_margin > 1.0) {
@@ -250,6 +288,14 @@ client_initialize(int argc, VALUE *argv, VALUE self)
     atomic_init(&client->delivered, 0);
     atomic_init(&client->timeouts, 0);
     atomic_init(&client->errors, 0);
+    atomic_init(&client->seq_gaps, 0);
+    atomic_init(&client->leaked_messages, 0);
+    atomic_init(&client->last_global_seq, 0);
+    atomic_init(&client->seen_global_seq, false);
+    for (size_t index = 0; index < ES_EVENT_TYPE_LAST; index++) {
+        atomic_init(&client->last_event_seq[index], 0);
+        atomic_init(&client->seen_event_seq[index], false);
+    }
     atomic_store_explicit(&client->closed, false, memory_order_release);
 
     es_new_client_result_t result = es_new_client(&client->client, ^(es_client_t *native, const es_message_t *message) {
@@ -386,8 +432,8 @@ client_stats(VALUE self)
     SET_STAT("errors", atomic_load_explicit(&client->errors, memory_order_relaxed));
     SET_STAT("queue_depth_max", atomic_load_explicit(&client->queue.depth_max, memory_order_relaxed));
     SET_STAT("queue_depth", esrb_queue_depth(&client->queue));
-    SET_STAT("seq_gaps", 0);
-    SET_STAT("leaked_messages", 0);
+    SET_STAT("seq_gaps", atomic_load_explicit(&client->seq_gaps, memory_order_relaxed));
+    SET_STAT("leaked_messages", atomic_load_explicit(&client->leaked_messages, memory_order_relaxed));
 #undef SET_STAT
     return stats;
 }

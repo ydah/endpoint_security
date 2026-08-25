@@ -29,7 +29,7 @@ module EndpointSecurity
     alias __native_stats stats
 
     # @return [Client]
-    def initialize(mute_self: true, **)
+    def initialize(mute_self: true, subscribe: nil, **)
       __native_initialize(mute_self: mute_self, **)
       @handlers = {}
       @subscriptions = []
@@ -37,6 +37,7 @@ module EndpointSecurity
       @reported_timeouts = 0
       @running = false
       mute_process(pid: ::Process.pid) if mute_self
+      self.subscribe(subscribe) if subscribe
     end
 
     # @return [Array<Symbol>]

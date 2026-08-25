@@ -13,7 +13,25 @@ require_relative "endpoint_security/client"
 require_relative "endpoint_security/recorder"
 
 # Ruby bindings for Apple's Endpoint Security API.
-module EndpointSecurity; end
+module EndpointSecurity
+  class << self
+    # Encoding used for +es_string_token_t+ values.
+    # @return [Symbol] +:utf8+ or +:binary+
+    attr_reader :string_encoding
+
+    # Selects the encoding used for native string tokens.
+    # @param value [Symbol] +:utf8+ or +:binary+
+    # @return [Symbol]
+    def string_encoding=(value)
+      value = value.to_sym
+      raise ArgumentError, "string_encoding must be :utf8 or :binary" unless %i[utf8 binary].include?(value)
+
+      @string_encoding = value
+    end
+  end
+
+  self.string_encoding = :utf8
+end
 
 # Short alias for {EndpointSecurity}.
 ES = EndpointSecurity

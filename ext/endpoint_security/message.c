@@ -39,6 +39,9 @@ static void
 message_free(void *pointer)
 {
     esrb_message_t *message = pointer;
+    if (message->valid && message->held) {
+        atomic_fetch_add_explicit(&message->client->leaked_messages, 1, memory_order_relaxed);
+    }
     message_release(message);
     xfree(message);
 }
@@ -130,7 +133,7 @@ message_process(VALUE self)
 {
     esrb_message_t *wrapper = get_message(self);
     const es_message_t *message = wrapper->slot->message;
-    return esrb_view_wrap(self, message->process, "es_process_t", message->version);
+    return esrb_view_wrap(self, message->process, "es_process_t", message->version, wrapper->client->strict_version);
 }
 
 static VALUE
@@ -138,14 +141,35 @@ message_thread(VALUE self)
 {
     esrb_message_t *wrapper = get_message(self);
     const es_message_t *message = wrapper->slot->message;
-    return message->version >= 4 ? esrb_view_wrap(self, message->thread, "es_thread_t", message->version) : Qnil;
+    return message->version >= 4
+        ? esrb_view_wrap(self, message->thread, "es_thread_t", message->version, wrapper->client->strict_version)
+        : Qnil;
 }
 
 static VALUE
 message_event(VALUE self)
 {
     esrb_message_t *wrapper = get_message(self);
-    return esrb_event_wrap(self, wrapper->slot->message);
+    return esrb_event_wrap(self, wrapper->slot->message, wrapper->client->strict_version);
+}
+
+static VALUE
+message_result(VALUE self)
+{
+    const es_message_t *message = get_message(self)->slot->message;
+    if (message->action_type == ES_ACTION_TYPE_AUTH) {
+        return Qnil;
+    }
+    if (message->action.notify.result_type == ES_RESULT_TYPE_FLAGS) {
+        return UINT2NUM(message->action.notify.result.flags);
+    }
+    return ID2SYM(rb_intern(message->action.notify.result.auth == ES_AUTH_RESULT_ALLOW ? "allow" : "deny"));
+}
+
+static VALUE
+message_raw_pointer(VALUE self)
+{
+    return ULL2NUM((uintptr_t)get_message(self)->slot->message);
 }
 
 static VALUE
@@ -314,7 +338,9 @@ esrb_init_message(VALUE endpoint_security)
     rb_define_method(c_message, "process", message_process, 0);
     rb_define_method(c_message, "thread", message_thread, 0);
     rb_define_method(c_message, "event", message_event, 0);
+    rb_define_method(c_message, "result", message_result, 0);
     rb_define_method(c_message, "raw_event_bytes", message_raw_event_bytes, 0);
+    rb_define_method(c_message, "raw_pointer", message_raw_pointer, 0);
     rb_define_method(c_message, "time_left", message_time_left, 0);
     rb_define_method(c_message, "answered?", message_answered_p, 0);
     rb_define_method(c_message, "allow!", message_allow, -1);
