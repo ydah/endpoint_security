@@ -1,0 +1,12 @@
+@import "tailwindcss" source(none);
+@source "./public/index.html";
+
+@layer base {
+  body { font-family: "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif; }
+  code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+  h1, h2, h3 { @apply text-balance; }
+  p { @apply text-pretty; }
+  a:focus-visible { @apply outline-2 outline-offset-4 outline-red-700; }
+  pre:focus-visible { @apply outline-2 outline-offset-4 outline-red-700; }
+  ::selection { @apply bg-red-100 text-red-900; }
+}

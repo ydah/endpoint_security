@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <title>endpoint_security — macOS events, in Ruby</title>
+    <meta name="description" content="Native Ruby bindings for Apple's Endpoint Security framework. Observe processes and files, respond to authorization events, and record activity as JSON.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="endpoint_security — macOS events, in Ruby">
+    <meta property="og:description" content="Subscribe to macOS events with a Ruby block. Native event delivery, authorization fallbacks, and JSON recording.">
+    <meta property="og:url" content="https://ydah.github.io/endpoint_security/">
+    <link rel="canonical" href="https://ydah.github.io/endpoint_security/">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body class="bg-white text-slate-900 antialiased">
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-3">Skip to content</a>
+    <header class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-7 lg:px-10">
+      <a href="./" class="flex items-center gap-3 rounded-sm text-lg font-semibold" aria-label="endpoint_security home">
+        <svg class="size-9 shrink-0" viewBox="0 0 40 40" fill="none" aria-hidden="true"><rect width="40" height="40" rx="10" class="fill-red-700"/><path d="M11 13h18l-3 7-6 8-6-8zM11 13l9 15 9-15M14 20h12M16 13l-2 7m10-7 2 7" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <span>endpoint_security</span>
+      </a>
+      <nav aria-label="Main navigation" class="flex items-center gap-6 text-sm font-medium text-slate-600 sm:gap-8">
+        <a href="#features" class="hover:text-red-700">Features</a>
+        <a href="https://github.com/ydah/endpoint_security#readme" class="hover:text-red-700">Documentation</a>
+        <a href="https://github.com/ydah/endpoint_security" class="flex items-center gap-2 text-slate-900 hover:text-red-700">GitHub <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 5h5v5M19 5l-9 9M10 5H5v14h14v-5"/></svg></a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section aria-labelledby="hero-title" class="mx-auto grid max-w-7xl items-center gap-12 px-6 pt-12 pb-16 lg:grid-cols-2 lg:gap-10 lg:px-10 lg:pt-20 lg:pb-24">
+        <div>
+          <p class="mb-7 flex items-center gap-2 text-sm font-medium text-slate-600"><span class="size-2 rounded-full bg-red-700" aria-hidden="true"></span> A Ruby interface to Apple’s Endpoint Security</p>
+          <h1 id="hero-title" class="max-w-xl text-5xl leading-tight font-semibold sm:text-6xl lg:text-7xl">Your Mac has<br>a lot to say.<br>Listen in Ruby.</h1>
+          <p class="mt-6 max-w-md text-lg leading-relaxed text-slate-600">Watch processes. Follow file activity. Decide what runs. Work with macOS security events through a familiar Ruby block.</p>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <a href="#get-started" class="inline-flex min-h-12 items-center justify-center rounded-lg bg-red-700 px-6 py-3 text-sm font-semibold text-white hover:bg-red-800">Get started</a>
+            <a href="https://github.com/ydah/endpoint_security/tree/main/examples" class="inline-flex min-h-12 items-center justify-center rounded-lg border border-slate-200 px-6 py-3 text-sm font-semibold hover:bg-slate-50">Explore examples</a>
+          </div>
+          <p class="mt-6 text-sm text-slate-500 tabular-nums">macOS 13+ <span class="mx-2 text-slate-300" aria-hidden="true">/</span> CRuby 3.2+ <span class="mx-2 text-slate-300" aria-hidden="true">/</span> MIT licensed</p>
+        </div>
+
+        <figure class="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-3 shadow-sm sm:p-5">
+          <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 text-sm">
+              <span class="flex items-center gap-2 font-medium"><svg class="size-4 text-red-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-14-2 16"/></svg> observe.rb</span>
+              <span class="text-slate-500">Ruby</span>
+            </div>
+            <pre tabindex="0" aria-label="Ruby example: observe process executions" class="overflow-x-auto p-5 text-xs leading-7 sm:text-sm"><code><span class="text-red-700">require</span> "endpoint_security"
+
+ES::Client.open(<span class="text-red-700">subscribe:</span> :notify_exec) <span class="text-red-700">do</span> |client|
+  client.on(:notify_exec) <span class="text-red-700">do</span> |message|
+    target = message.event.target
+    puts "#{target.executable.path} pid=#{target.pid}"
+  <span class="text-red-700">end</span>
+
+  client.run
+<span class="text-red-700">end</span></code></pre>
+            <div class="border-t border-slate-200 bg-slate-50 px-5 py-4">
+              <p class="mb-3 text-xs font-medium text-slate-500">Example output</p>
+              <pre tabindex="0" aria-label="Example process event output" class="overflow-x-auto text-xs leading-6 text-slate-600 tabular-nums"><code>/bin/zsh pid=412
+/usr/bin/git pid=418
+/usr/bin/ssh pid=419</code></pre>
+            </div>
+          </div>
+          <figcaption class="flex items-center justify-between gap-3 px-1 pt-4 text-xs text-slate-500"><span>Native events. Ordinary Ruby.</span><span>Requires an entitled host</span></figcaption>
+        </figure>
+      </section>
+
+      <section aria-label="Event delivery" class="border-y border-slate-200 bg-slate-50">
+        <div class="mx-auto grid max-w-7xl gap-6 px-6 py-7 lg:grid-cols-3 lg:items-center lg:px-10">
+          <p class="text-sm leading-6 text-slate-600">Close to the operating system.<br><span class="font-medium text-slate-900">Comfortably inside Ruby.</span></p>
+          <ol class="flex flex-wrap items-center gap-x-4 gap-y-3 text-sm font-medium lg:col-span-2 lg:justify-end sm:gap-x-6">
+            <li>macOS events</li><li aria-hidden="true" class="text-slate-400">›</li>
+            <li>Native queue</li><li aria-hidden="true" class="text-slate-400">›</li>
+            <li>Ruby handler</li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="features" aria-labelledby="features-title" class="mx-auto max-w-7xl scroll-mt-8 px-6 py-20 lg:px-10 lg:py-24">
+        <div class="grid gap-5 lg:grid-cols-2 lg:gap-10">
+          <h2 id="features-title" class="max-w-md text-3xl leading-tight font-semibold sm:text-4xl">System-level visibility.<br>Ruby-level simplicity.</h2>
+          <p class="max-w-lg self-end text-base leading-7 text-slate-600">Build monitoring and authorization tools with generated event bindings, native message views, and control over the events you receive.</p>
+        </div>
+        <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+          <article>
+            <svg class="mb-5 size-8 text-red-700" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="26" height="22" rx="4"/><path d="m8 12 4 4-4 4m8 0h8"/></svg>
+            <h3 class="text-xl font-semibold">Observe what happens</h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600">Subscribe to process and file events. Inspect executables, signing identities, and event fields through lazy Ruby views.</p>
+            <a href="https://github.com/ydah/endpoint_security/blob/main/examples/procmon.rb" class="mt-4 inline-block rounded-sm text-sm font-semibold text-red-700 underline decoration-red-200 underline-offset-4 hover:decoration-red-700">Process monitoring example</a>
+          </article>
+          <article>
+            <svg class="mb-5 size-8 text-red-700" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m16 3 11 4v8c0 7-11 14-11 14S5 22 5 15V7z"/><path d="m11 15 4 4 7-8"/></svg>
+            <h3 class="text-xl font-semibold">Decide what runs</h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600">Allow or deny authorization events. A native watchdog sends your configured fallback if Ruby misses a deadline, with exactly-once responses.</p>
+            <a href="https://github.com/ydah/endpoint_security#authorization" class="mt-4 inline-block rounded-sm text-sm font-semibold text-red-700 underline decoration-red-200 underline-offset-4 hover:decoration-red-700">Authorization guide</a>
+          </article>
+          <article>
+            <svg class="mb-5 size-8 text-red-700" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 5H7v22h5M20 5h5v22h-5M13 11h6m-6 5h6m-6 5h6"/></svg>
+            <h3 class="text-xl font-semibold">Keep the useful signal</h3>
+            <p class="mt-3 text-sm leading-7 text-slate-600">Mute processes and paths, inspect queue statistics, and record events as newline-delimited JSON for later analysis.</p>
+            <a href="https://github.com/ydah/endpoint_security#muting-and-recording" class="mt-4 inline-block rounded-sm text-sm font-semibold text-red-700 underline decoration-red-200 underline-offset-4 hover:decoration-red-700">Muting and recording guide</a>
+          </article>
+        </div>
+      </section>
+
+      <section id="get-started" aria-labelledby="start-title" class="scroll-mt-8 bg-slate-900 text-white">
+        <div class="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-2 lg:gap-20 lg:px-10 lg:py-20">
+          <div>
+            <h2 id="start-title" class="text-3xl font-semibold sm:text-4xl">Start with a subscription.</h2>
+            <p class="mt-5 max-w-md text-base leading-7 text-slate-300">Add the gem to your project, prepare your Mac, and choose the events you want to handle.</p>
+            <div class="mt-8 overflow-hidden rounded-xl border border-slate-600">
+              <p class="bg-slate-800 px-5 py-3 text-xs font-medium text-slate-300">Gemfile</p>
+              <pre tabindex="0" aria-label="Add endpoint_security to your Gemfile" class="overflow-x-auto px-5 py-5 text-sm"><code>gem "endpoint_security"</code></pre>
+              <div class="border-t border-slate-600 px-5 py-4">
+                <p class="mb-2 text-xs text-slate-400">Then install</p>
+                <pre tabindex="0" aria-label="Install with Bundler" class="overflow-x-auto text-sm"><code>bundle install</code></pre>
+              </div>
+            </div>
+            <a href="https://github.com/ydah/endpoint_security#quick-start" class="mt-6 inline-flex min-h-12 items-center rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-200">Read the quick start</a>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold">Before you connect</h3>
+            <p class="mt-3 text-sm leading-7 text-slate-300">Apple’s Endpoint Security framework requires an approved, signed host executable.</p>
+            <ul class="mt-6 space-y-4 text-sm leading-6 text-slate-200">
+              <li class="flex gap-3"><span aria-hidden="true" class="text-slate-400">✓</span><span class="tabular-nums">macOS 13+, CRuby 3.2+, and Xcode Command Line Tools</span></li>
+              <li class="flex gap-3"><span aria-hidden="true" class="text-slate-400">✓</span><span>An Apple-approved Endpoint Security client entitlement</span></li>
+              <li class="flex gap-3"><span aria-hidden="true" class="text-slate-400">✓</span><span>A signed host Ruby executable with Full Disk Access</span></li>
+              <li class="flex gap-3"><span aria-hidden="true" class="text-slate-400">✓</span><span>Root privileges when opening a client</span></li>
+            </ul>
+            <p class="mt-7 border-t border-slate-600 pt-5 text-sm leading-6 text-slate-300">The entitlement belongs to the host executable, not the gem. This project cannot grant or bypass Apple’s approval.</p>
+            <a href="https://github.com/ydah/endpoint_security#installation" class="mt-4 inline-block rounded-sm text-sm font-semibold underline decoration-slate-500 underline-offset-4 hover:decoration-white">Read the setup requirements</a>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="contribute-title" class="mx-auto flex max-w-7xl flex-col justify-between gap-6 px-6 py-14 sm:flex-row sm:items-center lg:px-10">
+        <div><h2 id="contribute-title" class="text-2xl font-semibold">Open source. Open to your ideas.</h2><p class="mt-3 text-sm leading-6 text-slate-600">Read the source, report an issue, or contribute an example.</p></div>
+        <a href="https://github.com/ydah/endpoint_security" class="inline-flex min-h-12 shrink-0 items-center justify-center self-start rounded-lg border border-slate-200 px-5 py-3 text-sm font-semibold hover:bg-slate-50 sm:self-auto">View on GitHub</a>
+      </section>
+    </main>
+
+    <footer class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 border-t border-slate-200 px-6 py-7 text-xs text-slate-500 lg:px-10">
+      <p>endpoint_security <span class="mx-2" aria-hidden="true">/</span> Built by <a href="https://github.com/ydah" class="rounded-sm underline underline-offset-4 hover:text-slate-900">Yudai Takada</a></p>
+      <div class="flex gap-6"><a href="https://github.com/ydah/endpoint_security/blob/main/LICENSE.txt" class="rounded-sm hover:text-slate-900">MIT License</a><a href="https://github.com/ydah/endpoint_security/issues" class="rounded-sm hover:text-slate-900">Report an issue</a></div>
+    </footer>
+  </body>
+</html>
